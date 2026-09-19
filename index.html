@@ -37,23 +37,8 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 .media-item h3 { font-size: 15px; margin: 0 0 10px 0; }
 .media-item img { width: 100%; border-radius: 6px; }
 .media-item iframe { width: 100%; height: 250px; border-radius: 6px; }
-
-#media-section {
-    max-width: 800px !important; 
-    margin: 30px auto !important; 
-    padding: 0 15px;
-    box-sizing: border-box;
-    text-align: center;
-}
-#media-section img {
-    max-width: 100% !important;
-    height: auto !important;
-    display: block;
-    margin: 0 auto 15px auto !important;
-    border-radius: 8px;
-    border: 1px solid #eee;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
+#media-section { max-width: 800px !important; margin: 30px auto !important; padding: 0 15px; box-sizing: border-box; text-align: center; }
+#media-section img { max-width: 100% !important; height: auto !important; display: block; margin: 0 auto 15px auto !important; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 </style>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 </head>
@@ -118,11 +103,9 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 </div>
 
 <script>
-// 全局配置
-window.eliteSpawnRate = 0.45; // 默认精英怪概率45%
-
-// 页面切换
+window.eliteSpawnRate = 0.45;
 window.pendingGame = null;
+
 function go(name) {
   if (name === 'snake' || name === 'breakout' || name === 'space') {
     window.pendingGame = name; 
@@ -138,8 +121,6 @@ function switchPage(name) {
   if (name !== 'snake') sStop(); if (name !== 'breakout') bStop(); if (name !== 'space') spStop();
   if (name === 'snake') sReset(); else if (name === 'breakout') bReset(); else if (name === 'space') spReset();
 }
-
-// 设备适配
 function selectDevice(type) {
     document.getElementById('device-modal').style.display = 'none';
     applyDeviceStyle(type);
@@ -148,24 +129,20 @@ function selectDevice(type) {
 function applyDeviceStyle(type) {
     var canvases = document.querySelectorAll('canvas');
     if (type === 'pc') {
-        document.body.style.maxWidth = '100%'; 
-        document.body.style.padding = '20px 40px';
+        document.body.style.maxWidth = '100%'; document.body.style.padding = '20px 40px';
         canvases.forEach(function(c) { c.style.maxWidth = '100%'; c.style.width = '900px'; c.style.margin = '20px auto'; });
     } else {
-        document.body.style.maxWidth = '640px';
-        document.body.style.padding = '12px 12px 30px';
+        document.body.style.maxWidth = '640px'; document.body.style.padding = '12px 12px 30px';
         canvases.forEach(function(c) { c.style.maxWidth = '480px'; c.style.width = '100%'; c.style.margin = '8px auto'; });
     }
 }
 
-// 数据存储
 const ADMIN_PASSWORD = "123456";
 let isAdminLoggedIn = false;
 function getCustomGames() { try { return JSON.parse(localStorage.getItem('custom_games') || '[]'); } catch(e) { return []; } }
 function saveCustomGames(games) { localStorage.setItem('custom_games', JSON.stringify(games)); renderCustomGames(); }
 function getCustomMedias() { try { return JSON.parse(localStorage.getItem('custom_medias') || '[]'); } catch(e) { return []; } }
 function saveCustomMedias(medias) { localStorage.setItem('custom_medias', JSON.stringify(medias)); renderCustomMedias(); }
-
 function renderCustomGames() {
     const listEl = document.getElementById('custom-games-list');
     if (!listEl) return;
@@ -205,7 +182,6 @@ function deleteMedia(index) {
     let medias = getCustomMedias(); medias.splice(index, 1); saveCustomMedias(medias);
 }
 
-// 终端命令
 let cmdOutput, cmdInput, cmdWindow;
 function initTerminal() {
     cmdOutput = document.getElementById('term-output'); cmdInput = document.getElementById('term-input'); cmdWindow = document.getElementById('terminal-window');
@@ -219,7 +195,6 @@ function openTerminal() {
     cmdOutput.innerHTML = ''; printTerminal("管理员模式已开启，请输入命令：\n");
 }
 function printTerminal(text) { cmdOutput.innerHTML += text + "<br>"; cmdOutput.scrollTop = cmdOutput.scrollHeight; }
-
 function processCommand(cmd) {
     if (!cmd) return;
     printTerminal("> " + cmd);
@@ -252,9 +227,7 @@ function processCommand(cmd) {
         if (!isNaN(rate) && rate >= 0 && rate <= 100) {
             window.eliteSpawnRate = rate / 100;
             printTerminal(`[+] 精英怪生成概率已调整为 ${rate}%`);
-        } else {
-            printTerminal(`[!] 请输入 0-100 之间的数字，例如：admin_rate 45`);
-        }
+        } else { printTerminal(`[!] 请输入 0-100 之间的数字，例如：admin_rate 45`); }
         return;
     }
     if (cmd.toLowerCase().startsWith('add ')) {
@@ -282,7 +255,6 @@ function processCommand(cmd) {
     else { printTerminal(`'${cmd}' 不是内部或外部命令。`); }
 }
 
-// 音效系统
 var Sound = (function() {
   var ctx = null; var enabled = true;
   try { var saved = localStorage.getItem('sound_on'); if (saved === '0') enabled = false; } catch(e) {}
@@ -320,7 +292,6 @@ function initAudioOnce() { Sound.init(); document.removeEventListener('touchstar
 document.addEventListener('touchstart', initAudioOnce); document.addEventListener('mousedown', initAudioOnce); document.addEventListener('click', initAudioOnce);
 (function() { if (!Sound.isOn()) { document.getElementById('soundBtn').textContent = '音效关'; } })();
 
-// 贪吃蛇
 var snake = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('snakeC'); var cx = cv.getContext('2d'); var G = 20, CELL = 20; var body, dir, nextDir, food, score, tickMs, lastTick, best = 0, dead = false;
@@ -361,7 +332,6 @@ var snake = { running: false, raf: null };
   }, {passive:false});
 })();
 
-// 打砖块
 var br = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('brC'); var cx = cv.getContext('2d'); var W = cv.width, H = cv.height; var paddle, ball, bricks, score, lives, keys = {};
@@ -417,7 +387,6 @@ var br = { running: false, raf: null };
   }
 })();
 
-// 星际守卫
 var sp = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('spC'); var cx = cv.getContext('2d'); var W = cv.width, H = cv.height; 
@@ -458,12 +427,21 @@ var sp = { running: false, raf: null };
   
   function dropPowerup(x, y) { powerups.push({ x: x, y: y, vy: 100, r: 12, type: Math.floor(Math.random() * 2) + 1 }); }
 
+  // 修复后的攻击函数，绿色技能球(2)生效
   function fire() { 
       var y = player.y - player.r; 
-      var bulletCount = 2 + player.adminSkillLevel; 
-      for (var i = 0; i < bulletCount; i++) {
-          var offsetX = (i - (bulletCount - 1) / 2) * 15;
-          bullets.push({ x: player.x + offsetX, y: y, vx: offsetX * 5, vy: -560 });
+      if (player.skillType === 2) {
+          // 技能2：一次发射3颗子弹
+          bullets.push({ x: player.x - 15, y: y, vx: -100, vy: -560 });
+          bullets.push({ x: player.x, y: y, vx: 0, vy: -560 });
+          bullets.push({ x: player.x + 15, y: y, vx: 100, vy: -560 });
+      } else {
+          // 普通攻击或叠加技能
+          var bulletCount = 2 + player.adminSkillLevel;
+          for (var i = 0; i < bulletCount; i++) {
+              var offsetX = (i - (bulletCount - 1) / 2) * 15;
+              bullets.push({ x: player.x + offsetX, y: y, vx: offsetX * 5, vy: -560 });
+          }
       }
       Sound.shoot(); 
   }
@@ -558,13 +536,14 @@ var sp = { running: false, raf: null };
               if (e.eliteType === 1) {
                   e.skillTimer = 1.5;
                   var angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
-                  // 发射3颗追踪子弹
+                  // 精英怪1：三发追踪
                   for (var k = -1; k <= 1; k++) {
                       var ang = angleToPlayer + k * 0.15;
                       enemiesBullets.push({ x: e.x, y: e.y, vx: Math.cos(ang) * 250, vy: Math.sin(ang) * 250 }); 
                   }
               } else if (e.eliteType === 2) {
                   e.skillTimer = 2.0;
+                  // 精英怪2：范围弹幕
                   for (var ang = 0; ang < Math.PI * 2; ang += Math.PI / 8) { 
                       enemiesBullets.push({ x: e.x, y: e.y, vx: Math.cos(ang) * 200, vy: Math.sin(ang) * 200 });
                   }
