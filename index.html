@@ -37,22 +37,19 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 .media-item h3 { font-size: 15px; margin: 0 0 10px 0; }
 .media-item img { width: 100%; border-radius: 6px; }
 .media-item iframe { width: 100%; height: 250px; border-radius: 6px; }
-#ad-banner { display: none; margin: 0 auto 20px auto; text-align: center; width: 100%; }
-#ad-banner img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #eee; display: block; margin: 0 auto; }
+/* 顶部广告图，自适应宽度，永远居中 */
+#hardcoded-ad { 
+    max-width: 100%; 
+    height: auto; 
+    border-radius: 8px; 
+    display: block; 
+    margin: 0 auto 20px auto; 
+    border: 1px solid #eee;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 </head>
 <body>
-
-<script>
-// =================================================================
-// 🚨 极客兄弟，以后换广告，你只需要改下面这一行的链接！🚨
-// =================================================================
-const AD_IMAGE_URL = "https://via.placeholder.com/600x150?text=你的广告位";
-
-// 如果你不想显示广告了，把上面的链接改成 "" 即可。
-// =================================================================
-</script>
 
 <!-- 设备选择弹窗 -->
 <div id="device-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; display: none; justify-content: center; align-items: center;">
@@ -67,9 +64,6 @@ const AD_IMAGE_URL = "https://via.placeholder.com/600x150?text=你的广告位";
 </div>
 
 <div id="p-home" class="page on">
-  <div id="ad-banner">
-    <img id="ad-img" src="" alt="广告位">
-  </div>
   <h1>游戏站 <button class="sound-toggle" id="soundBtn" onclick="toggleSound()">🔊 音效开</button></h1>
   <ul class="games">
     <li><a href="#" onclick="go('snake');return false;">贪吃蛇</a><div class="desc">滑动屏幕或点方向键控制，撞墙或撞自己结束。</div></li>
@@ -77,8 +71,14 @@ const AD_IMAGE_URL = "https://via.placeholder.com/600x150?text=你的广告位";
     <li><a href="#" onclick="go('space');return false;">星际守卫</a><div class="desc">手指拖动飞船，自动开火，躲开红色敌人。</div></li>
   </ul>
   <div id="custom-games-list" style="margin-top: 10px;"></div>
+  
+  <!-- 图片与视频区 -->
   <div id="media-section" style="margin-top: 30px;">
     <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">📷 图片与视频区</h2>
+    
+    <!-- 这里直接硬编码加载 ad.jpg，只要图片存在，所有人打开都能看到！ -->
+    <img id="hardcoded-ad" src="ad.jpg" alt="广告位" onerror="this.style.display='none'">
+    
     <div id="media-list"></div>
   </div>
 </div>
@@ -113,19 +113,6 @@ const AD_IMAGE_URL = "https://via.placeholder.com/600x150?text=你的广告位";
 </div>
 
 <script>
-// ============ 广告加载逻辑 ============
-function loadAd() {
-    const banner = document.getElementById('ad-banner');
-    const img = document.getElementById('ad-img');
-    // 如果代码顶部的 AD_IMAGE_URL 有网址，就显示广告
-    if (AD_IMAGE_URL && AD_IMAGE_URL.startsWith('http')) {
-        img.src = AD_IMAGE_URL;
-        banner.style.display = 'block';
-    } else {
-        banner.style.display = 'none';
-    }
-}
-
 // ============ 页面切换逻辑 ============
 window.pendingGame = null;
 
@@ -196,7 +183,7 @@ function renderCustomMedias() {
     const listEl = document.getElementById('media-list');
     if (!listEl) return;
     let medias = getCustomMedias();
-    if (medias.length === 0) { listEl.innerHTML = '<p style="color:#999; font-size:13px;">还没有添加图片或视频哦~</p>'; return; }
+    if (medias.length === 0) { return; } // 如果本地没有添加任何东西，就不显示多余的提示
     let html = '';
     medias.forEach(function(item, index) {
         html += `<div class="media-item">
@@ -531,7 +518,6 @@ window.onload = function() {
     initTerminal();
     renderCustomGames();
     renderCustomMedias();
-    loadAd();
 };
 </script>
 
