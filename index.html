@@ -7,7 +7,7 @@
 <style>
 * { -webkit-tap-highlight-color: transparent; }
 html, body { background: #fff; color: #000; font-family: SimSun, "宋体", serif; font-size: 15px; margin: 0; padding: 0; overscroll-behavior: none; }
-body { max-width: 640px; margin: 0 auto; padding: 12px 12px 30px; box-sizing: border-box; }
+body { max-width: 100%; margin: 0 auto; padding: 12px 12px 30px; box-sizing: border-box; transition: all 0.3s ease; }
 h1 { font-size: 19px; border-bottom: 1px solid #999; padding-bottom: 6px; margin: 6px 0 12px; display: flex; justify-content: space-between; align-items: center; }
 h1 a { color: #0000cc; text-decoration: none; font-size: 14px; padding: 4px 8px; }
 h1 a:active { color: #ff0000; }
@@ -15,7 +15,7 @@ h1 a:active { color: #ff0000; }
 .page.on { display: block; }
 a { color: #0000cc; }
 a:active { color: #ff0000; }
-canvas { background: #000; border: 1px solid #999; touch-action: none; display: block; margin: 8px auto; width: 100%; max-width: 480px; height: auto; }
+canvas { background: #000; border: 1px solid #999; touch-action: none; display: block; margin: 8px auto; width: 100%; height: auto; }
 .hud { text-align: center; margin: 6px 0; font-size: 15px; }
 .center { text-align: center; }
 .btn { font-family: inherit; font-size: 16px; padding: 10px 20px; margin: 8px 4px; border: 1px solid #999; background: #eee; cursor: pointer; text-decoration: none; color: #000; display: inline-block; -webkit-user-select: none; user-select: none; min-width: 100px; }
@@ -32,9 +32,35 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 .left { grid-column: 1; grid-row: 2; }
 .down { grid-column: 2; grid-row: 2; }
 .right { grid-column: 3; grid-row: 2; }
+/* 深色控制台样式 */
+.admin-panel { display: none; margin-top: 15px; padding: 15px; border: 1px solid #444; background: #1e1e1e; border-radius: 8px; text-align: left; color: #fff; }
+.admin-panel h3 { color: #4af; border-bottom: 1px solid #444; padding-bottom: 5px; }
+.admin-panel label { font-size: 14px; color: #ccc; }
+.admin-panel input, .admin-panel textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; border-radius: 4px; padding: 8px; font-family: monospace; }
+.admin-panel input:focus, .admin-panel textarea:focus { outline: none; border-color: #0056b3; }
+.admin-entry { text-align: center; margin-top: 30px; }
+/* 媒体区样式 */
+.media-item { border: 1px solid #ddd; padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #fafafa; }
+.media-item h3 { font-size: 15px; margin: 0 0 10px 0; }
+.media-item img { width: 100%; border-radius: 6px; }
+.media-item iframe { width: 100%; height: 250px; border-radius: 6px; }
 </style>
+<!-- 引入 Pyodide 引擎 -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 </head>
 <body>
+
+<!-- ================= 设备选择弹窗 ================= -->
+<div id="device-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; display: none; justify-content: center; align-items: center;">
+    <div style="background: #fff; padding: 30px 20px; border-radius: 12px; text-align: center; max-width: 80%;">
+        <h2 style="margin-top: 0; color: #333; font-size: 20px;">请选择你的设备</h2>
+        <p style="font-size: 13px; color: #888; margin-bottom: 20px;">选择后会自动适配显示比例。</p>
+        <div style="display: flex; justify-content: space-around; gap: 15px;">
+            <button onclick="selectDevice('pc')" style="padding: 15px 25px; font-size: 16px; cursor: pointer; background: #0056b3; color: white; border: none; border-radius: 6px; flex: 1;">💻 电脑</button>
+            <button onclick="selectDevice('mobile')" style="padding: 15px 25px; font-size: 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 6px; flex: 1;">📱 手机</button>
+        </div>
+    </div>
+</div>
 
 <div id="p-home" class="page on">
   <h1>游戏站 <button class="sound-toggle" id="soundBtn" onclick="toggleSound()">🔊 音效开</button></h1>
@@ -43,6 +69,14 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
     <li><a href="#" onclick="go('breakout');return false;">打砖块</a><div class="desc">手指拖动底部挡板，把球弹回去打光砖块。</div></li>
     <li><a href="#" onclick="go('space');return false;">星际守卫</a><div class="desc">手指拖动飞船，自动开火，躲开红色敌人。</div></li>
   </ul>
+  
+  <div id="custom-games-list" style="margin-top: 10px;"></div>
+  
+  <!-- 媒体展示区 -->
+  <div id="media-section" style="margin-top: 30px;">
+    <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">📷 图片与视频区</h2>
+    <div id="media-list"></div>
+  </div>
 </div>
 
 <div id="p-snake" class="page">
@@ -75,9 +109,185 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 </div>
 
 <script>
-document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
-document.addEventListener('touchmove', function(e) { if (e.target.tagName === 'CANVAS') e.preventDefault(); }, { passive: false });
+// ============ 页面切换逻辑 ============
+window.pendingGame = null;
 
+function go(name) {
+  if (name === 'snake' || name === 'breakout' || name === 'space') {
+    window.pendingGame = name; 
+    document.getElementById('device-modal').style.display = 'flex';
+    return;
+  }
+  switchPage(name);
+}
+
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('on'); });
+  document.getElementById('p-' + name).classList.add('on');
+  window.scrollTo(0, 0);
+  if (name !== 'snake') sStop(); if (name !== 'breakout') bStop(); if (name !== 'space') spStop();
+  if (name === 'snake') sReset(); else if (name === 'breakout') bReset(); else if (name === 'space') spReset();
+}
+
+function selectDevice(type) {
+    document.getElementById('device-modal').style.display = 'none';
+    applyDeviceStyle(type);
+    if (window.pendingGame) {
+        switchPage(window.pendingGame);
+        window.pendingGame = null;
+    }
+}
+
+function applyDeviceStyle(type) {
+    var canvases = document.querySelectorAll('canvas');
+    if (type === 'pc') {
+        document.body.style.maxWidth = '100%';
+        document.body.style.padding = '30px 60px 60px';
+        document.body.style.fontSize = '18px';
+        canvases.forEach(function(c) { c.style.maxWidth = '800px'; c.style.margin = '20px auto'; });
+    } else {
+        document.body.style.maxWidth = '640px';
+        document.body.style.padding = '12px 12px 30px';
+        document.body.style.fontSize = '15px';
+        canvases.forEach(function(c) { c.style.maxWidth = '480px'; c.style.margin = '8px auto'; });
+    }
+}
+
+// ============ 游戏与媒体管理功能 ============
+const ADMIN_PASSWORD = "123456";
+let pyodideReadyPromise = null;
+
+// 存储管理
+function getCustomGames() { try { return JSON.parse(localStorage.getItem('custom_games') || '[]'); } catch(e) { return []; } }
+function saveCustomGames(games) { localStorage.setItem('custom_games', JSON.stringify(games)); renderCustomGames(); }
+
+function getCustomMedias() { try { return JSON.parse(localStorage.getItem('custom_medias') || '[]'); } catch(e) { return []; } }
+function saveCustomMedias(medias) { localStorage.setItem('custom_medias', JSON.stringify(medias)); renderCustomMedias(); }
+
+// 渲染游戏列表
+function renderCustomGames() {
+    const listEl = document.getElementById('custom-games-list');
+    if (!listEl) return;
+    let games = getCustomGames();
+    if (games.length === 0) { listEl.innerHTML = ''; return; }
+    let html = '<ul class="games">';
+    games.forEach(function(name) {
+        html += `<li><a href="#" onclick="playCustomGame('${name}');return false;">${name.replace('.html','')}</a></li>`;
+    });
+    html += '</ul>';
+    listEl.innerHTML = html;
+}
+
+// 渲染媒体列表
+function renderCustomMedias() {
+    const listEl = document.getElementById('media-list');
+    if (!listEl) return;
+    let medias = getCustomMedias();
+    if (medias.length === 0) { listEl.innerHTML = '<p style="color:#999; font-size:13px;">还没有添加图片或视频哦~</p>'; return; }
+    
+    let html = '';
+    medias.forEach(function(item, index) {
+        html += `<div class="media-item">
+            <h3 style="font-size: 15px; margin: 0 0 10px 0;">${item.name}</h3>`;
+        
+        if (item.type === 'video') {
+            // 如果是B站视频，用iframe嵌入
+            html += `<iframe src="${item.url}" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>`;
+        } else {
+            html += `<img src="${item.url}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/600x300?text=图片加载失败';">`;
+        }
+        
+        html += `<button onclick="deleteMedia(${index})" style="margin-top:10px; padding: 4px 8px; background: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">删除</button></div>`;
+    });
+    listEl.innerHTML = html;
+}
+
+// 播放自定义游戏
+function playCustomGame(name) {
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 9999; background: white;';
+    iframe.src = 'https://ty696.github.io/123/' + name;
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '❌ 返回主站';
+    closeBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 10000; padding: 10px 20px; background: #d9534f; color: white; border: none; border-radius: 5px; cursor: pointer;';
+    closeBtn.onclick = () => { iframe.remove(); closeBtn.remove(); };
+    document.body.appendChild(iframe);
+    document.body.appendChild(closeBtn);
+}
+
+// 管理员登录
+function unlockPy() {
+    let pwd = prompt("请输入管理员密码：");
+    if (pwd === ADMIN_PASSWORD) {
+        document.getElementById('py-panel').style.display = 'block';
+        document.getElementById('admin-entry').style.display = 'none';
+        renderCustomGames();
+        renderCustomMedias();
+    } else {
+        alert("密码错误！");
+    }
+}
+
+// 添加游戏
+function addNewGame() {
+    let name = document.getElementById('new-game-name').value.trim();
+    if (!name) { alert("请输入游戏文件名！"); return; }
+    if (!name.endsWith('.html')) name += '.html';
+    let games = getCustomGames();
+    if (games.includes(name)) { alert("这个游戏已经存在了！"); return; }
+    games.push(name);
+    saveCustomGames(games);
+    document.getElementById('new-game-name').value = '';
+    alert("添加成功！新游戏已出现在首页。");
+}
+
+// 添加媒体（图片/视频）
+function addNewMedia() {
+    let name = document.getElementById('media-name').value.trim();
+    let url = document.getElementById('media-url').value.trim();
+    let type = document.getElementById('media-type').value;
+
+    if (!name || !url) { alert("请输入名称和链接！"); return; }
+    if (!url.startsWith('http')) { alert("请输入正确的链接（以 http 或 https 开头）"); return; }
+
+    let medias = getCustomMedias();
+    medias.push({ name: name, url: url, type: type });
+    saveCustomMedias(medias);
+
+    document.getElementById('media-name').value = '';
+    document.getElementById('media-url').value = '';
+    alert("添加成功！可以去首页看看了。");
+}
+
+// 删除媒体
+function deleteMedia(index) {
+    if (!confirm("确定要删除这个媒体吗？")) return;
+    let medias = getCustomMedias();
+    medias.splice(index, 1);
+    saveCustomMedias(medias);
+}
+
+// rm 删除游戏（兼容大小写）
+function handleAdminCommand() {
+    const cmd = document.getElementById('admin-command').value.trim();
+    if (cmd.toUpperCase().startsWith('RM ')) {
+        const gameName = cmd.substring(3).trim();
+        let games = getCustomGames();
+        const idx = games.indexOf(gameName);
+        if (idx !== -1) {
+            games.splice(idx, 1);
+            saveCustomGames(games);
+            document.getElementById('admin-command').value = '';
+            alert("已成功删除游戏：" + gameName);
+        } else {
+            alert("找不到游戏：" + gameName + "，请检查名字。");
+        }
+    } else {
+        alert("格式错误！请输入：rm 游戏名 (例如：rm game2.html)");
+    }
+}
+
+// ============ 音效系统 ============
 var Sound = (function() {
   var ctx = null; var enabled = true;
   try { var saved = localStorage.getItem('sound_on'); if (saved === '0') enabled = false; } catch(e) {}
@@ -115,14 +325,7 @@ function initAudioOnce() { Sound.init(); document.removeEventListener('touchstar
 document.addEventListener('touchstart', initAudioOnce); document.addEventListener('mousedown', initAudioOnce); document.addEventListener('click', initAudioOnce);
 (function() { if (!Sound.isOn()) { document.getElementById('soundBtn').textContent = '🔇 音效关'; } })();
 
-function go(name) {
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('on'); });
-  document.getElementById('p-' + name).classList.add('on');
-  window.scrollTo(0, 0);
-  if (name !== 'snake') sStop(); if (name !== 'breakout') bStop(); if (name !== 'space') spStop();
-  if (name === 'snake') sReset(); else if (name === 'breakout') bReset(); else if (name === 'space') spReset();
-}
-
+// ============ 贪吃蛇 ============
 var snake = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('snakeC'); var cx = cv.getContext('2d'); var G = 20, CELL = 20; var body, dir, nextDir, food, score, tickMs, lastTick, best = 0, dead = false;
@@ -163,6 +366,7 @@ var snake = { running: false, raf: null };
   }, {passive:false});
 })();
 
+// ============ 打砖块 ============
 var br = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('brC'); var cx = cv.getContext('2d'); var W = cv.width, H = cv.height; var paddle, ball, bricks, score, lives, keys = {};
@@ -218,6 +422,7 @@ var br = { running: false, raf: null };
   }
 })();
 
+// ============ 星际守卫 ============
 var sp = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('spC'); var cx = cv.getContext('2d'); var W = cv.width, H = cv.height; var player, bullets, enemies, particles, stars; var keys = {}, pointerX = null, pointerActive = false; var score, lives, fireTimer, spawnTimer, lastT;
@@ -283,25 +488,95 @@ var sp = { running: false, raf: null };
     var dt = (now - lastT) / 1000; lastT = now; if (dt > 0.05) dt = 0.05; update(dt); draw(); sp.raf = requestAnimationFrame(loop);
   }
 })();
+
+// ============ Python 模拟器 ============
+async function initPyodide() {
+    if (!pyodideReadyPromise) {
+        pyodideReadyPromise = loadPyodide({
+            stdout: (text) => { appendOutput(text); },
+            stderr: (text) => { appendOutput("❌ " + text); }
+        });
+    }
+    return pyodideReadyPromise;
+}
+
+function appendOutput(text) {
+    const outputEl = document.getElementById('py-output');
+    if (outputEl.textContent === "等待执行...") { outputEl.textContent = ""; }
+    outputEl.textContent += text + "\n";
+}
+
+async function runPython() {
+    const code = document.getElementById('py-code').value;
+    if (!code.trim()) { alert("请输入 Python 代码！"); return; }
+    const outputEl = document.getElementById('py-output');
+    outputEl.textContent = "正在加载 Python 引擎，请稍候... (首次加载可能需要10-20秒)\n";
+    try {
+        const pyodide = await initPyodide();
+        outputEl.textContent = ">>> 运行结果：\n"; 
+        await pyodide.runPythonAsync(code);
+    } catch (err) {
+        outputEl.textContent += "\n报错了兄弟：\n" + err;
+    }
+}
 </script>
 
-<!-- ================= 作者署名（在这里修改你的名字！） ================= -->
-<footer style="
-    margin-top: 60px; 
-    padding: 20px; 
-    text-align: right; 
-    font-size: 13px; 
-    color: #888; 
-    border-top: 1px dashed #ccc;
-    font-family: SimSun, serif;
-">
+<!-- ================= 作者署名 ================= -->
+<footer style="margin-top: 60px; padding: 20px; text-align: right; font-size: 13px; color: #888; border-top: 1px dashed #ccc; font-family: SimSun, serif;">
     <p style="margin: 0 0 5px 0;">
-        🎮 本站由 <strong style="color: #0056b3;">老鼠昊铭</strong> 独立开发
+        🎮 本站由 <a href="https://space.bilibili.com/1732077032" target="_blank" style="color: #0056b3; text-decoration: none; font-weight: bold; border-bottom: 1px dashed #0056b3;">老鼠昊铭</a> 独立开发
     </p>
     <p style="margin: 0; font-size: 12px; color: #aaa;">
         <em>Powered by HTML5 Canvas &amp; Web Audio API</em> | © 2026
     </p>
 </footer>
+
+<!-- ================= 管理员入口 ================= -->
+<div id="admin-entry" class="admin-entry">
+    <button onclick="unlockPy()" style="font-size: 13px; padding: 8px 16px; background: #333; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px;">
+        🔒 管理员入口
+    </button>
+</div>
+
+<!-- ================= 深色管理员后台面板 ================= -->
+<div id="py-panel" class="admin-panel">
+    <h3 style="margin-top: 0; font-size: 16px;">🛠️ 游戏与媒体管理后台</h3>
+    
+    <!-- 添加游戏 -->
+    <div style="margin-bottom: 15px;">
+        <label>添加新游戏 (输入文件名，如 game2.html)：</label><br>
+        <input type="text" id="new-game-name" placeholder="例如：game2.html" style="width: 60%; margin-top: 5px;">
+        <button onclick="addNewGame()" style="padding: 6px 12px; background: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer;">添加游戏</button>
+    </div>
+
+    <!-- 删除游戏 -->
+    <div style="margin-bottom: 15px; border-top: 1px dashed #444; padding-top: 10px;">
+        <label>输入删除指令 (格式: rm 游戏名)：</label><br>
+        <input type="text" id="admin-command" placeholder="例如：rm game2.html" style="width: 60%; margin-top: 5px;">
+        <button onclick="handleAdminCommand()" style="padding: 6px 12px; background: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer;">执行删除</button>
+    </div>
+
+    <!-- 添加媒体 -->
+    <div style="margin-bottom: 15px; border-top: 1px dashed #444; padding-top: 10px;">
+        <label>添加图片/视频 (输入名称和链接)：</label><br>
+        <input type="text" id="media-name" placeholder="名称 (如：精彩集锦)" style="width: 30%; margin-top: 5px;">
+        <select id="media-type" style="padding: 6px; margin-top: 5px; background: #2d2d2d; color: #fff; border: 1px solid #555; border-radius: 4px;">
+            <option value="image">图片</option>
+            <option value="video">视频</option>
+        </select>
+        <input type="text" id="media-url" placeholder="链接 (如：https://...)" style="width: 50%; margin-top: 5px;">
+        <button onclick="addNewMedia()" style="padding: 6px 12px; background: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer;">添加媒体</button>
+    </div>
+
+    <!-- Python 模拟器 -->
+    <div style="border-top: 1px dashed #444; padding-top: 10px;">
+        <h3 style="margin-top: 0; font-size: 16px;">🐍 Python 在线模拟器</h3>
+        <textarea id="py-code" placeholder="print('你好，极客世界！')" style="width: 100%; height: 100px; box-sizing: border-box;"></textarea>
+        <br><br>
+        <button onclick="runPython()" style="padding: 8px 16px; background: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer;">🚀 运行代码</button>
+        <pre id="py-output" style="background: #000; color: #0f0; padding: 10px; border-radius: 4px; margin-top: 10px; min-height: 40px; font-family: monospace; white-space: pre-wrap; word-break: break-all;">等待执行...</pre>
+    </div>
+</div>
 
 </body>
 </html>
