@@ -37,25 +37,41 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 .media-item h3 { font-size: 15px; margin: 0 0 10px 0; }
 .media-item img { width: 100%; border-radius: 6px; }
 .media-item iframe { width: 100%; height: 250px; border-radius: 6px; }
+
+#media-section {
+    max-width: 800px !important; 
+    margin: 30px auto !important; 
+    padding: 0 15px;
+    box-sizing: border-box;
+    text-align: center;
+}
+#media-section img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 0 auto 15px auto !important;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
 </style>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 </head>
 <body>
 
-<!-- 设备选择弹窗 -->
 <div id="device-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; display: none; justify-content: center; align-items: center;">
     <div style="background: #fff; padding: 30px 20px; border-radius: 12px; text-align: center; max-width: 80%;">
         <h2 style="margin-top: 0; color: #333; font-size: 20px;">请选择你的设备</h2>
         <p style="font-size: 13px; color: #888; margin-bottom: 20px;">选择后会自动适配显示比例。</p>
         <div style="display: flex; justify-content: space-around; gap: 15px;">
-            <button onclick="selectDevice('pc')" style="padding: 15px 25px; font-size: 16px; cursor: pointer; background: #0056b3; color: white; border: none; border-radius: 6px; flex: 1;">💻 电脑</button>
-            <button onclick="selectDevice('mobile')" style="padding: 15px 25px; font-size: 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 6px; flex: 1;">📱 手机</button>
+            <button onclick="selectDevice('pc')" style="padding: 15px 25px; font-size: 16px; cursor: pointer; background: #0056b3; color: white; border: none; border-radius: 6px; flex: 1;">电脑</button>
+            <button onclick="selectDevice('mobile')" style="padding: 15px 25px; font-size: 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 6px; flex: 1;">手机</button>
         </div>
     </div>
 </div>
 
 <div id="p-home" class="page on">
-  <h1>游戏站 <button class="sound-toggle" id="soundBtn" onclick="toggleSound()">🔊 音效开</button></h1>
+  <h1>游戏站 <button class="sound-toggle" id="soundBtn" onclick="toggleSound()">音效开</button></h1>
   <ul class="games">
     <li><a href="#" onclick="go('snake');return false;">贪吃蛇</a><div class="desc">滑动屏幕或点方向键控制，撞墙或撞自己结束。</div></li>
     <li><a href="#" onclick="go('breakout');return false;">打砖块</a><div class="desc">手指拖动底部挡板，把球弹回去打光砖块。</div></li>
@@ -64,19 +80,17 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
   <div id="custom-games-list" style="margin-top: 10px;"></div>
   
   <div id="media-section" style="margin-top: 30px;">
-    <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">📷 图片与视频区</h2>
-    <!-- 🚨 三张固定图片区：请确保仓库根目录有 AB.jpg, 2.jpg, 3.jpg -->
-    <img src="ab.jpg" style="width:100%; border-radius:8px; margin-bottom:10px;" onerror="this.style.display='none'">
-    <img src="2.jpg" style="width:100%; border-radius:8px; margin-bottom:10px;" onerror="this.style.display='none'">
-    <img src="3.jpg" style="width:100%; border-radius:8px; margin-bottom:10px;" onerror="this.style.display='none'">
-    
+    <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">图片与视频区</h2>
+    <img src="ab.jpg" alt="图片1" onerror="this.style.display='none'">
+    <img src="2.jpg" alt="图片2" onerror="this.style.display='none'">
+    <img src="3.jpg" alt="图片3" onerror="this.style.display='none'">
     <div id="media-list"></div>
   </div>
 </div>
 
 <div id="p-snake" class="page">
   <h1>贪吃蛇 <a href="#" onclick="go('home');return false;">[返回]</a></h1>
-  <div class="hud">分数：<span id="sScore">0</span>　最高：<span id="sBest">0</span></div>
+  <div class="hud">分数：<span id="sScore">0</span> 最高：<span id="sBest">0</span></div>
   <canvas id="snakeC" width="400" height="400"></canvas>
   <div class="center">
     <div class="pad">
@@ -91,22 +105,24 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 
 <div id="p-breakout" class="page">
   <h1>打砖块 <a href="#" onclick="go('home');return false;">[返回]</a></h1>
-  <div class="hud">分数：<span id="bScore">0</span>　生命：<span id="bLives">3</span></div>
+  <div class="hud">分数：<span id="bScore">0</span> 生命：<span id="bLives">3</span></div>
   <canvas id="brC" width="480" height="600"></canvas>
   <div class="center"><button class="btn" onclick="bReset()">重新开始</button></div>
 </div>
 
 <div id="p-space" class="page">
   <h1>星际守卫 <a href="#" onclick="go('home');return false;">[返回]</a></h1>
-  <div class="hud">分数：<span id="spScore">0</span>　生命：<span id="spLives">3</span></div>
+  <div class="hud">分数：<span id="spScore">0</span> 生命：<span id="spLives">3</span></div>
   <canvas id="spC" width="400" height="600"></canvas>
   <div class="center"><button class="btn" onclick="spReset()">重新开始</button></div>
 </div>
 
 <script>
-// ============ 页面切换与设备适配逻辑 ============
-window.pendingGame = null;
+// 全局配置
+window.eliteSpawnRate = 0.45; // 默认精英怪概率45%
 
+// 页面切换
+window.pendingGame = null;
 function go(name) {
   if (name === 'snake' || name === 'breakout' || name === 'space') {
     window.pendingGame = name; 
@@ -115,7 +131,6 @@ function go(name) {
   }
   switchPage(name);
 }
-
 function switchPage(name) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('on'); });
   document.getElementById('p-' + name).classList.add('on');
@@ -124,42 +139,28 @@ function switchPage(name) {
   if (name === 'snake') sReset(); else if (name === 'breakout') bReset(); else if (name === 'space') spReset();
 }
 
+// 设备适配
 function selectDevice(type) {
     document.getElementById('device-modal').style.display = 'none';
     applyDeviceStyle(type);
-    if (window.pendingGame) {
-        switchPage(window.pendingGame);
-        window.pendingGame = null;
-    }
+    if (window.pendingGame) { switchPage(window.pendingGame); window.pendingGame = null; }
 }
-
 function applyDeviceStyle(type) {
     var canvases = document.querySelectorAll('canvas');
     if (type === 'pc') {
-        // 电脑端：拉宽画布，全屏视野
         document.body.style.maxWidth = '100%'; 
         document.body.style.padding = '20px 40px';
-        canvases.forEach(function(c) { 
-            c.style.maxWidth = '100%'; 
-            c.style.width = '900px'; // 电脑端画布宽900px
-            c.style.margin = '20px auto'; 
-        });
+        canvases.forEach(function(c) { c.style.maxWidth = '100%'; c.style.width = '900px'; c.style.margin = '20px auto'; });
     } else {
-        // 手机端：保持9:16比例不变
         document.body.style.maxWidth = '640px';
         document.body.style.padding = '12px 12px 30px';
-        canvases.forEach(function(c) { 
-            c.style.maxWidth = '480px'; 
-            c.style.width = '100%';
-            c.style.margin = '8px auto'; 
-        });
+        canvases.forEach(function(c) { c.style.maxWidth = '480px'; c.style.width = '100%'; c.style.margin = '8px auto'; });
     }
 }
 
-// ============ 数据存储与渲染 ============
+// 数据存储
 const ADMIN_PASSWORD = "123456";
 let isAdminLoggedIn = false;
-
 function getCustomGames() { try { return JSON.parse(localStorage.getItem('custom_games') || '[]'); } catch(e) { return []; } }
 function saveCustomGames(games) { localStorage.setItem('custom_games', JSON.stringify(games)); renderCustomGames(); }
 function getCustomMedias() { try { return JSON.parse(localStorage.getItem('custom_medias') || '[]'); } catch(e) { return []; } }
@@ -171,13 +172,10 @@ function renderCustomGames() {
     let games = getCustomGames();
     if (games.length === 0) { listEl.innerHTML = ''; return; }
     let html = '<ul class="games">';
-    games.forEach(function(name) {
-        html += `<li><a href="#" onclick="playCustomGame('${name}');return false;">${name.replace('.html','')}</a></li>`;
-    });
+    games.forEach(function(name) { html += `<li><a href="#" onclick="playCustomGame('${name}');return false;">${name.replace('.html','')}</a></li>`; });
     html += '</ul>';
     listEl.innerHTML = html;
 }
-
 function renderCustomMedias() {
     const listEl = document.getElementById('media-list');
     if (!listEl) return;
@@ -185,133 +183,106 @@ function renderCustomMedias() {
     if (medias.length === 0) { return; }
     let html = '';
     medias.forEach(function(item, index) {
-        html += `<div class="media-item">
-            <h3>${item.name}</h3>`;
-        if (item.type === 'video') {
-            html += `<iframe src="${item.url}" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>`;
-        } else {
-            html += `<img src="${item.url}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/600x300?text=图片加载失败';">`;
-        }
+        html += `<div class="media-item"><h3>${item.name}</h3>`;
+        if (item.type === 'video') { html += `<iframe src="${item.url}" scrolling="no" border="0" frameborder="no" allowfullscreen="true"></iframe>`; } 
+        else { html += `<img src="${item.url}" onerror="this.src='https://via.placeholder.com/600x300?text=Error';">`; }
         html += `<button onclick="deleteMedia(${index})" style="margin-top:10px; padding: 4px 8px; background: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">删除</button></div>`;
     });
     listEl.innerHTML = html;
 }
-
 function playCustomGame(name) {
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 9999; background: white;';
     iframe.src = 'https://ty696.github.io/123/' + name;
     const closeBtn = document.createElement('button');
-    closeBtn.textContent = '❌ 返回主站';
+    closeBtn.textContent = '返回主站';
     closeBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 10000; padding: 10px 20px; background: #d9534f; color: white; border: none; border-radius: 5px; cursor: pointer;';
     closeBtn.onclick = () => { iframe.remove(); closeBtn.remove(); };
-    document.body.appendChild(iframe);
-    document.body.appendChild(closeBtn);
+    document.body.appendChild(iframe); document.body.appendChild(closeBtn);
 }
-
 function deleteMedia(index) {
     if (!confirm("确定要删除这个媒体吗？")) return;
-    let medias = getCustomMedias();
-    medias.splice(index, 1);
-    saveCustomMedias(medias);
+    let medias = getCustomMedias(); medias.splice(index, 1); saveCustomMedias(medias);
 }
 
-// ============ 黑框终端逻辑 ============
+// 终端命令
 let cmdOutput, cmdInput, cmdWindow;
-
 function initTerminal() {
-    cmdOutput = document.getElementById('term-output');
-    cmdInput = document.getElementById('term-input');
-    cmdWindow = document.getElementById('terminal-window');
-
-    cmdInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            processCommand(this.value.trim());
-            this.value = '';
-        }
-    });
-
-    document.getElementById('term-close').onclick = function() {
-        cmdWindow.style.display = 'none';
-        cmdInput.blur();
-    };
+    cmdOutput = document.getElementById('term-output'); cmdInput = document.getElementById('term-input'); cmdWindow = document.getElementById('terminal-window');
+    cmdInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { processCommand(this.value.trim()); this.value = ''; } });
+    document.getElementById('term-close').onclick = function() { cmdWindow.style.display = 'none'; cmdInput.blur(); };
 }
-
 function openTerminal() {
     let pwd = prompt("请输入管理员密码：");
-    if (pwd !== ADMIN_PASSWORD) {
-        alert("密码错误！");
-        return;
-    }
-    isAdminLoggedIn = true;
-    cmdWindow.style.display = 'block';
-    cmdInput.focus();
-    cmdOutput.innerHTML = '';
-    printTerminal("管理员模式已开启，请输入命令：\n");
+    if (pwd !== ADMIN_PASSWORD) { alert("密码错误！"); return; }
+    isAdminLoggedIn = true; cmdWindow.style.display = 'block'; cmdInput.focus();
+    cmdOutput.innerHTML = ''; printTerminal("管理员模式已开启，请输入命令：\n");
 }
-
-function printTerminal(text) {
-    cmdOutput.innerHTML += text + "<br>";
-    cmdOutput.scrollTop = cmdOutput.scrollHeight;
-}
+function printTerminal(text) { cmdOutput.innerHTML += text + "<br>"; cmdOutput.scrollTop = cmdOutput.scrollHeight; }
 
 function processCommand(cmd) {
     if (!cmd) return;
     printTerminal("> " + cmd);
-    
     if (cmd.toLowerCase() === 'cls') { cmdOutput.innerHTML = ''; return; }
     if (cmd.toLowerCase() === 'exit') { cmdWindow.style.display = 'none'; return; }
-
     if (cmd.toLowerCase() === 'help') {
         printTerminal("可用命令:");
-        printTerminal("  add <文件名>        - 添加新游戏 (例如: add game2.html)");
-        printTerminal("  rm <文件名>         - 删除游戏 (例如: rm game2.html)");
-        printTerminal("  addimg <链接> <名称> - 添加图片到媒体区");
-        printTerminal("  addvid <链接> <名称> - 添加视频到媒体区");
-        printTerminal("  ls                  - 列出所有自定义游戏");
-        printTerminal("  cls                 - 清屏");
-        printTerminal("  exit                - 退出");
+        printTerminal("  add <文件名> - 添加新游戏");
+        printTerminal("  rm <文件名>  - 删除游戏");
+        printTerminal("  addimg <链接> <名称> - 添加图片");
+        printTerminal("  addvid <链接> <名称> - 添加视频");
+        printTerminal("  admin_skill  - 获取全技能(可叠加3次)");
+        printTerminal("  admin_rate <0-100> - 调整精英怪出现概率(%)");
+        printTerminal("  cls          - 清屏");
+        printTerminal("  exit         - 退出");
         return;
     }
-
+    if (cmd.toLowerCase() === 'admin_skill') {
+        if (window.sp && window.sp.player) {
+            if (window.sp.player.adminSkillLevel < 3) {
+                window.sp.player.adminSkillLevel++;
+                printTerminal(`[+] 成功注入技能！当前叠加次数：${window.sp.player.adminSkillLevel}/3`);
+                Sound.win();
+            } else { printTerminal(`[!] 已达最高叠加次数（3次）！`); }
+        } else { printTerminal(`[!] 请先进入星际守卫游戏！`); }
+        return;
+    }
+    if (cmd.toLowerCase().startsWith('admin_rate ')) {
+        let rate = parseInt(cmd.substring(11).trim());
+        if (!isNaN(rate) && rate >= 0 && rate <= 100) {
+            window.eliteSpawnRate = rate / 100;
+            printTerminal(`[+] 精英怪生成概率已调整为 ${rate}%`);
+        } else {
+            printTerminal(`[!] 请输入 0-100 之间的数字，例如：admin_rate 45`);
+        }
+        return;
+    }
     if (cmd.toLowerCase().startsWith('add ')) {
-        let name = cmd.substring(4).trim();
-        if (!name.endsWith('.html')) name += '.html';
-        let games = getCustomGames();
-        if (games.includes(name)) { printTerminal(`[!] 游戏 ${name} 已存在。`); }
-        else { games.push(name); saveCustomGames(games); printTerminal(`[+] 成功添加游戏: ${name}`); }
+        let name = cmd.substring(4).trim(); if (!name.endsWith('.html')) name += '.html';
+        let games = getCustomGames(); if (games.includes(name)) { printTerminal(`[!] 游戏已存在`); }
+        else { games.push(name); saveCustomGames(games); printTerminal(`[+] 成功添加`); }
     } 
     else if (cmd.toLowerCase().startsWith('rm ')) {
-        let name = cmd.substring(3).trim();
-        let games = getCustomGames();
-        let idx = games.indexOf(name);
-        if (idx !== -1) { games.splice(idx, 1); saveCustomGames(games); printTerminal(`[-] 成功删除游戏: ${name}`); }
-        else { printTerminal(`[!] 找不到游戏: ${name}`); }
+        let name = cmd.substring(3).trim(); let games = getCustomGames(); let idx = games.indexOf(name);
+        if (idx !== -1) { games.splice(idx, 1); saveCustomGames(games); printTerminal(`[-] 成功删除`); }
+        else { printTerminal(`[!] 找不到游戏`); }
     }
     else if (cmd.toLowerCase().startsWith('addimg ')) {
-        let parts = cmd.substring(7).trim().split(' ');
-        let url = parts[0], name = parts.slice(1).join(' ') || '未命名图片';
-        let medias = getCustomMedias(); medias.push({ name: name, url: url, type: 'image' }); saveCustomMedias(medias);
-        printTerminal(`[+] 成功添加图片: ${name}`);
+        let parts = cmd.substring(7).trim().split(' '); let url = parts[0], name = parts.slice(1).join(' ') || '未命名图片';
+        let medias = getCustomMedias(); medias.push({ name: name, url: url, type: 'image' }); saveCustomMedias(medias); printTerminal(`[+] 成功添加图片`);
     }
     else if (cmd.toLowerCase().startsWith('addvid ')) {
-        let parts = cmd.substring(7).trim().split(' ');
-        let url = parts[0], name = parts.slice(1).join(' ') || '未命名视频';
-        let medias = getCustomMedias(); medias.push({ name: name, url: url, type: 'video' }); saveCustomMedias(medias);
-        printTerminal(`[+] 成功添加视频: ${name}`);
+        let parts = cmd.substring(7).trim().split(' '); let url = parts[0], name = parts.slice(1).join(' ') || '未命名视频';
+        let medias = getCustomMedias(); medias.push({ name: name, url: url, type: 'video' }); saveCustomMedias(medias); printTerminal(`[+] 成功添加视频`);
     }
     else if (cmd.toLowerCase() === 'ls') {
-        let games = getCustomGames();
-        printTerminal("自定义游戏列表:");
-        games.forEach(g => printTerminal("  " + g));
+        let games = getCustomGames(); printTerminal("自定义游戏列表:"); games.forEach(g => printTerminal("  " + g));
         if (games.length === 0) printTerminal("  (空)");
     }
-    else {
-        printTerminal(`'${cmd}' 不是内部或外部命令，也不是可运行的程序或批处理文件。`);
-    }
+    else { printTerminal(`'${cmd}' 不是内部或外部命令。`); }
 }
 
-// ============ 音效系统 ============
+// 音效系统
 var Sound = (function() {
   var ctx = null; var enabled = true;
   try { var saved = localStorage.getItem('sound_on'); if (saved === '0') enabled = false; } catch(e) {}
@@ -344,12 +315,12 @@ var Sound = (function() {
   };
 })();
 
-function toggleSound() { Sound.init(); var on = Sound.toggle(); document.getElementById('soundBtn').textContent = on ? '🔊 音效开' : '🔇 音效关'; }
+function toggleSound() { Sound.init(); var on = Sound.toggle(); document.getElementById('soundBtn').textContent = on ? '音效开' : '音效关'; }
 function initAudioOnce() { Sound.init(); document.removeEventListener('touchstart', initAudioOnce); document.removeEventListener('mousedown', initAudioOnce); document.removeEventListener('click', initAudioOnce); }
 document.addEventListener('touchstart', initAudioOnce); document.addEventListener('mousedown', initAudioOnce); document.addEventListener('click', initAudioOnce);
-(function() { if (!Sound.isOn()) { document.getElementById('soundBtn').textContent = '🔇 音效关'; } })();
+(function() { if (!Sound.isOn()) { document.getElementById('soundBtn').textContent = '音效关'; } })();
 
-// ============ 贪吃蛇 ============
+// 贪吃蛇
 var snake = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('snakeC'); var cx = cv.getContext('2d'); var G = 20, CELL = 20; var body, dir, nextDir, food, score, tickMs, lastTick, best = 0, dead = false;
@@ -390,7 +361,7 @@ var snake = { running: false, raf: null };
   }, {passive:false});
 })();
 
-// ============ 打砖块 ============
+// 打砖块
 var br = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('brC'); var cx = cv.getContext('2d'); var W = cv.width, H = cv.height; var paddle, ball, bricks, score, lives, keys = {};
@@ -446,15 +417,14 @@ var br = { running: false, raf: null };
   }
 })();
 
-// ============ 星际守卫 (完美修复版) ============
+// 星际守卫
 var sp = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('spC'); var cx = cv.getContext('2d'); var W = cv.width, H = cv.height; 
-  var player, bullets, enemies, particles, stars, powerups, shockwaves, enemiesBullets; // 🚨 已修复：在这里声明了 enemiesBullets
+  var player, bullets, enemies, particles, stars, powerups, enemiesBullets; 
   var keys = {}, pointerX = null, pointerY = null, pointerActive = false; 
   var score, lives, fireTimer, spawnTimer, lastT;
 
-  // 贴图加载（上传同名图片到根目录即可自动替换）
   var imgPlayer = new Image(); imgPlayer.src = 'player.png';
   var imgEnemy = new Image(); imgEnemy.src = 'enemy.png';
   var imgElite = new Image(); imgElite.src = 'elite.png';
@@ -463,9 +433,8 @@ var sp = { running: false, raf: null };
   
   window.spReset = function() {
     spStop(); 
-    player = { x: W/2, y: H - 150, r: 16, speed: 360, skillType: 0, skillTimer: 0, skill1Timer: 0 }; 
-    bullets = []; enemies = []; particles = []; stars = []; powerups = []; shockwaves = []; 
-    enemiesBullets = []; // 🚨 已修复：每次重置时清空敌方子弹数组
+    player = { x: W/2, y: H - 150, r: 16, speed: 360, skillType: 0, skillTimer: 0, skill1Timer: 0, adminSkillLevel: 0 }; 
+    bullets = []; enemies = []; particles = []; stars = []; powerups = []; enemiesBullets = []; 
     for (var i = 0; i < 60; i++) { stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*2 + 0.5 }); }
     score = 0; lives = 3; fireTimer = 0; spawnTimer = 0; lastT = performance.now(); 
     document.getElementById('spScore').textContent = '0'; document.getElementById('spLives').textContent = '3'; 
@@ -474,19 +443,16 @@ var sp = { running: false, raf: null };
 
   function setPointer(clientX, clientY) { 
       var rect = cv.getBoundingClientRect(); 
-      var scaleX = W / rect.width; var scaleY = H / rect.height; 
-      pointerX = (clientX - rect.left) * scaleX; 
-      pointerY = (clientY - rect.top) * scaleY; 
+      pointerX = (clientX - rect.left) * (W / rect.width); 
+      pointerY = (clientY - rect.top) * (H / rect.height); 
   }
   
   cv.addEventListener('mousedown', function(e) { pointerActive = true; setPointer(e.clientX, e.clientY); }); 
   cv.addEventListener('mousemove', function(e) { if (pointerActive) setPointer(e.clientX, e.clientY); }); 
   document.addEventListener('mouseup', function() { pointerActive = false; });
-  
   cv.addEventListener('touchstart', function(e) { pointerActive = true; if (e.touches[0]) setPointer(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }, {passive:false});
   cv.addEventListener('touchmove', function(e) { if (e.touches[0]) setPointer(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }, {passive:false}); 
   document.addEventListener('touchend', function() { pointerActive = false; });
-  
   document.addEventListener('keydown', function(e) { keys[e.key] = true; if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].indexOf(e.key) !== -1) e.preventDefault(); }); 
   document.addEventListener('keyup', function(e) { keys[e.key] = false; });
   
@@ -494,26 +460,22 @@ var sp = { running: false, raf: null };
 
   function fire() { 
       var y = player.y - player.r; 
-      if (player.skillType === 2) { 
-          bullets.push({ x: player.x - 15, y: y, vx: -100, vy: -560 });
-          bullets.push({ x: player.x, y: y, vx: 0, vy: -560 });
-          bullets.push({ x: player.x + 15, y: y, vx: 100, vy: -560 });
-      } else {
-          bullets.push({ x: player.x - 10, y: y, vx: 0, vy: -560 }); 
-          bullets.push({ x: player.x + 10, y: y, vx: 0, vy: -560 }); 
+      var bulletCount = 2 + player.adminSkillLevel; 
+      for (var i = 0; i < bulletCount; i++) {
+          var offsetX = (i - (bulletCount - 1) / 2) * 15;
+          bullets.push({ x: player.x + offsetX, y: y, vx: offsetX * 5, vy: -560 });
       }
       Sound.shoot(); 
   }
   
   function spawnEnemy() { 
       var r = 14 + Math.random() * 14; 
-      var isElite = Math.random() < 0.15; 
+      var isElite = Math.random() < window.eliteSpawnRate; 
       var eliteType = isElite ? (Math.random() < 0.5 ? 1 : 2) : 0; 
       var hp = isElite ? 5 : (r > 22 ? 2 : 1);
       var points = isElite ? 50 : Math.round(r);
       var vy = 80 + score * 0.35 + Math.random() * 40;
       if (isElite) vy *= 0.6; 
-      
       enemies.push({ x: 30 + Math.random() * (W - 60), y: -30, r: isElite ? r*1.5 : r, vy: vy, vx: (Math.random() - 0.5) * 50, hp: hp, points: points, isElite: isElite, eliteType: eliteType, skillTimer: 1.5, hasUsedSkill: false }); 
   }
   
@@ -555,7 +517,11 @@ var sp = { running: false, raf: null };
         player.skill1Timer -= dt;
         if (player.skill1Timer <= 0) {
             player.skill1Timer = 3.0;
-            for (var ang = 0; ang < Math.PI * 2; ang += Math.PI / 5) { bullets.push({ x: player.x, y: player.y, vx: Math.cos(ang) * 450, vy: Math.sin(ang) * 450 }); }
+            var bulletCount = 10 + player.adminSkillLevel * 5; 
+            for (var i = 0; i < bulletCount; i++) {
+                var ang = (Math.PI * 2 / bulletCount) * i;
+                bullets.push({ x: player.x, y: player.y, vx: Math.cos(ang) * 450, vy: Math.sin(ang) * 450 });
+            }
             Sound.win(); 
         }
     }
@@ -563,7 +529,6 @@ var sp = { running: false, raf: null };
     fireTimer -= dt; 
     if (fireTimer <= 0) { fire(); fireTimer = 0.16; }
     
-    // 更新我方子弹
     for (var i = bullets.length - 1; i >= 0; i--) {
       bullets[i].x += bullets[i].vx * dt; bullets[i].y += bullets[i].vy * dt; 
       if (bullets[i].y < -20 || bullets[i].x < -20 || bullets[i].x > W + 20) { bullets.splice(i, 1); continue; }
@@ -584,27 +549,24 @@ var sp = { running: false, raf: null };
       if (hit) bullets.splice(i, 1);
     }
     
-    // 更新怪物
     for (var i = enemies.length - 1; i >= 0; i--) {
       var e = enemies[i]; e.y += e.vy * dt; e.x += e.vx * dt; if (e.y > H + 60) { enemies.splice(i, 1); continue; }
       
       if (e.isElite) {
-          if (e.eliteType === 1) { 
-              e.skillTimer -= dt;
-              if (e.skillTimer <= 0) {
+          e.skillTimer -= dt;
+          if (e.skillTimer <= 0) {
+              if (e.eliteType === 1) {
                   e.skillTimer = 1.5;
                   var angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
+                  // 发射3颗追踪子弹
                   for (var k = -1; k <= 1; k++) {
-                      var ang = angleToPlayer + k * 0.3;
-                      enemiesBullets.push({ x: e.x, y: e.y, vx: Math.cos(ang) * 250, vy: Math.sin(ang) * 250 }); // 🚨 修复：enemiesBullets 已声明
+                      var ang = angleToPlayer + k * 0.15;
+                      enemiesBullets.push({ x: e.x, y: e.y, vx: Math.cos(ang) * 250, vy: Math.sin(ang) * 250 }); 
                   }
-              }
-          } else if (e.eliteType === 2) {
-              if (!e.hasUsedSkill) {
-                  e.skillTimer -= dt;
-                  if (e.skillTimer <= 0) {
-                      e.hasUsedSkill = true; 
-                      shockwaves.push({ x: e.x, y: e.y, radius: 10, maxRadius: 120, speed: 200, alive: true });
+              } else if (e.eliteType === 2) {
+                  e.skillTimer = 2.0;
+                  for (var ang = 0; ang < Math.PI * 2; ang += Math.PI / 8) { 
+                      enemiesBullets.push({ x: e.x, y: e.y, vx: Math.cos(ang) * 200, vy: Math.sin(ang) * 200 });
                   }
               }
           }
@@ -614,7 +576,6 @@ var sp = { running: false, raf: null };
       if (dx*dx + dy*dy < rr*rr) { lives--; document.getElementById('spLives').textContent = lives; explode(player.x, player.y, '#4af', 24); Sound.playerHit(); enemies.splice(i, 1); if (lives <= 0) sp.running = false; }
     }
     
-    // 更新敌方子弹
     for (var i = enemiesBullets.length - 1; i >= 0; i--) {
         var b = enemiesBullets[i];
         b.x += b.vx * dt; b.y += b.vy * dt;
@@ -626,24 +587,9 @@ var sp = { running: false, raf: null };
             if (lives <= 0) sp.running = false;
         }
     }
-
-    // 更新冲击波
-    for (var i = shockwaves.length - 1; i >= 0; i--) {
-        var sw = shockwaves[i];
-        sw.radius += sw.speed * dt;
-        if (sw.radius > sw.maxRadius) { shockwaves.splice(i, 1); continue; }
-        var dx = sw.x - player.x, dy = sw.y - player.y;
-        if (Math.sqrt(dx*dx + dy*dy) < sw.radius + player.r && !sw.hit) {
-            sw.hit = true;
-            lives--; document.getElementById('spLives').textContent = lives; Sound.playerHit();
-            if (lives <= 0) sp.running = false;
-        }
-    }
     
-    // 更新技能球
     for (var i = powerups.length - 1; i >= 0; i--) {
-        var p = powerups[i];
-        p.y += p.vy * dt;
+        var p = powerups[i]; p.y += p.vy * dt;
         if (p.y > H + 20) { powerups.splice(i, 1); continue; }
         var dx = p.x - player.x, dy = p.y - player.y;
         if (dx*dx + dy*dy < (p.r + player.r) * (p.r + player.r)) {
@@ -651,12 +597,9 @@ var sp = { running: false, raf: null };
             Sound.win(); powerups.splice(i, 1);
         }
     }
-
-    // 粒子系统
     for (var i = particles.length - 1; i >= 0; i--) {
       var p = particles[i]; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.96; p.vy *= 0.96; p.life -= dt; if (p.life <= 0) particles.splice(i, 1);
     }
-    
     spawnTimer -= dt;
     if (spawnTimer <= 0) { spawnEnemy(); spawnTimer = Math.max(0.35, 1.0 - score * 0.001) * (0.7 + Math.random() * 0.6); }
   }
@@ -671,12 +614,6 @@ var sp = { running: false, raf: null };
         cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 6.283); cx.fill();
         cx.fillStyle = '#000'; cx.font = '12px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(p.type, p.x, p.y);
     }
-
-    for (var i = 0; i < shockwaves.length; i++) {
-        var sw = shockwaves[i]; cx.strokeStyle = '#f0f'; cx.lineWidth = 3;
-        cx.beginPath(); cx.arc(sw.x, sw.y, sw.radius, 0, 6.283); cx.stroke();
-    }
-
     for (var i = 0; i < particles.length; i++) { var p = particles[i]; cx.globalAlpha = Math.max(0, p.life / p.maxLife); cx.fillStyle = p.color; cx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size); }
     cx.globalAlpha = 1;
     
@@ -694,8 +631,11 @@ var sp = { running: false, raf: null };
     cx.fillStyle = '#ff0'; 
     for (var i = 0; i < bullets.length; i++) { cx.beginPath(); cx.arc(bullets[i].x, bullets[i].y, 4, 0, 6.283); cx.fill(); }
 
-    cx.fillStyle = '#f0f'; 
-    for (var i = 0; i < enemiesBullets.length; i++) { cx.beginPath(); cx.arc(enemiesBullets[i].x, enemiesBullets[i].y, 5, 0, 6.283); cx.fill(); }
+    for (var i = 0; i < enemiesBullets.length; i++) {
+        var b = enemiesBullets[i];
+        cx.beginPath(); cx.arc(b.x, b.y, 5, 0, 6.283); cx.fillStyle = '#f00'; cx.fill();
+        cx.beginPath(); cx.arc(b.x, b.y, 2, 0, 6.283); cx.fillStyle = '#fff'; cx.fill();
+    }
     
     if (sp.running) {
       cx.save(); cx.translate(player.x, player.y); 
@@ -709,7 +649,6 @@ var sp = { running: false, raf: null };
       if (player.skillTimer > 0) { cx.strokeStyle = player.skillType === 1 ? '#0ff' : '#0f0'; cx.lineWidth = 2; cx.beginPath(); cx.arc(0, 0, player.r + 10, 0, 6.283); cx.stroke(); }
       cx.restore();
     }
-    
     if (!sp.running) { cx.fillStyle = '#fff'; cx.font = '22px SimSun'; cx.textAlign = 'center'; cx.fillText('游戏结束，得分 ' + score, W/2, H/2); cx.font = '14px SimSun'; cx.fillText('点重新开始', W/2, H/2 + 30); }
   }
   
@@ -727,18 +666,16 @@ window.onload = function() {
 </script>
 
 <footer style="margin-top: 60px; padding: 20px; text-align: right; font-size: 13px; color: #888; border-top: 1px dashed #ccc; font-family: SimSun, serif;">
-    <p style="margin: 0 0 5px 0;">🎮 本站由 <a href="https://space.bilibili.com/1732077032" target="_blank" style="color: #0056b3; text-decoration: none; font-weight: bold; border-bottom: 1px dashed #0056b3;">老鼠昊铭</a> 独立开发</p>
-    <p style="margin: 0; font-size: 12px; color: #aaa;"><em>Powered by HTML5 Canvas &amp; Web Audio API</em> | © 2026</p>
+    <p style="margin: 0 0 5px 0;">本站由 <a href="https://space.bilibili.com/1732077032" target="_blank" style="color: #0056b3; text-decoration: none; font-weight: bold;">老鼠昊铭</a> 独立开发</p>
+    <p style="margin: 0; font-size: 12px; color: #aaa;"><em>Powered by HTML5 Canvas</em> | © 2026</p>
 </footer>
 
-<!-- 管理员入口（黑色按钮） -->
 <div class="admin-entry">
     <button onclick="openTerminal()" style="font-size: 12px; padding: 8px 16px; background: #000; color: #fff; border: 1px solid #333; cursor: pointer; border-radius: 4px;">
         管理员入口
     </button>
 </div>
 
-<!-- 纯黑全屏终端窗口 -->
 <div id="terminal-window" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; z-index: 999999; font-family: monospace; padding: 20px; box-sizing: border-box; flex-direction: column;">
     <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
         <button id="term-close" style="background: none; border: none; color: #555; font-size: 24px; cursor: pointer;">×</button>
