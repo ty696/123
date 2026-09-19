@@ -37,19 +37,23 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 .media-item h3 { font-size: 15px; margin: 0 0 10px 0; }
 .media-item img { width: 100%; border-radius: 6px; }
 .media-item iframe { width: 100%; height: 250px; border-radius: 6px; }
-/* 顶部广告图，自适应宽度，永远居中 */
-#hardcoded-ad { 
-    max-width: 100%; 
-    height: auto; 
-    border-radius: 8px; 
-    display: block; 
-    margin: 0 auto 20px auto; 
-    border: 1px solid #eee;
-}
 </style>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 </head>
 <body>
+
+<script>
+// =================================================================
+// 📸 极客兄弟，以后加图片，只需把图片传到仓库，然后在下面这个清单里加名字！
+// =================================================================
+const MY_IMAGES = [
+    "ad.jpg",       // 你的第一张图（可以是广告、海报、随便什么）
+    // "1.jpg",     // 如果传了第二张图，就把前面的 // 删掉，写上名字
+    // "2.png",     // 第三张图同理
+    // "3.jpg"
+];
+// =================================================================
+</script>
 
 <!-- 设备选择弹窗 -->
 <div id="device-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; display: none; justify-content: center; align-items: center;">
@@ -75,10 +79,8 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
   <!-- 图片与视频区 -->
   <div id="media-section" style="margin-top: 30px;">
     <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">📷 图片与视频区</h2>
-    
-    <!-- 这里直接硬编码加载 ad.jpg，只要图片存在，所有人打开都能看到！ -->
-    <img id="hardcoded-ad" src="ad.jpg" alt="广告位" onerror="this.style.display='none'">
-    
+    <!-- 这里会自动展示 MY_IMAGES 里的所有图片 -->
+    <div id="hardcoded-images"></div>
     <div id="media-list"></div>
   </div>
 </div>
@@ -113,6 +115,17 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 </div>
 
 <script>
+// ============ 硬编码图片渲染逻辑 ============
+function renderHardcodedImages() {
+    const container = document.getElementById('hardcoded-images');
+    if (!container) return;
+    let html = '';
+    MY_IMAGES.forEach(function(imgName) {
+        html += `<img src="${imgName}" style="max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 0 auto 20px auto; border: 1px solid #eee;" onerror="this.style.display='none'">`;
+    });
+    container.innerHTML = html;
+}
+
 // ============ 页面切换逻辑 ============
 window.pendingGame = null;
 
@@ -183,7 +196,7 @@ function renderCustomMedias() {
     const listEl = document.getElementById('media-list');
     if (!listEl) return;
     let medias = getCustomMedias();
-    if (medias.length === 0) { return; } // 如果本地没有添加任何东西，就不显示多余的提示
+    if (medias.length === 0) { return; }
     let html = '';
     medias.forEach(function(item, index) {
         html += `<div class="media-item">
@@ -267,8 +280,8 @@ function processCommand(cmd) {
         printTerminal("可用命令:");
         printTerminal("  add <文件名>        - 添加新游戏 (例如: add game2.html)");
         printTerminal("  rm <文件名>         - 删除游戏 (例如: rm game2.html)");
-        printTerminal("  addimg <链接> <名称> - 添加图片到媒体区");
-        printTerminal("  addvid <链接> <名称> - 添加视频到媒体区");
+        printTerminal("  addimg <链接> <名称> - 添加图片到媒体区 (仅自己可见)");
+        printTerminal("  addvid <链接> <名称> - 添加视频到媒体区 (仅自己可见)");
         printTerminal("  ls                  - 列出所有自定义游戏");
         printTerminal("  cls                 - 清屏");
         printTerminal("  exit                - 退出");
@@ -518,6 +531,7 @@ window.onload = function() {
     initTerminal();
     renderCustomGames();
     renderCustomMedias();
+    renderHardcodedImages(); // 渲染“图片清单”里的所有图片
 };
 </script>
 
