@@ -206,20 +206,27 @@ function processCommand(cmd) {
         printTerminal("  rm <文件名>  - 删除游戏");
         printTerminal("  addimg <链接> <名称> - 添加图片");
         printTerminal("  addvid <链接> <名称> - 添加视频");
-        printTerminal("  admin_skill  - 获取全技能(可叠加3次)");
+        printTerminal("  admin_skill  - 获取全技能(可叠加3次，永久生效)");
         printTerminal("  admin_rate <0-100> - 调整精英怪出现概率(%)");
         printTerminal("  cls          - 清屏");
         printTerminal("  exit         - 退出");
         return;
     }
+    // 修复：管理员技能代码，不再强制要求进入游戏才能输入
     if (cmd.toLowerCase() === 'admin_skill') {
-        if (window.sp && window.sp.player) {
-            if (window.sp.player.adminSkillLevel < 3) {
-                window.sp.player.adminSkillLevel++;
-                printTerminal(`[+] 成功注入技能！当前叠加次数：${window.sp.player.adminSkillLevel}/3`);
-                Sound.win();
-            } else { printTerminal(`[!] 已达最高叠加次数（3次）！`); }
-        } else { printTerminal(`[!] 请先进入星际守卫游戏！`); }
+        let currentLevel = parseInt(localStorage.getItem('admin_skill_level') || '0');
+        if (currentLevel < 3) {
+            currentLevel++;
+            localStorage.setItem('admin_skill_level', currentLevel);
+            printTerminal(`[+] 成功注入技能！当前叠加次数：${currentLevel}/3 (已永久保存)`);
+            Sound.win();
+            // 如果游戏正在运行，立刻生效
+            if (window.sp && window.sp.player) {
+                window.sp.player.adminSkillLevel = currentLevel;
+            }
+        } else {
+            printTerminal(`[!] 已达最高叠加次数（3次）！`);
+        }
         return;
     }
     if (cmd.toLowerCase().startsWith('admin_rate ')) {
@@ -402,7 +409,9 @@ var sp = { running: false, raf: null };
   
   window.spReset = function() {
     spStop(); 
-    player = { x: W/2, y: H - 150, r: 16, speed: 360, skillType: 0, skillTimer: 0, skill1Timer: 0, adminSkillLevel: 0 }; 
+    // 读取本地存储的管理员技能叠加等级
+    let savedAdminSkill = parseInt(localStorage.getItem('admin_skill_level') || '0');
+    player = { x: W/2, y: H - 150, r: 16, speed: 360, skillType: 0, skillTimer: 0, skill1Timer: 0, adminSkillLevel: savedAdminSkill }; 
     bullets = []; enemies = []; particles = []; stars = []; powerups = []; enemiesBullets = []; 
     for (var i = 0; i < 60; i++) { stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*2 + 0.5 }); }
     score = 0; lives = 3; fireTimer = 0; spawnTimer = 0; lastT = performance.now(); 
@@ -427,16 +436,13 @@ var sp = { running: false, raf: null };
   
   function dropPowerup(x, y) { powerups.push({ x: x, y: y, vy: 100, r: 12, type: Math.floor(Math.random() * 2) + 1 }); }
 
-  // 修复后的攻击函数，绿色技能球(2)生效
   function fire() { 
       var y = player.y - player.r; 
       if (player.skillType === 2) {
-          // 技能2：一次发射3颗子弹
           bullets.push({ x: player.x - 15, y: y, vx: -100, vy: -560 });
           bullets.push({ x: player.x, y: y, vx: 0, vy: -560 });
           bullets.push({ x: player.x + 15, y: y, vx: 100, vy: -560 });
       } else {
-          // 普通攻击或叠加技能
           var bulletCount = 2 + player.adminSkillLevel;
           for (var i = 0; i < bulletCount; i++) {
               var offsetX = (i - (bulletCount - 1) / 2) * 15;
@@ -536,14 +542,12 @@ var sp = { running: false, raf: null };
               if (e.eliteType === 1) {
                   e.skillTimer = 1.5;
                   var angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
-                  // 精英怪1：三发追踪
                   for (var k = -1; k <= 1; k++) {
                       var ang = angleToPlayer + k * 0.15;
                       enemiesBullets.push({ x: e.x, y: e.y, vx: Math.cos(ang) * 250, vy: Math.sin(ang) * 250 }); 
                   }
               } else if (e.eliteType === 2) {
                   e.skillTimer = 2.0;
-                  // 精英怪2：范围弹幕
                   for (var ang = 0; ang < Math.PI * 2; ang += Math.PI / 8) { 
                       enemiesBullets.push({ x: e.x, y: e.y, vx: Math.cos(ang) * 200, vy: Math.sin(ang) * 200 });
                   }
