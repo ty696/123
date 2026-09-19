@@ -37,10 +37,22 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 .media-item h3 { font-size: 15px; margin: 0 0 10px 0; }
 .media-item img { width: 100%; border-radius: 6px; }
 .media-item iframe { width: 100%; height: 250px; border-radius: 6px; }
+#ad-banner { display: none; margin: 0 auto 20px auto; text-align: center; width: 100%; }
+#ad-banner img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #eee; display: block; margin: 0 auto; }
 </style>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 </head>
 <body>
+
+<script>
+// =================================================================
+// 🚨 极客兄弟，以后换广告，你只需要改下面这一行的链接！🚨
+// =================================================================
+const AD_IMAGE_URL = "https://via.placeholder.com/600x150?text=你的广告位";
+
+// 如果你不想显示广告了，把上面的链接改成 "" 即可。
+// =================================================================
+</script>
 
 <!-- 设备选择弹窗 -->
 <div id="device-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; display: none; justify-content: center; align-items: center;">
@@ -55,6 +67,9 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 </div>
 
 <div id="p-home" class="page on">
+  <div id="ad-banner">
+    <img id="ad-img" src="" alt="广告位">
+  </div>
   <h1>游戏站 <button class="sound-toggle" id="soundBtn" onclick="toggleSound()">🔊 音效开</button></h1>
   <ul class="games">
     <li><a href="#" onclick="go('snake');return false;">贪吃蛇</a><div class="desc">滑动屏幕或点方向键控制，撞墙或撞自己结束。</div></li>
@@ -98,6 +113,19 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 </div>
 
 <script>
+// ============ 广告加载逻辑 ============
+function loadAd() {
+    const banner = document.getElementById('ad-banner');
+    const img = document.getElementById('ad-img');
+    // 如果代码顶部的 AD_IMAGE_URL 有网址，就显示广告
+    if (AD_IMAGE_URL && AD_IMAGE_URL.startsWith('http')) {
+        img.src = AD_IMAGE_URL;
+        banner.style.display = 'block';
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
 // ============ 页面切换逻辑 ============
 window.pendingGame = null;
 
@@ -232,7 +260,7 @@ function openTerminal() {
     isAdminLoggedIn = true;
     cmdWindow.style.display = 'block';
     cmdInput.focus();
-    cmdOutput.innerHTML = ''; // 清空之前的输出
+    cmdOutput.innerHTML = '';
     printTerminal("管理员模式已开启，请输入命令：\n");
 }
 
@@ -243,26 +271,17 @@ function printTerminal(text) {
 
 function processCommand(cmd) {
     if (!cmd) return;
-    
-    // 回显输入的命令
     printTerminal("> " + cmd);
     
-    if (cmd.toLowerCase() === 'cls') {
-        cmdOutput.innerHTML = '';
-        return;
-    }
-
-    if (cmd.toLowerCase() === 'exit') {
-        cmdWindow.style.display = 'none';
-        return;
-    }
+    if (cmd.toLowerCase() === 'cls') { cmdOutput.innerHTML = ''; return; }
+    if (cmd.toLowerCase() === 'exit') { cmdWindow.style.display = 'none'; return; }
 
     if (cmd.toLowerCase() === 'help') {
         printTerminal("可用命令:");
         printTerminal("  add <文件名>        - 添加新游戏 (例如: add game2.html)");
         printTerminal("  rm <文件名>         - 删除游戏 (例如: rm game2.html)");
-        printTerminal("  addimg <链接> <名称> - 添加图片");
-        printTerminal("  addvid <链接> <名称> - 添加视频");
+        printTerminal("  addimg <链接> <名称> - 添加图片到媒体区");
+        printTerminal("  addvid <链接> <名称> - 添加视频到媒体区");
         printTerminal("  ls                  - 列出所有自定义游戏");
         printTerminal("  cls                 - 清屏");
         printTerminal("  exit                - 退出");
@@ -512,6 +531,7 @@ window.onload = function() {
     initTerminal();
     renderCustomGames();
     renderCustomMedias();
+    loadAd();
 };
 </script>
 
