@@ -44,6 +44,20 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 </head>
 <body>
 
+<script>
+// =================================================================
+// 以后上传新游戏到根目录，在这里加名字即可
+// =================================================================
+const CUSTOM_GAMES = [
+    // "game2.html", 
+];
+// =================================================================
+
+// 其他全局配置
+window.eliteSpawnRate = 0.45;
+window.pendingGame = null;
+</script>
+
 <div id="device-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; display: none; justify-content: center; align-items: center;">
     <div style="background: #fff; padding: 30px 20px; border-radius: 12px; text-align: center; max-width: 80%;">
         <h2 style="margin-top: 0; color: #333; font-size: 20px;">请选择你的设备</h2>
@@ -62,13 +76,15 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
     <li><a href="#" onclick="go('breakout');return false;">打砖块</a><div class="desc">手指拖动底部挡板，把球弹回去打光砖块。</div></li>
     <li><a href="#" onclick="go('space');return false;">星际守卫</a><div class="desc">全屏拖动飞船，自动开火。击杀怪物有几率掉落技能球！加入精英怪！</div></li>
   </ul>
+  
+  <!-- 自动显示新游戏 -->
   <div id="custom-games-list" style="margin-top: 10px;"></div>
   
   <div id="media-section" style="margin-top: 30px;">
     <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">图片与视频区</h2>
-    <img src="ab.jpg" alt="图片1" onerror="this.style.display='none'">
-    <img src="2.jpg" alt="图片2" onerror="this.style.display='none'">
-    <img src="3.jpg" alt="图片3" onerror="this.style.display='none'">
+    <img src="ad.jpg" alt="图片1" onerror="this.style.display='none'">
+    <img src="1.jpg" alt="图片2" onerror="this.style.display='none'">
+    <img src="2.jpg" alt="图片3" onerror="this.style.display='none'">
     <div id="media-list"></div>
   </div>
 </div>
@@ -103,9 +119,7 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 </div>
 
 <script>
-window.eliteSpawnRate = 0.45;
-window.pendingGame = null;
-
+// 页面切换
 function go(name) {
   if (name === 'snake' || name === 'breakout' || name === 'space') {
     window.pendingGame = name; 
@@ -121,6 +135,8 @@ function switchPage(name) {
   if (name !== 'snake') sStop(); if (name !== 'breakout') bStop(); if (name !== 'space') spStop();
   if (name === 'snake') sReset(); else if (name === 'breakout') bReset(); else if (name === 'space') spReset();
 }
+
+// 设备适配
 function selectDevice(type) {
     document.getElementById('device-modal').style.display = 'none';
     applyDeviceStyle(type);
@@ -137,22 +153,25 @@ function applyDeviceStyle(type) {
     }
 }
 
+// 数据存储与渲染
 const ADMIN_PASSWORD = "123456";
 let isAdminLoggedIn = false;
-function getCustomGames() { try { return JSON.parse(localStorage.getItem('custom_games') || '[]'); } catch(e) { return []; } }
-function saveCustomGames(games) { localStorage.setItem('custom_games', JSON.stringify(games)); renderCustomGames(); }
 function getCustomMedias() { try { return JSON.parse(localStorage.getItem('custom_medias') || '[]'); } catch(e) { return []; } }
 function saveCustomMedias(medias) { localStorage.setItem('custom_medias', JSON.stringify(medias)); renderCustomMedias(); }
+
 function renderCustomGames() {
     const listEl = document.getElementById('custom-games-list');
     if (!listEl) return;
-    let games = getCustomGames();
-    if (games.length === 0) { listEl.innerHTML = ''; return; }
-    let html = '<ul class="games">';
-    games.forEach(function(name) { html += `<li><a href="#" onclick="playCustomGame('${name}');return false;">${name.replace('.html','')}</a></li>`; });
+    if (CUSTOM_GAMES.length === 0) { listEl.innerHTML = ''; return; }
+    let html = '<h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top:20px;">我的新游戏</h2><ul class="games">';
+    CUSTOM_GAMES.forEach(function(name) {
+        let displayName = name.replace('.html', ''); 
+        html += `<li><a href="#" onclick="playCustomGame('${name}');return false;">${displayName}</a></li>`;
+    });
     html += '</ul>';
     listEl.innerHTML = html;
 }
+
 function renderCustomMedias() {
     const listEl = document.getElementById('media-list');
     if (!listEl) return;
@@ -167,21 +186,24 @@ function renderCustomMedias() {
     });
     listEl.innerHTML = html;
 }
+
 function playCustomGame(name) {
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 9999; background: white;';
-    iframe.src = 'https://ty696.github.io/123/' + name;
+    iframe.src = 'https://ty696.github.io/123/' + name; 
     const closeBtn = document.createElement('button');
     closeBtn.textContent = '返回主站';
     closeBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 10000; padding: 10px 20px; background: #d9534f; color: white; border: none; border-radius: 5px; cursor: pointer;';
     closeBtn.onclick = () => { iframe.remove(); closeBtn.remove(); };
     document.body.appendChild(iframe); document.body.appendChild(closeBtn);
 }
+
 function deleteMedia(index) {
     if (!confirm("确定要删除这个媒体吗？")) return;
     let medias = getCustomMedias(); medias.splice(index, 1); saveCustomMedias(medias);
 }
 
+// 终端命令
 let cmdOutput, cmdInput, cmdWindow;
 function initTerminal() {
     cmdOutput = document.getElementById('term-output'); cmdInput = document.getElementById('term-input'); cmdWindow = document.getElementById('terminal-window');
@@ -195,6 +217,7 @@ function openTerminal() {
     cmdOutput.innerHTML = ''; printTerminal("管理员模式已开启，请输入命令：\n");
 }
 function printTerminal(text) { cmdOutput.innerHTML += text + "<br>"; cmdOutput.scrollTop = cmdOutput.scrollHeight; }
+
 function processCommand(cmd) {
     if (!cmd) return;
     printTerminal("> " + cmd);
@@ -202,17 +225,14 @@ function processCommand(cmd) {
     if (cmd.toLowerCase() === 'exit') { cmdWindow.style.display = 'none'; return; }
     if (cmd.toLowerCase() === 'help') {
         printTerminal("可用命令:");
-        printTerminal("  add <文件名> - 添加新游戏");
-        printTerminal("  rm <文件名>  - 删除游戏");
-        printTerminal("  addimg <链接> <名称> - 添加图片");
-        printTerminal("  addvid <链接> <名称> - 添加视频");
-        printTerminal("  admin_skill  - 获取全技能(可叠加3次，永久生效)");
+        printTerminal("  admin_skill  - 获取全技能(叠加3次，永久保存)");
         printTerminal("  admin_rate <0-100> - 调整精英怪出现概率(%)");
+        printTerminal("  addimg <链接> <名称> - 添加图片到媒体区");
+        printTerminal("  addvid <链接> <名称> - 添加视频到媒体区");
         printTerminal("  cls          - 清屏");
         printTerminal("  exit         - 退出");
         return;
     }
-    // 修复：管理员技能代码，不再强制要求进入游戏才能输入
     if (cmd.toLowerCase() === 'admin_skill') {
         let currentLevel = parseInt(localStorage.getItem('admin_skill_level') || '0');
         if (currentLevel < 3) {
@@ -220,13 +240,8 @@ function processCommand(cmd) {
             localStorage.setItem('admin_skill_level', currentLevel);
             printTerminal(`[+] 成功注入技能！当前叠加次数：${currentLevel}/3 (已永久保存)`);
             Sound.win();
-            // 如果游戏正在运行，立刻生效
-            if (window.sp && window.sp.player) {
-                window.sp.player.adminSkillLevel = currentLevel;
-            }
-        } else {
-            printTerminal(`[!] 已达最高叠加次数（3次）！`);
-        }
+            if (window.sp && window.sp.player) { window.sp.player.adminSkillLevel = currentLevel; }
+        } else { printTerminal(`[!] 已达最高叠加次数（3次）！`); }
         return;
     }
     if (cmd.toLowerCase().startsWith('admin_rate ')) {
@@ -237,17 +252,7 @@ function processCommand(cmd) {
         } else { printTerminal(`[!] 请输入 0-100 之间的数字，例如：admin_rate 45`); }
         return;
     }
-    if (cmd.toLowerCase().startsWith('add ')) {
-        let name = cmd.substring(4).trim(); if (!name.endsWith('.html')) name += '.html';
-        let games = getCustomGames(); if (games.includes(name)) { printTerminal(`[!] 游戏已存在`); }
-        else { games.push(name); saveCustomGames(games); printTerminal(`[+] 成功添加`); }
-    } 
-    else if (cmd.toLowerCase().startsWith('rm ')) {
-        let name = cmd.substring(3).trim(); let games = getCustomGames(); let idx = games.indexOf(name);
-        if (idx !== -1) { games.splice(idx, 1); saveCustomGames(games); printTerminal(`[-] 成功删除`); }
-        else { printTerminal(`[!] 找不到游戏`); }
-    }
-    else if (cmd.toLowerCase().startsWith('addimg ')) {
+    if (cmd.toLowerCase().startsWith('addimg ')) {
         let parts = cmd.substring(7).trim().split(' '); let url = parts[0], name = parts.slice(1).join(' ') || '未命名图片';
         let medias = getCustomMedias(); medias.push({ name: name, url: url, type: 'image' }); saveCustomMedias(medias); printTerminal(`[+] 成功添加图片`);
     }
@@ -255,13 +260,10 @@ function processCommand(cmd) {
         let parts = cmd.substring(7).trim().split(' '); let url = parts[0], name = parts.slice(1).join(' ') || '未命名视频';
         let medias = getCustomMedias(); medias.push({ name: name, url: url, type: 'video' }); saveCustomMedias(medias); printTerminal(`[+] 成功添加视频`);
     }
-    else if (cmd.toLowerCase() === 'ls') {
-        let games = getCustomGames(); printTerminal("自定义游戏列表:"); games.forEach(g => printTerminal("  " + g));
-        if (games.length === 0) printTerminal("  (空)");
-    }
     else { printTerminal(`'${cmd}' 不是内部或外部命令。`); }
 }
 
+// 音效系统
 var Sound = (function() {
   var ctx = null; var enabled = true;
   try { var saved = localStorage.getItem('sound_on'); if (saved === '0') enabled = false; } catch(e) {}
@@ -299,6 +301,7 @@ function initAudioOnce() { Sound.init(); document.removeEventListener('touchstar
 document.addEventListener('touchstart', initAudioOnce); document.addEventListener('mousedown', initAudioOnce); document.addEventListener('click', initAudioOnce);
 (function() { if (!Sound.isOn()) { document.getElementById('soundBtn').textContent = '音效关'; } })();
 
+// 贪吃蛇
 var snake = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('snakeC'); var cx = cv.getContext('2d'); var G = 20, CELL = 20; var body, dir, nextDir, food, score, tickMs, lastTick, best = 0, dead = false;
@@ -339,6 +342,7 @@ var snake = { running: false, raf: null };
   }, {passive:false});
 })();
 
+// 打砖块
 var br = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('brC'); var cx = cv.getContext('2d'); var W = cv.width, H = cv.height; var paddle, ball, bricks, score, lives, keys = {};
@@ -394,6 +398,7 @@ var br = { running: false, raf: null };
   }
 })();
 
+// 星际守卫
 var sp = { running: false, raf: null };
 (function() {
   var cv = document.getElementById('spC'); var cx = cv.getContext('2d'); var W = cv.width, H = cv.height; 
@@ -409,7 +414,6 @@ var sp = { running: false, raf: null };
   
   window.spReset = function() {
     spStop(); 
-    // 读取本地存储的管理员技能叠加等级
     let savedAdminSkill = parseInt(localStorage.getItem('admin_skill_level') || '0');
     player = { x: W/2, y: H - 150, r: 16, speed: 360, skillType: 0, skillTimer: 0, skill1Timer: 0, adminSkillLevel: savedAdminSkill }; 
     bullets = []; enemies = []; particles = []; stars = []; powerups = []; enemiesBullets = []; 
