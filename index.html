@@ -40,20 +40,22 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 #media-section { max-width: 800px !important; margin: 30px auto !important; padding: 0 15px; box-sizing: border-box; text-align: center; }
 #media-section img { max-width: 100% !important; height: auto !important; display: block; margin: 0 auto 15px auto !important; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 </style>
-<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 </head>
 <body>
 
 <script>
 // =================================================================
-// 以后上传新游戏到根目录，在这里加名字即可
+// 
+// 往仓库传了新游戏，就在这里加上名字！
+// 注意名字必须和上传的文件名一模一样（包括大小写和 .html）
 // =================================================================
 const CUSTOM_GAMES = [
-    // "game2.html", 
+    "game2.html",       // <-- 你刚传的新游戏，如果文件名是 geme2.html 就改这里
+    "horror3d.html",    // <-- 你之前做的恐怖游戏
 ];
 // =================================================================
 
-// 其他全局配置
+// 全局配置
 window.eliteSpawnRate = 0.45;
 window.pendingGame = null;
 </script>
@@ -77,12 +79,12 @@ window.pendingGame = null;
     <li><a href="#" onclick="go('space');return false;">星际守卫</a><div class="desc">全屏拖动飞船，自动开火。击杀怪物有几率掉落技能球！加入精英怪！</div></li>
   </ul>
   
-  <!-- 自动显示新游戏 -->
+  <!-- 自动显示你配置的新游戏 -->
   <div id="custom-games-list" style="margin-top: 10px;"></div>
   
   <div id="media-section" style="margin-top: 30px;">
-    <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">图片与视频区</h2>
-    <img src="ad.jpg" alt="图片1" onerror="this.style.display='none'">
+    <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">评论区</h2>
+    <img src="ab.jpg" alt="图片1" onerror="this.style.display='none'">
     <img src="1.jpg" alt="图片2" onerror="this.style.display='none'">
     <img src="2.jpg" alt="图片3" onerror="this.style.display='none'">
     <div id="media-list"></div>
@@ -153,7 +155,7 @@ function applyDeviceStyle(type) {
     }
 }
 
-// 数据存储与渲染
+// 数据存储
 const ADMIN_PASSWORD = "123456";
 let isAdminLoggedIn = false;
 function getCustomMedias() { try { return JSON.parse(localStorage.getItem('custom_medias') || '[]'); } catch(e) { return []; } }
