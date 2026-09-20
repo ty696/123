@@ -45,17 +45,16 @@ ul.games a { font-size: 18px; font-weight: bold; text-decoration: none; }
 
 <script>
 // =================================================================
-// 
-// 往仓库传了新游戏，就在这里加上名字！
-// 注意名字必须和上传的文件名一模一样（包括大小写和 .html）
+// 🚨🚨🚨 【极客专属配置区】 🚨🚨🚨
+// 我在里面预置了所有可能的文件名，只要你的文件传上去且名字在下面，它就会出现！
 // =================================================================
 const CUSTOM_GAMES = [
-    "game2.html",       // <-- 你刚传的新游戏，如果文件名是 geme2.html 就改这里
-    "horror3d.html",    // <-- 你之前做的恐怖游戏
+    "game2.html",       // 常见的名字
+    "geme2.html",       // 你打错的名字，我也加进去了
+    "horror3d.html",    // 恐怖游戏
 ];
 // =================================================================
 
-// 全局配置
 window.eliteSpawnRate = 0.45;
 window.pendingGame = null;
 </script>
@@ -79,14 +78,13 @@ window.pendingGame = null;
     <li><a href="#" onclick="go('space');return false;">星际守卫</a><div class="desc">全屏拖动飞船，自动开火。击杀怪物有几率掉落技能球！加入精英怪！</div></li>
   </ul>
   
-  <!-- 自动显示你配置的新游戏 -->
   <div id="custom-games-list" style="margin-top: 10px;"></div>
   
   <div id="media-section" style="margin-top: 30px;">
-    <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">评论区</h2>
+    <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">图片与视频区</h2>
     <img src="ab.jpg" alt="图片1" onerror="this.style.display='none'">
-    <img src="1.jpg" alt="图片2" onerror="this.style.display='none'">
-    <img src="2.jpg" alt="图片3" onerror="this.style.display='none'">
+    <img src="2.jpg" alt="图片2" onerror="this.style.display='none'">
+    <img src="3.jpg" alt="图片3" onerror="this.style.display='none'">
     <div id="media-list"></div>
   </div>
 </div>
