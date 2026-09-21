@@ -11,13 +11,15 @@
     #hud { position: absolute; top: 20px; left: 20px; color: #a00; font-size: 18px; font-weight: bold; text-shadow: 0 0 10px #f00; z-index: 10; pointer-events: none; font-family: monospace; letter-spacing: 2px; }
     #stamina { position: absolute; top: 50px; left: 20px; width: 150px; height: 6px; background: #222; z-index: 10; }
     #stamina-bar { height: 100%; width: 100%; background: #800; transition: width 0.1s; }
-    #crosshair { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 50%; transform: translate(-50%, -50%); z-index: 5; }
+    #crosshair { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 50%; transform: translate(-50%, -50%); z-index: 5; }
+    
     #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 200; text-align: center; }
     #start-screen h1 { font-size: 56px; color: #500; letter-spacing: 20px; margin-bottom: 20px; text-shadow: 0 0 30px #800; animation: flicker 3s infinite; }
     @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
     #start-screen p { color: #444; font-size: 13px; margin: 6px 0; letter-spacing: 3px; }
     #start-screen button { margin-top: 40px; padding: 15px 50px; background: #000; border: 1px solid #500; color: #a00; font-size: 18px; cursor: pointer; letter-spacing: 8px; font-family: inherit; transition: all 0.3s; }
     #start-screen button:hover { background: #200; box-shadow: 0 0 20px #500; }
+    
     #msg { position: absolute; top: 60%; left: 50%; transform: translate(-50%,-50%); color: #fff; font-size: 20px; z-index: 20; text-shadow: 0 0 10px #000; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
     
     #jump-scare-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; justify-content: center; align-items: center; overflow: hidden; }
@@ -26,20 +28,47 @@
     @keyframes zoomIn { from { transform: scale(2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     @keyframes shake { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-10px,5px); } 75% { transform: translate(10px,-5px); } }
     
-    #game-over { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(50,0,0,0.85); color: #f00; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; text-align: center; }
-    #game-over h2 { font-size: 60px; letter-spacing: 20px; text-shadow: 0 0 30px #f00; }
-    #game-over p { color: #888; margin-top: 30px; font-size: 14px; letter-spacing: 3px; }
+    #game-over { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(50,0,0,0.9); color: #f00; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; text-align: center; }
+    #game-over h2 { font-size: 50px; letter-spacing: 15px; text-shadow: 0 0 30px #f00; }
     #win-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); color: #0a0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; text-align: center; }
-    #win-screen h2 { font-size: 50px; letter-spacing: 15px; text-shadow: 0 0 30px #0a0; }
+    #win-screen h2 { font-size: 45px; letter-spacing: 10px; text-shadow: 0 0 30px #0a0; }
+    
+    /* 手机端专用的“重新开始”按钮样式 */
+    .restart-btn {
+        margin-top: 40px;
+        padding: 15px 50px;
+        background: #000;
+        border: 2px solid #f00;
+        color: #f00;
+        font-size: 22px;
+        font-weight: bold;
+        letter-spacing: 5px;
+        cursor: pointer;
+        border-radius: 10px;
+        font-family: "Microsoft YaHei", sans-serif;
+        animation: pulse 1.5s infinite;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    .restart-btn:active { background: #500; color: #fff; }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+        70% { box-shadow: 0 0 0 20px rgba(255, 0, 0, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+    }
     
     #orientation-warning { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #f00; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; text-align: center; }
     #orientation-warning h2 { font-size: 30px; margin-bottom: 20px; letter-spacing: 5px; text-shadow: 0 0 10px #f00; }
     #orientation-warning .phone-icon { font-size: 80px; animation: rotatePhone 2s infinite; margin-bottom: 30px; }
     @keyframes rotatePhone { 0% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } 100% { transform: rotate(90deg); } }
     
-    #joystick-zone { position: absolute; bottom: 20px; left: 20px; width: 160px; height: 160px; z-index: 50; display: none; }
-    #joystick-base { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); }
-    #joystick-knob { position: absolute; top: 50%; left: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; background: rgba(150,0,0,0.5); border: 2px solid #500; }
+    /* 强制显示的虚拟摇杆和奔跑按钮 */
+    #joystick-zone { position: absolute; bottom: 20px; left: 20px; width: 140px; height: 140px; z-index: 50; display: block; }
+    #joystick-base { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+    #joystick-knob { position: absolute; top: 50%; left: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; background: rgba(150,0,0,0.6); border: 2px solid #800; }
+    
+    #run-btn { position: absolute; bottom: 40px; right: 40px; width: 80px; height: 80px; border-radius: 50%; background: rgba(150,0,0,0.5); border: 2px solid #800; color: #fff; font-size: 18px; font-weight: bold; text-align: center; line-height: 76px; z-index: 50; display: block; user-select: none; -webkit-user-select: none; }
+    #run-btn:active { background: rgba(200,0,0,0.7); }
 </style>
 </head>
 <body>
@@ -53,8 +82,8 @@
 <div id="start-screen">
     <h1>暗 室</h1>
     <p>—— 不要相信你听到的 ——</p>
-    <p style="margin-top:20px; color:#222;">WASD 移动 · 鼠标转向 · Shift 奔跑</p>
-    <p style="color:#222;">建议横屏游玩体验最佳</p>
+    <p style="margin-top:20px; color:#222;">左侧摇杆移动 · 右侧屏幕滑动转向</p>
+    <p style="color:#222;">按住右下角按钮奔跑（消耗体力）</p>
     <button onclick="startGame()">进 入</button>
 </div>
 
@@ -67,21 +96,24 @@
     <div id="joystick-base"></div>
     <div id="joystick-knob"></div>
 </div>
+<div id="run-btn">奔跑</div>
 
 <div id="jump-scare-overlay">
     <img id="scary-img" src="scary.jpg" onerror="this.style.display='none'; document.getElementById('fallback-eye').style.display='block';">
     <div id="fallback-eye">👁️</div>
 </div>
 
+<!-- 🚨 修改1：游戏结束界面 -->
 <div id="game-over">
     <h2>你 被 抓 住 了</h2>
-    <p>按 F5 重新开始</p>
+    <button class="restart-btn" onclick="startGame()">重新开始</button>
 </div>
 
+<!-- 🚨 修改2：逃脱成功界面 -->
 <div id="win-screen">
     <h2>你 逃 出 去 了</h2>
     <p>但那东西...还在黑暗中</p>
-    <p style="margin-top:30px; color:#555;">按 F5 再次进入</p>
+    <button class="restart-btn" onclick="startGame()">再玩一次</button>
 </div>
 
 <script src="https://cdn.staticfile.org/three.js/r128/three.min.js"></script>
@@ -96,7 +128,7 @@ function playSound(audioObj, volume = 1.0) {
 }
 
 let scene, camera, renderer;
-let player, flashlight, ambientLight;
+let player, flashlight;
 let keys = {};
 let yaw = 0, pitch = 0;
 let isPointerLocked = false;
@@ -112,42 +144,31 @@ let mapSize = 80;
 let joystickActive = false;
 let joystickStart = {x: 0, y: 0};
 let joystickVector = {x: 0, y: 0};
-let isTouchDevice = 'ontouchstart' in window;
-
-function checkOrientation() {
-    const warning = document.getElementById('orientation-warning');
-    if (isTouchDevice && window.innerHeight > window.innerWidth) {
-        warning.style.display = 'flex';
-    } else {
-        warning.style.display = 'none';
-        if (scene && renderer && camera) {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-    }
-}
-window.addEventListener('resize', checkOrientation);
+let isRunning = false;
+let runBtnPressed = false;
+let baseFov = 75, runFov = 90;
 
 function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.FogExp2(0x000000, 0.06);
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 200);
+    scene.fog = new THREE.FogExp2(0x000000, 0.04); 
+
+    camera = new THREE.PerspectiveCamera(baseFov, window.innerWidth / window.innerHeight, 0.1, 200);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    ambientLight = new THREE.AmbientLight(0x101010, 0.5);
+    let ambientLight = new THREE.AmbientLight(0x202020, 0.8);
     scene.add(ambientLight);
-    flashlight = new THREE.SpotLight(0xffffee, 1.5, 25, Math.PI / 7, 0.4, 1.5);
+
+    flashlight = new THREE.SpotLight(0xffffff, 3.5, 45, Math.PI / 5, 0.5, 1.0);
     flashlight.castShadow = true;
+    flashlight.shadow.mapSize.width = 1024;
+    flashlight.shadow.mapSize.height = 1024;
     scene.add(flashlight);
     scene.add(flashlight.target);
-    let redGlow = new THREE.PointLight(0x800000, 0.3, 3);
-    camera.add(redGlow);
 
     generateMap();
     createMonster();
@@ -160,24 +181,27 @@ function init() {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('click', onCanvasClick);
     document.addEventListener('pointerlockchange', onPointerLockChange);
-    if (isTouchDevice) setupJoystick();
-    checkOrientation();
+    
+    setupJoystick();
+    setupRunButton();
 }
 
 function generateMap() {
     const size = mapSize; const wallThickness = 0.5; const wallHeight = 3;
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9 });
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 1 });
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.9 });
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x101010, roughness: 1 });
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(size * 2, size * 2), floorMat);
     floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
-    const ceil = new THREE.Mesh(new THREE.PlaneGeometry(size * 2, size * 2), new THREE.MeshStandardMaterial({ color: 0x030303, roughness: 1 }));
+    const ceil = new THREE.Mesh(new THREE.PlaneGeometry(size * 2, size * 2), new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 1 }));
     ceil.rotation.x = Math.PI / 2; ceil.position.y = wallHeight; scene.add(ceil);
+    
     const bounds = [[-size, -size, size*2, wallThickness], [-size, size - wallThickness, size*2, wallThickness], [-size, -size, wallThickness, size*2], [size - wallThickness, -size, wallThickness, size*2]];
     bounds.forEach(b => {
         const wall = new THREE.Mesh(new THREE.BoxGeometry(b[2], wallHeight, b[3]), wallMat);
         wall.position.set(b[0] + b[2]/2, wallHeight/2, b[1] + b[3]/2);
         wall.castShadow = true; wall.receiveShadow = true; scene.add(wall); walls.push({x: b[0], z: b[1], w: b[2], d: b[3]});
     });
+
     for (let i = 0; i < 60; i++) {
         let w = (Math.random() < 0.5 ? 6 : 2) * (Math.random() < 0.5 ? 1 : 0.5);
         let d = (w > 4) ? 1 : 4 + Math.random() * 4;
@@ -188,6 +212,7 @@ function generateMap() {
         wall.position.set(x, wallHeight/2, z); wall.castShadow = true; wall.receiveShadow = true; scene.add(wall);
         walls.push({x: x - w/2, z: z - d/2, w: w, d: d});
     }
+
     for (let i = 0; i < 3; i++) {
         let placed = false; let attempts = 0;
         while (!placed && attempts < 200) {
@@ -228,19 +253,27 @@ function createMonster() {
 
 function updatePlayer(dt, time) {
     let forward = 0, right = 0;
-    if (isTouchDevice) { forward = -joystickVector.y; right = joystickVector.x; } 
-    else {
-        if (keys['w'] || keys['arrowup']) forward += 1;
-        if (keys['s'] || keys['arrowdown']) forward -= 1;
-        if (keys['a'] || keys['arrowleft']) right -= 1;
-        if (keys['d'] || keys['arrowright']) right += 1;
-    }
+    forward = -joystickVector.y; right = joystickVector.x;
+    if (keys['w'] || keys['arrowup']) forward += 1;
+    if (keys['s'] || keys['arrowdown']) forward -= 1;
+    if (keys['a'] || keys['arrowleft']) right -= 1;
+    if (keys['d'] || keys['arrowright']) right += 1;
+    
     let isMoving = (forward !== 0 || right !== 0);
-    let isRunning = keys['shift'] && stamina > 0 && isMoving;
-    let speed = isRunning ? 6 : 3;
-    if (isRunning) stamina = Math.max(0, stamina - dt * 30);
-    else stamina = Math.min(100, stamina + dt * 15);
+    isRunning = (keys['shift'] || runBtnPressed) && stamina > 0 && isMoving;
+    
+    let speed = isRunning ? 8 : 3.5; 
+    
+    if (isRunning) {
+        stamina = Math.max(0, stamina - dt * 25); 
+        camera.fov += (runFov - camera.fov) * 0.1; 
+    } else {
+        stamina = Math.min(100, stamina + dt * 10); 
+        camera.fov += (baseFov - camera.fov) * 0.1; 
+    }
+    camera.updateProjectionMatrix();
     document.getElementById('stamina-bar').style.width = stamina + '%';
+    
     if (isMoving) {
         const moveX = -Math.sin(yaw) * forward + Math.cos(yaw) * right;
         const moveZ = -Math.cos(yaw) * forward - Math.sin(yaw) * right;
@@ -255,12 +288,14 @@ function updatePlayer(dt, time) {
             }
             if (canX) player.x = nx;
             if (canZ) player.z = nz;
+            
             footstepTimer -= dt;
-            if (footstepTimer <= 0) { playSound(footstepSound, 0.3); footstepTimer = isRunning ? 0.3 : 0.5; }
+            if (footstepTimer <= 0) { playSound(footstepSound, 0.3); footstepTimer = isRunning ? 0.25 : 0.5; }
         }
     }
     player.x = Math.max(-mapSize + 1, Math.min(mapSize - 1, player.x));
     player.z = Math.max(-mapSize + 1, Math.min(mapSize - 1, player.z));
+    
     camera.position.set(player.x, player.y, player.z);
     camera.rotation.order = 'YXZ'; camera.rotation.y = yaw; camera.rotation.x = pitch;
     flashlight.position.copy(camera.position);
@@ -274,7 +309,7 @@ function updateMonster(dt, time) {
     const dist = Math.hypot(dx, dz);
     if (dist > 1.5) {
         let speed = monster.speed;
-        if (dist < 15) speed *= 2.2; else if (dist < 30) speed *= 1.5;
+        if (dist < 15) speed *= 2.5; else if (dist < 30) speed *= 1.8;
         const nx = monster.x + (dx / dist) * speed * dt; const nz = monster.z + (dz / dist) * speed * dt;
         if (!isInsideWall(nx, monster.z)) monster.x = nx;
         if (!isInsideWall(monster.x, nz)) monster.z = nz;
@@ -282,6 +317,7 @@ function updateMonster(dt, time) {
     monster.group.position.set(monster.x, 0, monster.z);
     monster.group.rotation.y = Math.atan2(dx, dz);
     monster.eyeLight.intensity = 0.3 + Math.sin(time * 10) * 0.2;
+    
     if (dist < 1.5 && gameState === 'playing') {
         gameState = 'gameover';
         playSound(ghostScream, 1.0); 
@@ -313,22 +349,33 @@ function updateItems(dt, time) {
 }
 
 function onMouseMove(e) { if (!isPointerLocked || gameState !== 'playing') return; yaw -= e.movementX * 0.002; pitch -= e.movementY * 0.002; pitch = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, pitch)); }
-function onCanvasClick() { if (gameState === 'playing' && !isTouchDevice && !isPointerLocked) renderer.domElement.requestPointerLock(); }
+function onCanvasClick() { if (gameState === 'playing' && !isPointerLocked) renderer.domElement.requestPointerLock(); }
 function onPointerLockChange() { isPointerLocked = document.pointerLockElement === renderer.domElement; }
 function onResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
 
 function setupJoystick() {
-    document.getElementById('joystick-zone').style.display = 'block';
     const zone = document.getElementById('joystick-zone'); const knob = document.getElementById('joystick-knob');
     zone.addEventListener('touchstart', e => { e.preventDefault(); joystickActive = true; const touch = e.touches[0]; const rect = zone.getBoundingClientRect(); joystickStart.x = rect.left + rect.width / 2; joystickStart.y = rect.top + rect.height / 2; }, {passive: false});
     zone.addEventListener('touchmove', e => {
         e.preventDefault(); if (!joystickActive) return; const touch = e.touches[0];
         let dx = touch.clientX - joystickStart.x; let dy = touch.clientY - joystickStart.y;
-        const maxDist = 60; const dist = Math.hypot(dx, dy);
+        const maxDist = 50; const dist = Math.hypot(dx, dy);
         if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
         knob.style.transform = `translate(${dx}px, ${dy}px)`; joystickVector.x = dx / maxDist; joystickVector.y = dy / maxDist;
     }, {passive: false});
     zone.addEventListener('touchend', e => { e.preventDefault(); joystickActive = false; knob.style.transform = 'translate(0,0)'; joystickVector = {x: 0, y: 0}; }, {passive: false});
+    
+    zone.addEventListener('mousedown', e => { joystickActive = true; const rect = zone.getBoundingClientRect(); joystickStart.x = rect.left + rect.width / 2; joystickStart.y = rect.top + rect.height / 2; });
+    document.addEventListener('mousemove', e => { if (!joystickActive) return; let dx = e.clientX - joystickStart.x; let dy = e.clientY - joystickStart.y; const maxDist = 50; const dist = Math.hypot(dx, dy); if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; } knob.style.transform = `translate(${dx}px, ${dy}px)`; joystickVector.x = dx / maxDist; joystickVector.y = dy / maxDist; });
+    document.addEventListener('mouseup', () => { joystickActive = false; knob.style.transform = 'translate(0,0)'; joystickVector = {x: 0, y: 0}; });
+}
+
+function setupRunButton() {
+    const btn = document.getElementById('run-btn');
+    btn.addEventListener('touchstart', e => { e.preventDefault(); runBtnPressed = true; }, {passive: false});
+    btn.addEventListener('touchend', e => { e.preventDefault(); runBtnPressed = false; }, {passive: false});
+    btn.addEventListener('mousedown', e => { e.preventDefault(); runBtnPressed = true; });
+    document.addEventListener('mouseup', () => { runBtnPressed = false; });
 }
 
 function animate(time) {
@@ -344,14 +391,20 @@ function animate(time) {
 function startGame() {
     if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen().catch(() => {}); }
     if (screen.orientation && screen.orientation.lock) { screen.orientation.lock('landscape').catch(() => {}); }
+    
     document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('game-over').style.display = 'none';
+    document.getElementById('win-screen').style.display = 'none';
+    
     gameState = 'playing'; player = { x: 0, y: 1.7, z: 0 }; yaw = 0; pitch = 0; score = 0; stamina = 100;
     document.getElementById('hud').innerText = '祭品: 0 / 3';
     items.forEach(it => { if (!it.collected) { scene.remove(it.mesh); scene.remove(it.light); } }); items = [];
     if (monster) scene.remove(monster.group);
     for (let i = 0; i < 3; i++) { let placed = false; let attempts = 0; while (!placed && attempts < 200) { let x = Math.random() * (mapSize * 1.6) - mapSize * 0.8; let z = Math.random() * (mapSize * 1.6) - mapSize * 0.8; if (Math.hypot(x, z) < 15) { attempts++; continue; } if (!isInsideWall(x, z)) { createItem(x, 1, z); placed = true; } attempts++; } }
     createMonster();
-    if (!isTouchDevice) renderer.domElement.requestPointerLock();
+    
+    if (renderer.domElement.requestPointerLock) renderer.domElement.requestPointerLock();
+    
     const msg = document.getElementById('msg'); msg.innerText = '找到 3 个祭品...'; msg.style.opacity = 1; setTimeout(() => { msg.style.opacity = 0; }, 3000);
 }
 init();
