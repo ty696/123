@@ -3,117 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>像素卡牌对战</title>
+    <title>像素卡牌对战 - 横屏优化版</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; font-family: 'Courier New', Courier, monospace; }
+        body { background-color: #1a1a1a; color: #fff; overflow: hidden; touch-action: none; }
         
-        /* 【核心修复】用 fixed 钉死整个游戏区域，完美适配手机 */
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #1a1a1a; color: #fff; touch-action: none; }
+        /* 竖屏提示层 */
+        #rotate-tip {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: #1a1a1a; z-index: 9999; text-align: center; padding: 20px;
+        }
+        #rotate-tip h1 { font-size: 24px; color: #ffd700; margin-bottom: 20px; }
+        #rotate-tip p { font-size: 16px; color: #aaa; }
+        
+        /* 横屏主容器 */
         #game-container {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0; /* 钉死四边 */
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            gap: 10px;
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            padding: 8px;
+            padding-top: 50px; /* 【修复】给顶部按钮留出高度 */
+            padding-bottom: max(12px, env(safe-area-inset-bottom)); /* 【修复】适配底部安全区域 */
+            gap: 8px;
+            background: #1a1a1a;
         }
         
-        .status-panel { flex: 0 0 auto; background: #2a2a2a; border: 4px solid #000; box-shadow: 4px 4px 0 #000; padding: 10px; display: flex; flex-direction: column; gap: 8px; position: relative; }
-        .status-panel h2 { font-size: 16px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #555; padding-bottom: 4px; display: flex; justify-content: space-between; }
-        .bar-container { height: 20px; background: #111; border: 2px solid #000; position: relative; overflow: hidden; }
+        /* 横屏布局：左中右三栏 */
+        #left-col { flex: 0 0 25%; display: flex; flex-direction: column; gap: 8px; }
+        #mid-col { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        #right-col { flex: 0 0 35%; display: flex; flex-direction: column; gap: 8px; }
+
+        /* 状态面板 */
+        .status-panel { flex: 0 0 auto; background: #2a2a2a; border: 4px solid #000; box-shadow: 4px 4px 0 #000; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .status-panel h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #555; padding-bottom: 4px; display: flex; justify-content: space-between; }
+        .bar-container { height: 18px; background: #111; border: 2px solid #000; position: relative; overflow: hidden; }
         .bar-fill { height: 100%; transition: width 0.3s ease; }
         .hp-fill { background: #ff4c4c; }
         .shield-fill { background: #4c9aff; position: absolute; top: 0; left: 0; opacity: 0.8; }
-        .bar-text { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; text-shadow: 1px 1px 0 #000; }
-        .energy-box { display: flex; align-items: center; gap: 5px; font-size: 16px; font-weight: bold; color: #ffd700; }
+        .bar-text { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; text-shadow: 1px 1px 0 #000; }
+        .energy-box { display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: bold; color: #ffd700; }
         
-        /* 【核心修复】日志区自适应，min-height 设为 0 防止被撑爆 */
-        #log-area { flex: 1 1 0; min-height: 0; background: #111; border: 4px solid #000; box-shadow: inset 4px 4px 0 #000; padding: 10px; overflow-y: auto; font-size: 13px; line-height: 1.5; color: #aaa; display: flex; flex-direction: column; gap: 5px; }
+        /* 战斗日志区 */
+        #log-area { flex: 1; min-height: 0; background: #111; border: 4px solid #000; box-shadow: inset 4px 4px 0 #000; padding: 8px; overflow-y: auto; font-size: 12px; line-height: 1.4; color: #aaa; display: flex; flex-direction: column; gap: 4px; }
         .log-entry { border-bottom: 1px dashed #333; padding-bottom: 2px; }
         .log-entry.player { color: #4c9aff; }
         .log-entry.enemy { color: #ff4c4c; }
         .log-entry.system { color: #ffd700; font-weight: bold; }
-        
-        /* 【核心修复】手牌区不强行占用大量空间，随内容 */
-        #hand-area { flex: 0 0 auto; display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; min-height: 140px; scrollbar-width: none; }
+
+        /* 手牌区 */
+        #hand-area { flex: 1; display: flex; overflow-x: auto; gap: 8px; padding: 5px 0; align-items: center; scrollbar-width: none; }
         #hand-area::-webkit-scrollbar { display: none; }
         
-        .card { width: 100px; height: 140px; background: #fff; color: #111; border: 4px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; justify-content: space-between; padding: 8px; cursor: pointer; flex-shrink: 0; transition: transform 0.1s, box-shadow 0.1s; position: relative; }
+        .card { width: 80px; height: 115px; background: #fff; color: #111; border: 4px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; justify-content: space-between; padding: 6px; cursor: pointer; flex-shrink: 0; transition: transform 0.1s, box-shadow 0.1s; position: relative; }
         .card:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
-        .card.selected { transform: translateY(-15px); box-shadow: 4px 8px 0 #000; border-color: #ffd700; }
+        .card.selected { transform: translateY(-10px); box-shadow: 4px 8px 0 #000; border-color: #ffd700; }
         @keyframes play-card-anim {
             0% { transform: scale(1) translateY(0); opacity: 1; }
-            50% { transform: scale(1.2) translateY(-30px); opacity: 0.8; }
-            100% { transform: scale(1.5) translateY(-100px); opacity: 0; }
+            50% { transform: scale(1.2) translateY(-20px); opacity: 0.8; }
+            100% { transform: scale(1.5) translateY(-80px); opacity: 0; }
         }
         .card.played { animation: play-card-anim 0.3s ease forwards; pointer-events: none; z-index: 999; }
-        .card-cost { background: #ffd700; border: 2px solid #000; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; border-radius: 50%; position: absolute; top: -10px; right: -10px; }
-        .card-name { font-weight: bold; font-size: 12px; text-align: center; margin-top: 10px; word-break: break-all; }
-        .card-type { font-size: 10px; text-align: center; color: #555; }
-        .card-desc { font-size: 11px; text-align: center; line-height: 1.2; }
-        
-        /* 【核心修复】按钮区固定高度，确保手指能按到 */
-        #controls { flex: 0 0 auto; display: flex; gap: 8px; padding-bottom: 5px; }
-        .btn { flex: 1; height: 80px; background: #2a2a2a; color: #fff; border: 4px solid #000; box-shadow: 4px 4px 0 #000; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
+        .card-cost { background: #ffd700; border: 2px solid #000; width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 12px; border-radius: 50%; position: absolute; top: -8px; right: -8px; }
+        .card-name { font-weight: bold; font-size: 11px; text-align: center; margin-top: 8px; word-break: break-all; }
+        .card-type { font-size: 9px; text-align: center; color: #555; }
+        .card-desc { font-size: 10px; text-align: center; line-height: 1.2; }
+
+        /* 操作按钮区 */
+        #controls { flex: 0 0 auto; display: flex; gap: 6px; }
+        .btn { flex: 1; height: 50px; background: #2a2a2a; color: #fff; border: 3px solid #000; box-shadow: 4px 4px 0 #000; font-size: 14px; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
         .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
         #play-btn { background: #4c9aff; }
         #end-btn { background: #ff4c4c; }
         #draw-btn { background: #ffd700; color: #000; }
         
-        #sound-toggle { position: fixed; top: 15px; right: 15px; z-index: 2000; background: #2a2a2a; border: 3px solid #000; box-shadow: 2px 2px 0 #000; color: #fff; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 50%; -webkit-tap-highlight-color: transparent; }
-        #sound-toggle:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #000; }
+        /* 顶部工具栏：规则、音效、赞助 */
+        #top-bar {
+            position: fixed;
+            top: max(8px, env(safe-area-inset-top));
+            left: 10px;
+            right: 10px;
+            height: 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2000;
+        }
+        #top-bar .left-btns { display: flex; gap: 8px; }
+        #top-bar .right-btns { display: flex; gap: 8px; }
+        
+        .small-btn {
+            background: #2a2a2a; color: #fff; border: 3px solid #000; box-shadow: 3px 3px 0 #000;
+            padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;
+            cursor: pointer; -webkit-tap-highlight-color: transparent; text-decoration: none;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .small-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+        #rules-btn { background: #ffd700; color: #000; }
+        #sound-toggle { width: 36px; padding: 0; font-size: 16px; }
+        #sponsor-btn { background: #007bff; color: #fff; }
 
-        #sponsor-btn { position: fixed; bottom: 110px; right: 20px; z-index: 2000; background: #007bff; color: #fff; padding: 10px 18px; text-decoration: none; border: 3px solid #000; box-shadow: 4px 4px 0 #000; border-radius: 8px; font-size: 14px; font-weight: bold; transition: transform 0.1s, box-shadow 0.1s; -webkit-tap-highlight-color: transparent; }
-        #sponsor-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
-
+        /* 游戏结束遮罩 */
         #game-over { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; gap: 20px; }
-        #game-over h1 { font-size: 36px; text-shadow: 4px 4px 0 #000; }
-        #game-over p { font-size: 18px; color: #aaa; }
-        #restart-btn { width: 200px; height: 80px; background: #ffd700; color: #000; }
+        #game-over h1 { font-size: 28px; text-shadow: 4px 4px 0 #000; }
+        #game-over p { font-size: 16px; color: #aaa; }
+        #restart-btn { width: 150px; height: 50px; background: #ffd700; color: #000; }
+
+        /* 游戏规则弹窗 */
+        #rules-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        .rules-content { background: #2a2a2a; border: 4px solid #000; box-shadow: 8px 8px 0 #000; padding: 20px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; color: #fff; font-size: 13px; line-height: 1.6; }
+        .rules-content h2 { text-align: center; color: #ffd700; margin-bottom: 15px; font-size: 18px; }
+        .rules-content p { margin-bottom: 8px; }
+        .rules-content .highlight { color: #4c9aff; font-weight: bold; }
+        #close-rules { margin-top: 15px; width: 100%; height: 50px; background: #4c9aff; color: #fff; border: 3px solid #000; box-shadow: 4px 4px 0 #000; font-weight: bold; cursor: pointer; }
+
+        /* 横屏媒体查询 */
+        @media (orientation: landscape) {
+            #rotate-tip { display: none; }
+            #game-container { display: flex; flex-direction: row; }
+        }
+        /* 竖屏提示 */
+        @media (orientation: portrait) {
+            #game-container { display: none; }
+            #rotate-tip { display: flex; }
+        }
     </style>
 </head>
 <body>
 
-<button id="sound-toggle" title="静音/开启声音">🔊</button>
+<!-- 竖屏提示 -->
+<div id="rotate-tip">
+    <h1>📱 请横屏体验</h1>
+    <p>为了更好的操作体验，请把手机横过来玩</p>
+</div>
 
-<div id="game-container">
-    <div class="status-panel" id="enemy-panel">
-        <h2>敌方 <span class="energy-box" id="enemy-energy">能量: 0 / 3</span></h2>
-        <div class="bar-container">
-            <div class="bar-fill hp-fill" id="enemy-hp-bar" style="width: 100%;"></div>
-            <div class="bar-fill shield-fill" id="enemy-shield-bar" style="width: 0%;"></div>
-            <div class="bar-text" id="enemy-hp-text">100 / 100</div>
-        </div>
+<!-- 顶部工具栏 -->
+<div id="top-bar">
+    <div class="left-btns">
+        <button class="small-btn" id="rules-btn">📖 规则</button>
     </div>
-
-    <div id="log-area"></div>
-
-    <div class="status-panel" id="player-panel">
-        <h2>玩家 <span class="energy-box" id="player-energy">能量: 0 / 3</span></h2>
-        <div class="bar-container">
-            <div class="bar-fill hp-fill" id="player-hp-bar" style="width: 100%;"></div>
-            <div class="bar-fill shield-fill" id="player-shield-bar" style="width: 0%;"></div>
-            <div class="bar-text" id="player-hp-text">100 / 100</div>
-        </div>
-    </div>
-
-    <div id="hand-area"></div>
-
-    <div id="controls">
-        <button class="btn" id="play-btn" disabled>打出</button>
-        <button class="btn" id="draw-btn">抽牌(1费)</button>
-        <button class="btn" id="end-btn">结束</button>
+    <div class="right-btns">
+        <button class="small-btn" id="sound-toggle">🔊</button>
+        <a href="https://ty696.github.io/6669/pay.html" target="_blank" class="small-btn" id="sponsor-btn">☕ 赞助</a>
     </div>
 </div>
 
-<!-- 赞助链接，已修复为绝对路径 -->
-<a href="https://ty696.github.io/6669/pay.html" target="_blank" id="sponsor-btn">赞助作者</a>
+<!-- 横屏游戏主容器 -->
+<div id="game-container">
+    <!-- 左栏：敌我状态 -->
+    <div id="left-col">
+        <div class="status-panel" id="enemy-panel">
+            <h2>敌方 <span class="energy-box" id="enemy-energy">能量: 0 / 3</span></h2>
+            <div class="bar-container">
+                <div class="bar-fill hp-fill" id="enemy-hp-bar" style="width: 100%;"></div>
+                <div class="bar-fill shield-fill" id="enemy-shield-bar" style="width: 0%;"></div>
+                <div class="bar-text" id="enemy-hp-text">100 / 100</div>
+            </div>
+        </div>
+        <div class="status-panel" id="player-panel">
+            <h2>玩家 <span class="energy-box" id="player-energy">能量: 0 / 3</span></h2>
+            <div class="bar-container">
+                <div class="bar-fill hp-fill" id="player-hp-bar" style="width: 100%;"></div>
+                <div class="bar-fill shield-fill" id="player-shield-bar" style="width: 0%;"></div>
+                <div class="bar-text" id="player-hp-text">100 / 100</div>
+            </div>
+        </div>
+    </div>
 
+    <!-- 中栏：战斗日志 -->
+    <div id="mid-col">
+        <div id="log-area"></div>
+    </div>
+
+    <!-- 右栏：手牌和操作 -->
+    <div id="right-col">
+        <div id="hand-area"></div>
+        <div id="controls">
+            <button class="btn" id="play-btn" disabled>打出</button>
+            <button class="btn" id="draw-btn">抽牌(1费)</button>
+            <button class="btn" id="end-btn">结束</button>
+        </div>
+    </div>
+</div>
+
+<!-- 游戏结束遮罩 -->
 <div id="game-over">
     <h1 id="game-over-text">GAME OVER</h1>
     <p id="game-over-sub">...</p>
     <button class="btn" id="restart-btn">重新开始</button>
+</div>
+
+<!-- 游戏规则弹窗 -->
+<div id="rules-modal">
+    <div class="rules-content">
+        <h2>📜 游戏规则</h2>
+        <p><span class="highlight">1. 基础目标：</span>双方各有 100 点生命值，先将对方生命值降至 0 的一方获胜。</p>
+        <p><span class="highlight">2. 能量机制：</span>每回合玩家和敌方拥有能量上限，初始为 3，每回合开始上限 +1（最高 10 点），回合开始时能量回满。打出卡牌需要消耗对应能量。</p>
+        <p><span class="highlight">3. 护盾机制：</span>护盾可以抵挡伤害，但每回合开始时护盾会清零（无法无限叠加）。</p>
+        <p><span class="highlight">4. 抽牌机制：</span>每回合开始时自动抽 2 张牌，手牌上限 5 张。牌库抽空后会洗入弃牌堆重新抽牌。你也可以点击“抽牌(1费)”消耗 1 点能量主动抽牌。</p>
+        <p><span class="highlight">5. 卡牌类型：</span>分为攻击、防御、回复三种。攻击牌造成伤害，防御牌获得护盾，回复牌恢复生命值。</p>
+        <p><span class="highlight">6. 操作方式：</span>点击卡牌选中（向上浮起），然后点击“打出”按钮释放。点击“结束”进入敌方回合。</p>
+        <button id="close-rules">我知道了</button>
+    </div>
 </div>
 
 <script>
@@ -130,9 +221,7 @@
         try {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             startBGM();
-        } catch (e) {
-            console.log('浏览器不支持 Web Audio API');
-        }
+        } catch (e) { console.log('浏览器不支持 Web Audio API'); }
     }
 
     function playSFX(type) {
@@ -141,24 +230,30 @@
         const gain = audioCtx.createGain();
         osc.connect(gain); gain.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
+        
         if (type === 'click') {
-            osc.type = 'square'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.05);
+            osc.type = 'square'; osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(600, now + 0.05);
             gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
             osc.start(now); osc.stop(now + 0.05);
         } else if (type === 'draw') {
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, now); osc.frequency.linearRampToValueAtTime(1000, now + 0.08);
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, now);
+            osc.frequency.linearRampToValueAtTime(1000, now + 0.08);
             gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
             osc.start(now); osc.stop(now + 0.08);
         } else if (type === 'attack') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.15);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now);
+            osc.frequency.exponentialRampToValueAtTime(50, now + 0.15);
             gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
             osc.start(now); osc.stop(now + 0.15);
         } else if (type === 'defend') {
-            osc.type = 'square'; osc.frequency.setValueAtTime(300, now); osc.frequency.linearRampToValueAtTime(400, now + 0.2);
+            osc.type = 'square'; osc.frequency.setValueAtTime(300, now);
+            osc.frequency.linearRampToValueAtTime(400, now + 0.2);
             gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
             osc.start(now); osc.stop(now + 0.2);
         } else if (type === 'heal') {
-            osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(800, now + 0.3);
+            osc.type = 'sine'; osc.frequency.setValueAtTime(400, now);
+            osc.frequency.linearRampToValueAtTime(800, now + 0.3);
             gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
             osc.start(now); osc.stop(now + 0.3);
         } else if (type === 'win') {
@@ -203,6 +298,19 @@
 
     document.body.addEventListener('touchstart', initAudio, { once: true, passive: false });
     document.body.addEventListener('click', initAudio, { once: true });
+
+    /* =========================================
+       游戏规则弹窗逻辑
+       ========================================= */
+    const rulesModal = document.getElementById('rules-modal');
+    document.getElementById('rules-btn').addEventListener('click', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        rulesModal.style.display = 'flex';
+    });
+    document.getElementById('close-rules').addEventListener('click', (e) => {
+        e.preventDefault();
+        rulesModal.style.display = 'none';
+    });
 
     /* =========================================
        数据层
@@ -416,6 +524,7 @@
         el.addEventListener('touchstart', (e) => { e.preventDefault(); handler(); }, { passive: false });
     };
     bindTap('play-btn', playSelectedCard); bindTap('draw-btn', drawPlayerCard); bindTap('end-btn', endPlayerTurn); bindTap('restart-btn', initGame);
+    
     initGame();
 </script>
 </body>
