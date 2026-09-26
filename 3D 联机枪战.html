@@ -57,7 +57,6 @@
   .ammo-box b { font-size: 18px; color: #fff; }
   #scoreDisplay { font-size: 13px; }
 
-  /* 左侧移动摇杆 */
   #joyMove {
     position: fixed;
     left: 24px; bottom: max(24px, env(safe-area-inset-bottom));
@@ -77,7 +76,6 @@
     text-align: center; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 2px;
   }
 
-  /* 右下角开火大按钮 */
   #fireBtn {
     position: fixed;
     right: 30px; bottom: max(30px, env(safe-area-inset-bottom));
@@ -96,7 +94,6 @@
     box-shadow: 0 0 30px rgba(255,60,60,0.9);
   }
 
-  /* 开镜、换弹按钮 */
   #mobileBtns {
     position: fixed; z-index: 25; display: none;
     right: 40px; bottom: max(160px, calc(env(safe-area-inset-bottom) + 160px));
@@ -202,19 +199,16 @@
   <div id="scoreDisplay">击杀: 0</div>
 </div>
 
-<!-- 移动摇杆 -->
 <div id="joyMove">
   <div id="joyMoveStick"></div>
   <div class="joy-label">移动</div>
 </div>
 
-<!-- 开镜 / 换弹 -->
 <div id="mobileBtns">
   <div class="mob-btn" id="mobScope">开镜</div>
   <div class="mob-btn" id="mobReload">换弹</div>
 </div>
 
-<!-- 开火按钮 -->
 <div id="fireBtn">开火</div>
 
 <div id="lookHint">滑动屏幕<br>转视角</div>
@@ -236,7 +230,9 @@
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script>
 // ============================================================
-// 3D 联机枪战 · 手机：左摇杆移动 + 屏幕滑动转视角 + 开火按钮
+// 3D 联机枪战 · 完整版
+// 手机：左摇杆移动 + 滑动转视角 + 开火按钮
+// 修复：出生点不卡墙 + 自动脱困 + 强制横屏
 // ============================================================
 const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
@@ -256,17 +252,53 @@ const SPREAD = 0.012;
 const SPREAD_SCOPED = 0.003;
 
 // ---------- 强制横屏 ----------
+let landscapeLocked = false;
+let fullscreenRequested = false;
+
+function tryLockOrientation() {
+  if (landscapeLocked) return;
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').then(function(){
+      landscapeLocked = true;
+      document.getElementById('rotate-tip').style.display = 'none';
+    }).catch(function(){});
+  } else if (screen.lockOrientation) {
+    try { screen.lockOrientation('landscape'); landscapeLocked = true; } catch(e){}
+  } else if (screen.mozLockOrientation) {
+    landscapeLocked = screen.mozLockOrientation('landscape');
+  } else if (screen.msLockOrientation) {
+    landscapeLocked = screen.msLockOrientation('landscape');
+  }
+}
+
 function forceLandscape() {
   var el = document.documentElement;
-  if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(function(){});
-  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
-  else if (el.msRequestFullscreen) el.msRequestFullscreen();
-  if (screen.orientation && screen.orientation.lock) {
-    setTimeout(function() { screen.orientation.lock('landscape').catch(function(){}); }, 300);
-  } else if (screen.lockOrientation) screen.lockOrientation('landscape');
-  else if (screen.mozLockOrientation) screen.mozLockOrientation('landscape');
-  else if (screen.msLockOrientation) screen.msLockOrientation('landscape');
+  if (!document.fullscreenElement && !fullscreenRequested) {
+    fullscreenRequested = true;
+    if (el.requestFullscreen) {
+      el.requestFullscreen({ navigationUI: 'hide' }).then(tryLockOrientation).catch(function(){
+        setTimeout(function(){ fullscreenRequested = false; }, 1000);
+      });
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+      setTimeout(tryLockOrientation, 300);
+    } else if (el.mozRequestFullScreen) {
+      el.mozRequestFullScreen();
+      setTimeout(tryLockOrientation, 300);
+    } else if (el.msRequestFullscreen) {
+      el.msRequestFullscreen();
+      setTimeout(tryLockOrientation, 300);
+    }
+  } else {
+    tryLockOrientation();
+  }
+  if (!landscapeLocked) {
+    var tries = 0;
+    var timer = setInterval(function() {
+      tryLockOrientation();
+      if (landscapeLocked || ++tries >= 6) clearInterval(timer);
+    }, 500);
+  }
 }
 
 // ---------- 音效 ----------
@@ -414,7 +446,7 @@ const bulletGeom = new THREE.SphereGeometry(0.1, 6, 6);
 function createBullet(color) { return new THREE.Mesh(bulletGeom, new THREE.MeshBasicMaterial({ color })); }
 
 // ---------- 状态 ----------
-const me = { x: 0, z: -30, yaw: 0, pitch: 0, hp: 100, alive: true, kills: 0, shootCd: 0, respawnAt: 0, ammo: MAG_SIZE, reloading: false, reloadEnd: 0, scoped: false };
+const me = { x: 0, z: -20, yaw: 0, pitch: 0, hp: 100, alive: true, kills: 0, shootCd: 0, respawnAt: 0, ammo: MAG_SIZE, reloading: false, reloadEnd: 0, scoped: false };
 const others = {};
 let bullets = [];
 const localBullets = [];
@@ -425,33 +457,66 @@ const keys = { w: false, a: false, s: false, d: false };
 let mouseDown = false, pointerLocked = false, rightDown = false;
 const joyMove = { active: false, dx: 0, dy: 0 };
 
-// 手机滑动转视角
 let lookTouchId = null;
 let lookLastX = 0, lookLastY = 0;
-// 手机开火按钮
 let fireBtnPressed = false;
 
 const now = () => performance.now();
 const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 
+// ---------- 碰撞与出生点 ----------
 function collideMove(px, pz, dx, dz) {
   let nx = clamp(px + dx, -MAP_LIMIT, MAP_LIMIT);
   for (const b of OBSTACLE_BOXES) {
+    if (b.h < 1.6) continue;
     if (Math.abs(nx - b.x) < b.w / 2 + PLAYER_RADIUS && Math.abs(pz - b.z) < b.d / 2 + PLAYER_RADIUS) {
-      if (b.h < 1.6) continue;
       nx = px; break;
     }
   }
   let nz = clamp(pz + dz, -MAP_LIMIT, MAP_LIMIT);
   for (const b of OBSTACLE_BOXES) {
+    if (b.h < 1.6) continue;
     if (Math.abs(nx - b.x) < b.w / 2 + PLAYER_RADIUS && Math.abs(nz - b.z) < b.d / 2 + PLAYER_RADIUS) {
-      if (b.h < 1.6) continue;
       nz = pz; break;
     }
   }
   return { x: nx, z: nz };
 }
 
+function isInsideObstacle(x, z) {
+  for (const b of OBSTACLE_BOXES) {
+    if (b.h < 1.6) continue;
+    if (Math.abs(x - b.x) < b.w / 2 + PLAYER_RADIUS && Math.abs(z - b.z) < b.d / 2 + PLAYER_RADIUS) {
+      return b;
+    }
+  }
+  return null;
+}
+
+function findSafeSpawn() {
+  for (let i = 0; i < 200; i++) {
+    const x = (Math.random() - 0.5) * 100;
+    const z = (Math.random() - 0.5) * 100;
+    if (!isInsideObstacle(x, z)) return { x, z };
+  }
+  return { x: 0, z: -20 };
+}
+
+function escapeIfStuck(obj) {
+  const b = isInsideObstacle(obj.x, obj.z);
+  if (!b) return;
+  const dL = obj.x - (b.x - b.w / 2 - PLAYER_RADIUS);
+  const dR = (b.x + b.w / 2 + PLAYER_RADIUS) - obj.x;
+  const dT = obj.z - (b.z - b.d / 2 - PLAYER_RADIUS);
+  const dB = (b.z + b.d / 2 + PLAYER_RADIUS) - obj.z;
+  const minD = Math.min(dL, dR, dT, dB);
+  if (minD === dL) obj.x = b.x - b.w / 2 - PLAYER_RADIUS - 0.2;
+  else if (minD === dR) obj.x = b.x + b.w / 2 + PLAYER_RADIUS + 0.2;
+  else if (minD === dT) obj.z = b.z - b.d / 2 - PLAYER_RADIUS - 0.2;
+  else obj.z = b.z + b.d / 2 + PLAYER_RADIUS + 0.2;
+}
+
+// ---------- 工具 ----------
 function setStatus(text, cls) {
   const el = document.getElementById('status');
   el.textContent = text; el.className = cls || '';
@@ -461,31 +526,45 @@ function checkOrientation() {
   if (!IS_MOBILE) { tip.style.display = 'none'; return; }
   if (window.innerHeight > window.innerWidth) {
     tip.style.display = 'flex';
-    if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function(){});
+    tryLockOrientation();
   } else {
     tip.style.display = 'none';
+    landscapeLocked = true;
   }
 }
 checkOrientation();
 window.addEventListener('resize', checkOrientation);
-window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 200));
+window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 300));
 
+// ---------- 菜单按钮 ----------
 document.getElementById('hostBtn').onclick = () => {
-  forceLandscape(); AudioSys.init();
+  forceLandscape();
+  AudioSys.init();
   roomId = document.getElementById('roomInput').value.trim() || '1234';
   isHost = true; startPeer('gf3d-' + roomId);
 };
 document.getElementById('joinBtn').onclick = () => {
-  forceLandscape(); AudioSys.init();
+  forceLandscape();
+  AudioSys.init();
   roomId = document.getElementById('roomInput').value.trim() || '1234';
   isHost = false; startPeer(null);
 };
 document.getElementById('fsBtn').onclick = () => {
-  const el = document.documentElement;
   if (!document.fullscreenElement) forceLandscape();
   else document.exitFullscreen().catch(() => {});
 };
 
+// 全局触摸/点击触发全屏
+document.addEventListener('touchend', function once() {
+  forceLandscape();
+  document.removeEventListener('touchend', once);
+}, { once: true, passive: true });
+document.addEventListener('click', function once() {
+  forceLandscape();
+  document.removeEventListener('click', once);
+}, { once: true });
+
+// ---------- PeerJS ----------
 function startPeer(peerId) {
   if (peer) peer.destroy();
   setStatus(isHost ? '正在创建房间...' : '正在连接...');
@@ -494,7 +573,9 @@ function startPeer(peerId) {
     if (isHost) setStatus('房间已创建！等待对手... 房间号: ' + roomId, 'ok');
     else { setStatus('正在加入房间...'); conn = peer.connect('gf3d-' + roomId, { reliable: true }); setupConn(); }
   });
-  peer.on('connection', (c) => { if (isHost) { conn = c; setupConn(); setStatus('对手已加入！开始战斗', 'ok'); startGame(); } });
+  peer.on('connection', (c) => {
+    if (isHost) { conn = c; setupConn(); setStatus('对手已加入！开始战斗', 'ok'); startGame(); }
+  });
   peer.on('error', (err) => {
     if (err.type === 'peer-unavailable') setStatus('找不到房间', 'err');
     else if (err.type === 'unavailable-id') setStatus('房间号被占用，换一个', 'err');
@@ -512,7 +593,8 @@ function setupConn() {
         if (!others[id]) {
           const mesh = createPlayerMesh(0xff4444);
           scene.add(mesh);
-          others[id] = { x: 0, z: 30, yaw: 0, hp: 100, alive: true, kills: 0, mesh, respawnAt: 0, lastShot: 0, targetX: 0, targetZ: 30 };
+          const sp = findSafeSpawn();
+          others[id] = { x: sp.x, z: sp.z, yaw: 0, hp: 100, alive: true, kills: 0, mesh, respawnAt: 0, lastShot: 0, targetX: sp.x, targetZ: sp.z };
         }
         const o = others[id];
         if (o.alive) {
@@ -637,27 +719,23 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-// ✅ 键盘 + 左摇杆 + 滑动转视角 + 开火按钮
 function readLocalInput() {
   let dx = 0, dz = 0, shoot = false;
   const fwd = { x: -Math.sin(me.yaw), z: -Math.cos(me.yaw) };
   const right = { x: Math.cos(me.yaw), z: -Math.sin(me.yaw) };
 
-  // 键盘
   if (keys.w) { dx += fwd.x; dz += fwd.z; }
   if (keys.s) { dx -= fwd.x; dz -= fwd.z; }
   if (keys.a) { dx -= right.x; dz -= right.z; }
   if (keys.d) { dx += right.x; dz += right.z; }
   if (mouseDown) shoot = true;
 
-  // 左摇杆移动
   if (joyMove.active) {
     const mx = joyMove.dx, my = -joyMove.dy;
     dx += right.x * mx + fwd.x * my;
     dz += right.z * mx + fwd.z * my;
   }
 
-  // 开火按钮
   if (fireBtnPressed) shoot = true;
 
   const len = Math.hypot(dx, dz);
@@ -684,6 +762,9 @@ function startReload() {
 }
 
 function hostUpdate(dt) {
+  escapeIfStuck(me);
+  for (const id in others) escapeIfStuck(others[id]);
+
   if (me.alive) {
     const inp = readLocalInput();
     const r = collideMove(me.x, me.z, inp.dx * SPEED * dt, inp.dz * SPEED * dt);
@@ -696,14 +777,16 @@ function hostUpdate(dt) {
       document.getElementById('reloadTip').style.display = 'none';
     }
   } else if (now() > me.respawnAt) {
+    const sp = findSafeSpawn();
     me.alive = true; me.hp = 100; me.ammo = MAG_SIZE; me.reloading = false;
-    me.x = (Math.random() - 0.5) * 100; me.z = (Math.random() - 0.5) * 100;
+    me.x = sp.x; me.z = sp.z;
   }
   for (const id in others) {
     const o = others[id];
     if (!o.alive && now() > o.respawnAt) {
+      const sp = findSafeSpawn();
       o.alive = true; o.hp = 100;
-      o.x = (Math.random() - 0.5) * 100; o.z = (Math.random() - 0.5) * 100;
+      o.x = sp.x; o.z = sp.z;
     }
   }
   for (let i = bullets.length - 1; i >= 0; i--) {
@@ -760,6 +843,8 @@ function broadcastState() {
 }
 
 function clientUpdate(dt) {
+  escapeIfStuck(me);
+
   if (me.alive) {
     const inp = readLocalInput();
     const r = collideMove(me.x, me.z, inp.dx * SPEED * dt, inp.dz * SPEED * dt);
@@ -837,7 +922,7 @@ function updateHUD() {
   document.getElementById('crosshair').classList.toggle('scoped', me.scoped);
 }
 
-// 电脑键盘输入
+// ---------- 键盘输入 ----------
 window.addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
   if (k === 'w' || k === 'arrowup') keys.w = true;
@@ -874,7 +959,7 @@ document.addEventListener('mouseup', (e) => {
 });
 document.addEventListener('contextmenu', e => e.preventDefault());
 
-// ---------- 手机：左摇杆移动 ----------
+// ---------- 手机：左摇杆 ----------
 (function bindMoveJoy() {
   const baseEl = document.getElementById('joyMove');
   const stickEl = document.getElementById('joyMoveStick');
