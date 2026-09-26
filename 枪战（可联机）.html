@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a12">
+<title>联机枪战 - 双端</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a12; font-family: -apple-system, sans-serif; position: fixed; touch-action: none; }
+  #game { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+
+  #rotate-tip {
+    position: fixed; inset: 0; z-index: 9999;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    background: #0a0a12; color: #0ff; text-align: center; padding: 30px;
+  }
+  #rotate-tip .icon { font-size: 60px; margin-bottom: 20px; animation: rot 2s ease-in-out infinite; }
+  @keyframes rot { 0%,100% { transform: rotate(0); } 50% { transform: rotate(90deg); } }
+  #rotate-tip h1 { font-size: 22px; letter-spacing: 4px; margin-bottom: 10px; }
+  #rotate-tip p { color: #888; font-size: 14px; }
+
+  #menu {
+    position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.94);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px;
+  }
+  #menu h1 { color: #0ff; font-size: 26px; letter-spacing: 4px; margin-bottom: 8px; text-shadow: 0 0 20px #0ff; }
+  #menu .subtitle { color: #888; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px; }
+  #menu input {
+    padding: 12px 16px; font-size: 16px; background: #1a1a25; color: #fff;
+    border: 2px solid #444; border-radius: 8px; width: 220px; text-align: center;
+    outline: none; font-family: inherit;
+  }
+  #menu input:focus { border-color: #0ff; box-shadow: 0 0 10px #0ff; }
+  #menu button {
+    padding: 14px 28px; font-size: 16px; font-weight: bold; border: none; border-radius: 10px;
+    cursor: pointer; min-width: 220px; color: #fff; font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #hostBtn { background: #2ea44f; }
+  #joinBtn { background: #0366d6; }
+  #menu button:active { transform: scale(0.96); }
+  #status { color: #aaa; font-size: 13px; min-height: 36px; text-align: center; padding: 0 20px; line-height: 1.6; }
+  #status.ok { color: #2ea44f; }
+  #status.err { color: #f44; }
+
+  #hud {
+    position: fixed; top: 0; left: 0; right: 0; padding: 10px 14px;
+    color: #fff; display: none; justify-content: space-between;
+    z-index: 10; pointer-events: none; font-weight: bold; text-shadow: 1px 1px 2px #000;
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+  #hud .hp-wrap { display: flex; align-items: center; gap: 8px; }
+  #hud .hp-label { font-size: 12px; color: #f88; }
+  .hp-bar { width: 100px; height: 12px; background: #333; border: 2px solid #000; border-radius: 4px; overflow: hidden; }
+  .hp-fill { height: 100%; background: #f44; transition: width 0.15s; }
+  #scoreDisplay { font-size: 13px; }
+
+  #joysticks {
+    position: fixed; inset: 0; display: none;
+    z-index: 20; pointer-events: none;
+  }
+  .joy-base {
+    width: 130px; height: 130px; border-radius: 50%;
+    background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.18);
+    position: absolute; bottom: 24px; pointer-events: auto; touch-action: none;
+    bottom: max(24px, env(safe-area-inset-bottom));
+  }
+  #joyMove { left: 24px; }
+  #joyAim { right: 24px; border-color: rgba(255,80,80,0.4); background: rgba(255,80,80,0.05); }
+  .joy-stick {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: rgba(255,255,255,0.35); border: 2px solid rgba(255,255,255,0.6);
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    pointer-events: none;
+  }
+  #joyAim .joy-stick { background: rgba(255,90,90,0.4); border-color: rgba(255,120,120,0.7); }
+  .joy-label {
+    position: absolute; bottom: -22px; left: 0; right: 0;
+    text-align: center; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 2px;
+  }
+
+  #fsBtn {
+    position: fixed; top: 10px; right: 12px; z-index: 30;
+    padding: 8px 12px; background: rgba(0,0,0,0.6); color: #0ff;
+    border: 1px solid rgba(0,255,255,0.4); border-radius: 6px;
+    font-size: 12px; font-weight: bold; cursor: pointer;
+    display: none; -webkit-tap-highlight-color: transparent;
+    padding-top: max(8px, env(safe-area-inset-top));
+  }
+  #fsBtn:active { background: rgba(0,255,255,0.2); }
+
+  /* 电脑端控制提示 */
+  #pcHint {
+    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 15; color: rgba(255,255,255,0.4); font-size: 12px;
+    letter-spacing: 1px; display: none; pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="rotate-tip">
+  <div class="icon">📱</div>
+  <h1>请横屏体验</h1>
+  <p>把手机横过来，体验更好</p>
+</div>
+
+<div id="hud">
+  <div class="hp-wrap">
+    <span class="hp-label">HP</span>
+    <div class="hp-bar"><div class="hp-fill" id="hpFill" style="width:100%"></div></div>
+  </div>
+  <div id="scoreDisplay">击杀: 0</div>
+</div>
+
+<div id="joysticks">
+  <div class="joy-base" id="joyMove">
+    <div class="joy-stick" id="joyMoveStick"></div>
+    <div class="joy-label">移动</div>
+  </div>
+  <div class="joy-base" id="joyAim">
+    <div class="joy-stick" id="joyAimStick"></div>
+    <div class="joy-label">瞄准 / 开火</div>
+  </div>
+</div>
+
+<div id="pcHint">WASD 移动 · 鼠标瞄准 · 左键开火</div>
+
+<button id="fsBtn">全屏</button>
+
+<div id="menu">
+  <h1>联机枪战</h1>
+  <div class="subtitle">电脑 / 手机 同台竞技</div>
+  <input id="roomInput" placeholder="输入房间号" value="1234" maxlength="12" inputmode="numeric">
+  <button id="hostBtn">创建房间（我是主机）</button>
+  <button id="joinBtn">加入房间</button>
+  <div id="status">输入同样的房间号，点创建或加入</div>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script>
+// ============================================================
+// 联机枪战 · 电脑 / 手机 双端 · 主机权威
+// ============================================================
+const W = 800, H = 600;
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+// ---------- 判断设备 ----------
+const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+const IS_MOBILE = IS_TOUCH && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// ---------- 自适应 ----------
+function fitCanvas() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  const scale = Math.min(canvas.width / W, canvas.height / H);
+  window._s = scale;
+  window._ox = (canvas.width - W * scale) / 2;
+  window._oy = (canvas.height - H * scale) / 2;
+}
+window.addEventListener('resize', fitCanvas);
+window.addEventListener('orientationchange', () => setTimeout(fitCanvas, 200));
+fitCanvas();
+
+// ---------- 竖屏检测（仅手机） ----------
+function checkOrientation() {
+  const tip = document.getElementById('rotate-tip');
+  if (!IS_MOBILE) { tip.style.display = 'none'; return; }
+  const isPortrait = window.innerHeight > window.innerWidth;
+  tip.style.display = isPortrait ? 'flex' : 'none';
+  if (!isPortrait) fitCanvas();
+}
+window.addEventListener('resize', checkOrientation);
+window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 200));
+checkOrientation();
+
+// ---------- 常量 ----------
+const PLAYER_R = 15;
+const PLAYER_SPEED = 3.4;
+const PLAYER_MAX_HP = 100;
+const BULLET_R = 4;
+const BULLET_SPEED = 11;
+const BULLET_DMG = 25;
+const SHOOT_CD = 170;
+const RESPAWN_TIME = 2000;
+const SYNC_RATE = 33;
+
+const OBSTACLES = [
+  { x: 150, y: 120, w: 100, h: 30 },
+  { x: 550, y: 120, w: 100, h: 30 },
+  { x: 150, y: 450, w: 100, h: 30 },
+  { x: 550, y: 450, w: 100, h: 30 },
+  { x: 380, y: 280, w: 40, h: 40 },
+  { x: 100, y: 280, w: 40, h: 40 },
+  { x: 660, y: 280, w: 40, h: 40 },
+];
+
+// ---------- 状态 ----------
+let peer = null, conn = null, isHost = false, roomId = '';
+const me = { x: W/2, y: H - 100, angle: -Math.PI/2, hp: PLAYER_MAX_HP, alive: true, respawnAt: 0, kills: 0, shootCd: 0 };
+const others = {};
+let bullets = [], particles = [];
+
+const keys = { w:false, a:false, s:false, d:false };
+let mouseX = W/2, mouseY = H/2, mouseDown = false;
+
+const joyMove = { active:false, dx:0, dy:0 };
+const joyAim  = { active:false, dx:0, dy:0 };
+
+const now = () => performance.now();
+const dist2 = (ax,ay,bx,by) => { const dx=ax-bx, dy=ay-by; return dx*dx+dy*dy; };
+const clamp = (v,a,b) => v<a?a:(v>b?b:v);
+
+function circleRectCollide(cx,cy,r,rect){
+  const nx = clamp(cx, rect.x, rect.x+rect.w);
+  const ny = clamp(cy, rect.y, rect.y+rect.h);
+  return dist2(cx,cy,nx,ny) < r*r;
+}
+function movePlayer(p, dx, dy){
+  let nx = p.x + dx, blocked = false;
+  for (const o of OBSTACLES) if (circleRectCollide(nx, p.y, PLAYER_R, o)) { blocked = true; break; }
+  if (!blocked) p.x = clamp(nx, PLAYER_R, W-PLAYER_R);
+  let ny = p.y + dy; blocked = false;
+  for (const o of OBSTACLES) if (circleRectCollide(p.x, ny, PLAYER_R, o)) { blocked = true; break; }
+  if (!blocked) p.y = clamp(ny, PLAYER_R, H-PLAYER_R);
+}
+function spawnExplosion(x,y,color){
+  for (let i=0;i<18;i++){
+    const a = Math.random()*Math.PI*2, sp = 1+Math.random()*5;
+    particles.push({ x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 1, color: color||'#ff0' });
+  }
+}
+function setStatus(text, cls){
+  const el = document.getElementById('status');
+  el.textContent = text; el.className = cls || '';
+}
+function showFullscreenBtn(){
+  if (document.documentElement.requestFullscreen) document.getElementById('fsBtn').style.display = 'block';
+}
+document.getElementById('fsBtn').onclick = () => {
+  const el = document.documentElement;
+  if (!document.fullscreenElement) el.requestFullscreen({ navigationUI:'hide' }).catch(()=>{});
+  else document.exitFullscreen().catch(()=>{});
+};
+
+// ---------- 网络 ----------
+document.getElementById('hostBtn').onclick = () => {
+  roomId = document.getElementById('roomInput').value.trim() || '1234';
+  isHost = true; startPeer('gf-'+roomId);
+};
+document.getElementById('joinBtn').onclick = () => {
+  roomId = document.getElementById('roomInput').value.trim() || '1234';
+  isHost = false; startPeer(null);
+};
+
+function startPeer(peerId){
+  if (peer) peer.destroy();
+  setStatus(isHost ? '正在创建房间...' : '正在连接...');
+  peer = new Peer(peerId, { debug: 0 });
+  peer.on('open', (id) => {
+    if (isHost) setStatus('房间已创建！等待对手... 房间号: '+roomId, 'ok');
+    else {
+      setStatus('正在加入房间...');
+      conn = peer.connect('gf-'+roomId, { reliable: true });
+      setupConn();
+    }
+  });
+  peer.on('connection', (c) => {
+    if (isHost){
+      conn = c; setupConn();
+      setStatus('对手已加入！开始战斗', 'ok');
+      startGame();
+    }
+  });
+  peer.on('error', (err) => {
+    if (err.type === 'peer-unavailable') setStatus('找不到房间，检查房间号或让主机先创建', 'err');
+    else if (err.type === 'unavailable-id') setStatus('房间号被占用，换一个', 'err');
+    else setStatus('连接错误: '+err.type, 'err');
+  });
+}
+
+function setupConn(){
+  conn.on('open', () => {
+    if (!isHost){ setStatus('连接成功！开始战斗', 'ok'); startGame(); }
+  });
+  conn.on('data', (data) => {
+    if (!data || !data.type) return;
+    if (isHost){
+      if (data.type === 'input'){
+        const id = conn.peer;
+        if (!others[id]) others[id] = { x: W/2, y: 100, angle: Math.PI/2, hp: PLAYER_MAX_HP, alive:true, respawnAt:0, kills:0, lastShot:0 };
+        const o = others[id];
+        if (o.alive){
+          const inp = data.input;
+          let dx = inp.dx, dy = inp.dy;
+          const len = Math.hypot(dx, dy);
+          if (len > 1){ dx /= len; dy /= len; }
+          movePlayer(o, dx*PLAYER_SPEED, dy*PLAYER_SPEED);
+          o.angle = inp.angle;
+          if (inp.shoot && now() - o.lastShot > SHOOT_CD){
+            o.lastShot = now();
+            spawnBullet(o.x, o.y, o.angle, id);
+          }
+        }
+      }
+    } else {
+      if (data.type === 'state'){
+        for (const id in data.players){
+          if (id === peer.id) continue;
+          others[id] = data.players[id];
+        }
+        bullets = data.bullets;
+        const my = data.players[peer.id];
+        if (my){
+          me.hp = my.hp; me.kills = my.kills;
+          const dx = my.x - me.x, dy = my.y - me.y;
+          if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5){
+            me.x += dx * 0.3; me.y += dy * 0.3;
+          }
+          if (!my.alive && me.alive){
+            me.alive = false; me.respawnAt = now() + RESPAWN_TIME;
+            spawnExplosion(me.x, me.y, '#4af');
+          }
+        }
+      }
+    }
+  });
+  conn.on('close', () => setStatus('对方已断开连接', 'err'));
+}
+
+function spawnBullet(x, y, angle, owner){
+  const bx = x + Math.cos(angle) * (PLAYER_R + 4);
+  const by = y + Math.sin(angle) * (PLAYER_R + 4);
+  bullets.push({ x: bx, y: by, vx: Math.cos(angle)*BULLET_SPEED, vy: Math.sin(angle)*BULLET_SPEED, owner });
+}
+
+function startGame(){
+  document.getElementById('menu').style.display = 'none';
+  document.getElementById('hud').style.display = 'flex';
+  if (IS_TOUCH) {
+    document.getElementById('joysticks').style.display = 'block';
+  } else {
+    document.getElementById('pcHint').style.display = 'block';
+  }
+  showFullscreenBtn();
+  lastFrame = now(); lastSync = 0;
+  requestAnimationFrame(loop);
+}
+
+let lastFrame = 0, lastSync = 0;
+
+function loop(t){
+  const dt = Math.min(50, t - lastFrame) / 16.67;
+  lastFrame = t;
+  if (isHost){
+    hostUpdate(dt);
+    if (t - lastSync > SYNC_RATE){ lastSync = t; broadcastState(); }
+  } else {
+    clientUpdate(dt);
+    if (t - lastSync > 50){ lastSync = t; sendInput(); }
+  }
+  render();
+  updateHUD();
+  requestAnimationFrame(loop);
+}
+
+// 读取本地输入（电脑或手机）
+function readLocalInput() {
+  let dx = 0, dy = 0, shoot = false;
+  if (IS_TOUCH) {
+    dx = joyMove.dx; dy = joyMove.dy;
+    if (joyAim.active && (Math.abs(joyAim.dx) > 0.15 || Math.abs(joyAim.dy) > 0.15)) {
+      shoot = true;
+      me.angle = Math.atan2(joyAim.dy, joyAim.dx);
+    }
+  } else {
+    if (keys.w) dy -= 1;
+    if (keys.s) dy += 1;
+    if (keys.a) dx -= 1;
+    if (keys.d) dx += 1;
+    me.angle = Math.atan2(mouseY - me.y, mouseX - me.x);
+    shoot = mouseDown;
+  }
+  return { dx, dy, shoot };
+}
+
+function hostUpdate(dt){
+  if (me.alive){
+    const inp = readLocalInput();
+    let { dx, dy } = inp;
+    const len = Math.hypot(dx, dy);
+    if (len > 0){
+      if (len > 1){ dx /= len; dy /= len; }
+      movePlayer(me, dx*PLAYER_SPEED*dt, dy*PLAYER_SPEED*dt);
+    }
+    if (inp.shoot && now() - me.shootCd > SHOOT_CD){
+      me.shootCd = now();
+      spawnBullet(me.x, me.y, me.angle, peer.id);
+    }
+  } else if (now() > me.respawnAt){
+    me.alive = true; me.hp = PLAYER_MAX_HP; me.x = W/2; me.y = H-100;
+  }
+  for (const id in others){
+    const o = others[id];
+    if (!o.alive && now() > o.respawnAt){
+      o.alive = true; o.hp = PLAYER_MAX_HP; o.x = W/2; o.y = 100;
+    }
+  }
+  for (let i = bullets.length-1; i >= 0; i--){
+    const b = bullets[i];
+    b.x += b.vx*dt; b.y += b.vy*dt;
+    if (b.x < 0 || b.x > W || b.y < 0 || b.y > H){ bullets.splice(i,1); continue; }
+    let hitWall = false;
+    for (const o of OBSTACLES) if (b.x > o.x && b.x < o.x+o.w && b.y > o.y && b.y < o.y+o.h){ hitWall = true; break; }
+    if (hitWall){ bullets.splice(i,1); continue; }
+    let hit = false;
+    if (b.owner !== peer.id && me.alive && dist2(b.x,b.y,me.x,me.y) < (PLAYER_R+BULLET_R)**2){
+      me.hp -= BULLET_DMG; spawnExplosion(b.x, b.y, '#f44'); hit = true;
+      if (me.hp <= 0){
+        me.hp = 0; me.alive = false; me.respawnAt = now()+RESPAWN_TIME;
+        spawnExplosion(me.x, me.y, '#4af');
+        if (others[b.owner]) others[b.owner].kills = (others[b.owner].kills||0)+1;
+      }
+    }
+    if (!hit){
+      for (const id in others){
+        const o = others[id];
+        if (b.owner === id || !o.alive) continue;
+        if (dist2(b.x,b.y,o.x,o.y) < (PLAYER_R+BULLET_R)**2){
+          o.hp -= BULLET_DMG; spawnExplosion(b.x, b.y, '#f44'); hit = true;
+          if (o.hp <= 0){
+            o.hp = 0; o.alive = false; o.respawnAt = now()+RESPAWN_TIME;
+            spawnExplosion(o.x, o.y, '#4af');
+            if (b.owner === peer.id) me.kills++;
+            else if (others[b.owner]) others[b.owner].kills = (others[b.owner].kills||0)+1;
+          }
+          break;
+        }
+      }
+    }
+    if (hit) bullets.splice(i,1);
+  }
+  for (let i = particles.length-1; i >= 0; i--){
+    const p = particles[i];
+    p.x += p.vx*dt; p.y += p.vy*dt;
+    p.vx *= 0.94; p.vy *= 0.94; p.life -= dt*0.04;
+    if (p.life <= 0) particles.splice(i,1);
+  }
+}
+
+function broadcastState(){
+  const players = {};
+  players[peer.id] = { x: me.x, y: me.y, angle: me.angle, hp: me.hp, alive: me.alive, kills: me.kills };
+  for (const id in others) players[id] = others[id];
+  try { conn.send({ type:'state', players, bullets }); } catch(e){}
+}
+
+function clientUpdate(dt){
+  if (me.alive){
+    const inp = readLocalInput();
+    let { dx, dy } = inp;
+    const len = Math.hypot(dx, dy);
+    if (len > 0){
+      if (len > 1){ dx /= len; dy /= len; }
+      movePlayer(me, dx*PLAYER_SPEED*dt, dy*PLAYER_SPEED*dt);
+    }
+  } else if (now() > me.respawnAt){
+    me.alive = true; me.hp = PLAYER_MAX_HP;
+  }
+  for (let i = bullets.length-1; i >= 0; i--){
+    const b = bullets[i];
+    b.x += b.vx*dt; b.y += b.vy*dt;
+    if (b.x < -20 || b.x > W+20 || b.y < -20 || b.y > H+20) bullets.splice(i,1);
+  }
+  for (let i = particles.length-1; i >= 0; i--){
+    const p = particles[i];
+    p.x += p.vx*dt; p.y += p.vy*dt;
+    p.vx *= 0.94; p.vy *= 0.94; p.life -= dt*0.04;
+    if (p.life <= 0) particles.splice(i,1);
+  }
+  // 客户端本地预测子弹
+  if (IS_TOUCH){
+    if (joyAim.active && (Math.abs(joyAim.dx) > 0.15 || Math.abs(joyAim.dy) > 0.15) && me.alive && now() - me.shootCd > SHOOT_CD){
+      me.shootCd = now();
+      spawnBullet(me.x, me.y, me.angle, 'local-predict');
+    }
+  } else {
+    if (mouseDown && me.alive && now() - me.shootCd > SHOOT_CD){
+      me.shootCd = now();
+      spawnBullet(me.x, me.y, me.angle, 'local-predict');
+    }
+  }
+}
+
+function sendInput(){
+  if (!conn || !conn.open) return;
+  const inp = readLocalInput();
+  try {
+    conn.send({ type:'input', input: { dx: inp.dx, dy: inp.dy, angle: me.angle, shoot: inp.shoot } });
+  } catch(e){}
+}
+
+// ---------- 渲染 ----------
+function render(){
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle = '#0a0a12';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.setTransform(window._s,0,0,window._s,window._ox,window._oy);
+
+  ctx.strokeStyle = '#1a2233'; ctx.lineWidth = 1;
+  for (let x=0; x<W; x+=40){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y=0; y<H; y+=40){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.strokeStyle = '#0ff'; ctx.lineWidth = 3;
+  ctx.strokeRect(1.5, 1.5, W-3, H-3);
+
+  for (const o of OBSTACLES){
+    ctx.fillStyle = '#2a3550'; ctx.fillRect(o.x,o.y,o.w,o.h);
+    ctx.strokeStyle = '#4a6a9a'; ctx.lineWidth = 2; ctx.strokeRect(o.x,o.y,o.w,o.h);
+  }
+  for (const b of bullets){
+    ctx.beginPath(); ctx.arc(b.x,b.y,BULLET_R,0,Math.PI*2);
+    ctx.fillStyle = (peer && b.owner === peer.id) ? '#0ff' : '#f80';
+    ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 14; ctx.fill(); ctx.shadowBlur = 0;
+  }
+  for (const id in others) drawPlayer(others[id], '#f44', false);
+  if (me.alive) drawPlayer(me, '#0ff', true);
+
+  for (const p of particles){
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x-2, p.y-2, 4, 4);
+  }
+  ctx.globalAlpha = 1;
+
+  if (!me.alive){
+    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 40px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('你已阵亡', W/2, H/2-10);
+    ctx.font = '20px sans-serif'; ctx.fillStyle = '#aaa';
+    const remain = Math.max(0, Math.ceil((me.respawnAt - now())/1000));
+    ctx.fillText(remain + ' 秒后重生', W/2, H/2+30);
+  }
+}
+
+function drawPlayer(p, color, isMe){
+  if (!p.alive) return;
+  ctx.save(); ctx.translate(p.x, p.y);
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.beginPath(); ctx.ellipse(0, 5, PLAYER_R, PLAYER_R*0.6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.shadowColor = color; ctx.shadowBlur = 18;
+  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(0,0,PLAYER_R,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.rotate(p.angle);
+  ctx.fillStyle = '#333'; ctx.fillRect(PLAYER_R-4, -4, 18, 8);
+  ctx.fillStyle = '#666'; ctx.fillRect(PLAYER_R+8, -2, 6, 4);
+  ctx.rotate(-p.angle);
+  const hpPct = p.hp / PLAYER_MAX_HP;
+  ctx.strokeStyle = hpPct > 0.5 ? '#2ea44f' : (hpPct > 0.25 ? '#ffaa00' : '#f44');
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(0,0,PLAYER_R+6,-Math.PI/2,-Math.PI/2+Math.PI*2*hpPct); ctx.stroke();
+  ctx.fillStyle = isMe ? '#0ff' : '#f88';
+  ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(isMe ? '你' : '对手', 0, -PLAYER_R-12);
+  ctx.restore();
+}
+
+function updateHUD(){
+  document.getElementById('hpFill').style.width = (me.hp/PLAYER_MAX_HP*100)+'%';
+  document.getElementById('scoreDisplay').textContent = '击杀: ' + me.kills;
+}
+
+// ---------- 电脑端输入 ----------
+window.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === 'w' || k === 'arrowup') keys.w = true;
+  if (k === 's' || k === 'arrowdown') keys.s = true;
+  if (k === 'a' || k === 'arrowleft') keys.a = true;
+  if (k === 'd' || k === 'arrowright') keys.d = true;
+  if (k === ' ') e.preventDefault();
+});
+window.addEventListener('keyup', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === 'w' || k === 'arrowup') keys.w = false;
+  if (k === 's' || k === 'arrowdown') keys.s = false;
+  if (k === 'a' || k === 'arrowleft') keys.a = false;
+  if (k === 'd' || k === 'arrowright') keys.d = false;
+});
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const px = (e.clientX - rect.left) * dpr;
+  const py = (e.clientY - rect.top) * dpr;
+  mouseX = (px - window._ox) / window._s;
+  mouseY = (py - window._oy) / window._s;
+});
+canvas.addEventListener('mousedown', (e) => { if (e.button === 0) mouseDown = true; });
+window.addEventListener('mouseup', () => { mouseDown = false; });
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// ---------- 手机端摇杆 ----------
+function bindJoy(baseEl, stickEl, target){
+  let pid = null;
+  const R = 55;
+  function update(clientX, clientY){
+    const rect = baseEl.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    let dx = clientX - cx, dy = clientY - cy;
+    const len = Math.hypot(dx, dy);
+    if (len > R){ dx = dx/len*R; dy = dy/len*R; }
+    stickEl.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    target.active = true;
+    target.dx = dx / R; target.dy = dy / R;
+  }
+  function end(){
+    stickEl.style.transform = 'translate(-50%, -50%)';
+    target.active = false; target.dx = 0; target.dy = 0;
+    pid = null;
+  }
+  baseEl.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    pid = t.identifier;
+    update(t.clientX, t.clientY);
+  }, { passive: false });
+  baseEl.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    for (const t of e.changedTouches){
+      if (t.identifier === pid) update(t.clientX, t.clientY);
+    }
+  }, { passive: false });
+  baseEl.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    for (const t of e.changedTouches){
+      if (t.identifier === pid) end();
+    }
+  }, { passive: false });
+  baseEl.addEventListener('touchcancel', (e) => {
+    e.preventDefault();
+    end();
+  }, { passive: false });
+}
+
+bindJoy(document.getElementById('joyMove'), document.getElementById('joyMoveStick'), joyMove);
+bindJoy(document.getElementById('joyAim'), document.getElementById('joyAimStick'), joyAim);
+
+// ---------- 全局防误触 ----------
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('contextmenu', e => e.preventDefault());
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+  const nowT = Date.now();
+  if (nowT - lastTouchEnd < 300) e.preventDefault();
+  lastTouchEnd = nowT;
+}, { passive: false });
+</script>
+</body>
+</html>
