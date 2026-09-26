@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0a12">
-<title>联机枪战 - 双端</title>
+<title>联机枪战 - 2D</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
   html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a12; font-family: -apple-system, sans-serif; position: fixed; touch-action: none; }
@@ -37,7 +37,6 @@
   #menu button {
     padding: 14px 28px; font-size: 16px; font-weight: bold; border: none; border-radius: 10px;
     cursor: pointer; min-width: 220px; color: #fff; font-family: inherit;
-    -webkit-tap-highlight-color: transparent;
   }
   #hostBtn { background: #2ea44f; }
   #joinBtn { background: #0366d6; }
@@ -65,8 +64,7 @@
   .joy-base {
     width: 130px; height: 130px; border-radius: 50%;
     background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.18);
-    position: absolute; bottom: 24px; pointer-events: auto; touch-action: none;
-    bottom: max(24px, env(safe-area-inset-bottom));
+    position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); pointer-events: auto; touch-action: none;
   }
   #joyMove { left: 24px; }
   #joyAim { right: 24px; border-color: rgba(255,80,80,0.4); background: rgba(255,80,80,0.05); }
@@ -90,9 +88,7 @@
     display: none; -webkit-tap-highlight-color: transparent;
     padding-top: max(8px, env(safe-area-inset-top));
   }
-  #fsBtn:active { background: rgba(0,255,255,0.2); }
 
-  /* 电脑端控制提示 */
   #pcHint {
     position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
     z-index: 15; color: rgba(255,255,255,0.4); font-size: 12px;
@@ -130,7 +126,6 @@
 </div>
 
 <div id="pcHint">WASD 移动 · 鼠标瞄准 · 左键开火</div>
-
 <button id="fsBtn">全屏</button>
 
 <div id="menu">
@@ -145,15 +140,41 @@
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script>
 // ============================================================
-// 联机枪战 · 电脑 / 手机 双端 · 主机权威
+// 联机枪战 · 2D · 强制横屏版
 // ============================================================
 const W = 800, H = 600;
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
-// ---------- 判断设备 ----------
-const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-const IS_MOBILE = IS_TOUCH && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+// 是否为手机（用于UI显示，不用于输入判断）
+const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// ---------- 强制横屏 ----------
+function forceLandscape() {
+  var el = document.documentElement;
+  // 全屏
+  if (el.requestFullscreen) {
+    el.requestFullscreen({ navigationUI: 'hide' }).catch(function(){});
+  } else if (el.webkitRequestFullscreen) {
+    el.webkitRequestFullscreen();
+  } else if (el.mozRequestFullScreen) {
+    el.mozRequestFullScreen();
+  } else if (el.msRequestFullscreen) {
+    el.msRequestFullscreen();
+  }
+  // 锁定横屏
+  if (screen.orientation && screen.orientation.lock) {
+    setTimeout(function() {
+      screen.orientation.lock('landscape').catch(function(){});
+    }, 300);
+  } else if (screen.lockOrientation) {
+    screen.lockOrientation('landscape');
+  } else if (screen.mozLockOrientation) {
+    screen.mozLockOrientation('landscape');
+  } else if (screen.msLockOrientation) {
+    screen.msLockOrientation('landscape');
+  }
+}
 
 // ---------- 自适应 ----------
 function fitCanvas() {
@@ -171,13 +192,20 @@ window.addEventListener('resize', fitCanvas);
 window.addEventListener('orientationchange', () => setTimeout(fitCanvas, 200));
 fitCanvas();
 
-// ---------- 竖屏检测（仅手机） ----------
+// ---------- 竖屏检测 ----------
 function checkOrientation() {
   const tip = document.getElementById('rotate-tip');
-  if (!IS_MOBILE) { tip.style.display = 'none'; return; }
   const isPortrait = window.innerHeight > window.innerWidth;
-  tip.style.display = isPortrait ? 'flex' : 'none';
-  if (!isPortrait) fitCanvas();
+  if (isPortrait) {
+    tip.style.display = 'flex';
+    // 再次尝试锁定横屏
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(function(){});
+    }
+  } else {
+    tip.style.display = 'none';
+    fitCanvas();
+  }
 }
 window.addEventListener('resize', checkOrientation);
 window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 200));
@@ -248,16 +276,21 @@ function showFullscreenBtn(){
 }
 document.getElementById('fsBtn').onclick = () => {
   const el = document.documentElement;
-  if (!document.fullscreenElement) el.requestFullscreen({ navigationUI:'hide' }).catch(()=>{});
-  else document.exitFullscreen().catch(()=>{});
+  if (!document.fullscreenElement) {
+    forceLandscape();
+  } else {
+    document.exitFullscreen().catch(()=>{});
+  }
 };
 
 // ---------- 网络 ----------
 document.getElementById('hostBtn').onclick = () => {
+  forceLandscape();
   roomId = document.getElementById('roomInput').value.trim() || '1234';
   isHost = true; startPeer('gf-'+roomId);
 };
 document.getElementById('joinBtn').onclick = () => {
+  forceLandscape();
   roomId = document.getElementById('roomInput').value.trim() || '1234';
   isHost = false; startPeer(null);
 };
@@ -346,7 +379,8 @@ function spawnBullet(x, y, angle, owner){
 function startGame(){
   document.getElementById('menu').style.display = 'none';
   document.getElementById('hud').style.display = 'flex';
-  if (IS_TOUCH) {
+  // 手机显示摇杆，电脑显示操作提示
+  if (IS_MOBILE) {
     document.getElementById('joysticks').style.display = 'block';
   } else {
     document.getElementById('pcHint').style.display = 'block';
@@ -373,23 +407,27 @@ function loop(t){
   requestAnimationFrame(loop);
 }
 
-// 读取本地输入（电脑或手机）
+// ✅ 键盘和触摸同时读取，不挑设备
 function readLocalInput() {
   let dx = 0, dy = 0, shoot = false;
-  if (IS_TOUCH) {
-    dx = joyMove.dx; dy = joyMove.dy;
-    if (joyAim.active && (Math.abs(joyAim.dx) > 0.15 || Math.abs(joyAim.dy) > 0.15)) {
-      shoot = true;
-      me.angle = Math.atan2(joyAim.dy, joyAim.dx);
-    }
-  } else {
-    if (keys.w) dy -= 1;
-    if (keys.s) dy += 1;
-    if (keys.a) dx -= 1;
-    if (keys.d) dx += 1;
+
+  // 键盘
+  if (keys.w) dy -= 1;
+  if (keys.s) dy += 1;
+  if (keys.a) dx -= 1;
+  if (keys.d) dx += 1;
+  if (mouseDown) shoot = true;
+
+  // 触摸摇杆
+  if (joyMove.active) { dx += joyMove.dx; dy += joyMove.dy; }
+  if (joyAim.active && (Math.abs(joyAim.dx) > 0.15 || Math.abs(joyAim.dy) > 0.15)) {
+    shoot = true;
+    me.angle = Math.atan2(joyAim.dy, joyAim.dx);
+  } else if (dx !== 0 || dy !== 0 || !joyAim.active) {
+    // 电脑端用鼠标算角度
     me.angle = Math.atan2(mouseY - me.y, mouseX - me.x);
-    shoot = mouseDown;
   }
+
   return { dx, dy, shoot };
 }
 
@@ -473,6 +511,10 @@ function clientUpdate(dt){
       if (len > 1){ dx /= len; dy /= len; }
       movePlayer(me, dx*PLAYER_SPEED*dt, dy*PLAYER_SPEED*dt);
     }
+    if (inp.shoot && now() - me.shootCd > SHOOT_CD){
+      me.shootCd = now();
+      spawnBullet(me.x, me.y, me.angle, 'local-predict');
+    }
   } else if (now() > me.respawnAt){
     me.alive = true; me.hp = PLAYER_MAX_HP;
   }
@@ -486,18 +528,6 @@ function clientUpdate(dt){
     p.x += p.vx*dt; p.y += p.vy*dt;
     p.vx *= 0.94; p.vy *= 0.94; p.life -= dt*0.04;
     if (p.life <= 0) particles.splice(i,1);
-  }
-  // 客户端本地预测子弹
-  if (IS_TOUCH){
-    if (joyAim.active && (Math.abs(joyAim.dx) > 0.15 || Math.abs(joyAim.dy) > 0.15) && me.alive && now() - me.shootCd > SHOOT_CD){
-      me.shootCd = now();
-      spawnBullet(me.x, me.y, me.angle, 'local-predict');
-    }
-  } else {
-    if (mouseDown && me.alive && now() - me.shootCd > SHOOT_CD){
-      me.shootCd = now();
-      spawnBullet(me.x, me.y, me.angle, 'local-predict');
-    }
   }
 }
 
@@ -579,7 +609,7 @@ function updateHUD(){
   document.getElementById('scoreDisplay').textContent = '击杀: ' + me.kills;
 }
 
-// ---------- 电脑端输入 ----------
+// ---------- 键盘输入（电脑） ----------
 window.addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
   if (k === 'w' || k === 'arrowup') keys.w = true;
@@ -607,7 +637,7 @@ canvas.addEventListener('mousedown', (e) => { if (e.button === 0) mouseDown = tr
 window.addEventListener('mouseup', () => { mouseDown = false; });
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-// ---------- 手机端摇杆 ----------
+// ---------- 触摸摇杆（手机） ----------
 function bindJoy(baseEl, stickEl, target){
   let pid = null;
   const R = 55;
