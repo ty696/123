@@ -97,6 +97,7 @@ const CUSTOM_GAMES = [
     "game2.html",
     "卡牌.html",
     "星际大战升级版.html",
+    "枪战（可联机）",
 ];
 window.eliteSpawnRate = 0.45;
 window.pendingGame = null;
@@ -772,4 +773,31 @@ setTimeout(function() {
 </script>
 
 </body>
+  <!-- 赞助作者二维码（手机优化版） -->
+<script>
+(function() {
+  // ⚠️ 二维码文件名不是 qr.jpg 的话，改这里
+  var QR_IMAGE = 'qr.jpg';
+
+  var btn = document.createElement('button');
+  btn.id = 'sponsor-btn';
+  btn.textContent = '☕ 赞助作者';
+  btn.style.cssText = 'position:fixed;top:12px;right:12px;z-index:99998;padding:8px 16px;background:#007bff;color:#fff;border:2px solid #000;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;box-shadow:3px 3px 0 #000;font-family:SimSun,serif;-webkit-tap-highlight-color:transparent;';
+
+  var modal = document.createElement('div');
+  modal.id = 'sponsor-modal';
+  modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.88);justify-content:center;align-items:center;flex-direction:column;gap:20px;padding:20px;box-sizing:border-box;';
+
+  modal.innerHTML = '<div style="color:#fff;font-size:16px;font-weight:bold;letter-spacing:2px;font-family:SimSun,serif;">扫 码 赞 助 作 者</div>'
+                  + '<img src="' + QR_IMAGE + '" style="max-width:80vw;max-height:70vh;background:#fff;border:4px solid #fff;border-radius:12px;box-shadow:0 0 30px rgba(0,150,255,0.5);" onerror="this.src=\'https://via.placeholder.com/300x300?text=qr.jpg\';this.alt=\'二维码加载失败\';" alt="收款二维码">'
+                  + '<div style="color:#aaa;font-size:13px;font-family:SimSun,serif;">长按二维码保存 · 点击空白处关闭</div>';
+
+  document.body.appendChild(btn);
+  document.body.appendChild(modal);
+
+  btn.onclick = function(e) { e.stopPropagation(); modal.style.display = 'flex'; };
+  modal.onclick = function() { modal.style.display = 'none'; };
+  modal.querySelector('img').onclick = function(e) { e.stopPropagation(); };
+})();
+</script>
 </html>
