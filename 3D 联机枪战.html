@@ -57,54 +57,61 @@
   .ammo-box b { font-size: 18px; color: #fff; }
   #scoreDisplay { font-size: 13px; }
 
-  #enemyHpBar {
-    position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
-    width: 220px; height: 16px; background: rgba(0,0,0,0.6);
-    border: 2px solid #000; border-radius: 6px; overflow: hidden;
-    z-index: 11; display: none;
-  }
-  #enemyHpFill { height: 100%; background: linear-gradient(90deg, #ff4444, #ff8844); width: 100%; transition: width 0.2s; }
-  #enemyHpText {
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 11px; font-weight: bold; text-shadow: 1px 1px 1px #000;
-  }
-
-  #joysticks { position: fixed; inset: 0; display: none; z-index: 20; pointer-events: none; }
-  .joy-base {
-    width: 130px; height: 130px; border-radius: 50%;
+  /* 左侧移动摇杆 */
+  #joyMove {
+    position: fixed;
+    left: 24px; bottom: max(24px, env(safe-area-inset-bottom));
+    width: 140px; height: 140px; border-radius: 50%;
     background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.18);
-    position: absolute; pointer-events: auto; touch-action: none;
-    bottom: max(24px, env(safe-area-inset-bottom));
+    z-index: 20; pointer-events: auto; touch-action: none;
+    display: none;
   }
-  #joyMove { left: 24px; }
-  #joyAim { right: 24px; border-color: rgba(255,80,80,0.4); background: rgba(255,80,80,0.05); }
-  .joy-stick {
-    width: 54px; height: 54px; border-radius: 50%;
+  #joyMoveStick {
+    width: 58px; height: 58px; border-radius: 50%;
     background: rgba(255,255,255,0.35); border: 2px solid rgba(255,255,255,0.6);
     position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
     pointer-events: none;
   }
-  #joyAim .joy-stick { background: rgba(255,90,90,0.4); border-color: rgba(255,120,120,0.7); }
   .joy-label {
     position: absolute; bottom: -22px; left: 0; right: 0;
     text-align: center; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 2px;
   }
 
+  /* 右下角开火大按钮 */
+  #fireBtn {
+    position: fixed;
+    right: 30px; bottom: max(30px, env(safe-area-inset-bottom));
+    width: 110px; height: 110px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,60,60,0.45), rgba(120,0,0,0.35));
+    border: 3px solid rgba(255,80,80,0.8);
+    color: #fff; font-size: 15px; font-weight: bold;
+    display: none; align-items: center; justify-content: center;
+    z-index: 25; touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    text-shadow: 0 0 8px #f44;
+    box-shadow: 0 0 20px rgba(255,60,60,0.4);
+  }
+  #fireBtn:active, #fireBtn.pressed {
+    background: radial-gradient(circle, rgba(255,60,60,0.8), rgba(180,0,0,0.6));
+    box-shadow: 0 0 30px rgba(255,60,60,0.9);
+  }
+
+  /* 开镜、换弹按钮 */
   #mobileBtns {
     position: fixed; z-index: 25; display: none;
-    right: 24px; bottom: 180px; flex-direction: column; gap: 12px;
+    right: 40px; bottom: max(160px, calc(env(safe-area-inset-bottom) + 160px));
+    flex-direction: row; gap: 14px;
   }
   .mob-btn {
-    width: 58px; height: 58px; border-radius: 50%;
+    width: 64px; height: 64px; border-radius: 50%;
     background: rgba(0,0,0,0.5); border: 2px solid rgba(0,255,255,0.5);
-    color: #0ff; font-size: 12px; font-weight: bold;
+    color: #0ff; font-size: 13px; font-weight: bold;
     display: flex; align-items: center; justify-content: center;
     -webkit-tap-highlight-color: transparent;
     text-shadow: 0 0 6px #0ff;
+    touch-action: none;
   }
   .mob-btn:active { background: rgba(0,255,255,0.2); }
-  #mobJump { border-color: rgba(120,255,120,0.7); color: #7fff7f; text-shadow: 0 0 6px #7fff7f; }
   #mobReload { border-color: rgba(255,220,100,0.6); color: #ffd76b; text-shadow: 0 0 6px #ffd76b; }
 
   #fsBtn {
@@ -125,23 +132,6 @@
   #crosshair::after { top: 50%; left: 0; height: 2px; width: 100%; transform: translateY(-50%); }
   #crosshair.scoped::before, #crosshair.scoped::after { background: rgba(255,60,60,0.95); box-shadow: 0 0 10px #f44; }
 
-  #hitmarker {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 40px; height: 40px; z-index: 6; pointer-events: none;
-    opacity: 0;
-  }
-  #hitmarker::before, #hitmarker::after {
-    content: ''; position: absolute; background: #ff0;
-    box-shadow: 0 0 10px #ff0;
-  }
-  #hitmarker::before { left: 50%; top: 0; width: 2px; height: 100%; transform: translateX(-50%); }
-  #hitmarker::after { top: 50%; left: 0; height: 2px; width: 100%; transform: translateY(-50%); }
-  #hitmarker.show { animation: hmPop 0.25s ease-out; }
-  @keyframes hmPop {
-    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); }
-  }
-
   #hitFlash {
     position: fixed; inset: 0; z-index: 8; pointer-events: none;
     background: radial-gradient(circle, transparent 40%, rgba(255,0,0,0.45) 100%);
@@ -150,7 +140,7 @@
   #hitFlash.on { opacity: 1; }
 
   #killFeed {
-    position: fixed; top: 100px; left: 14px; z-index: 12;
+    position: fixed; top: 60px; left: 14px; z-index: 12;
     color: #fff; font-size: 13px; pointer-events: none;
     text-shadow: 1px 1px 2px #000;
   }
@@ -182,6 +172,12 @@
     z-index: 12; display: none; text-shadow: 0 0 10px #ffd76b;
     font-weight: bold; pointer-events: none;
   }
+
+  #lookHint {
+    position: fixed; right: 30px; top: 50%; transform: translateY(-50%);
+    color: rgba(255,255,255,0.35); font-size: 12px; letter-spacing: 2px;
+    z-index: 15; display: none; pointer-events: none; text-align: right;
+  }
 </style>
 </head>
 <body>
@@ -193,7 +189,6 @@
 </div>
 
 <div id="crosshair"></div>
-<div id="hitmarker"></div>
 <div id="hitFlash"></div>
 <div id="killFeed"></div>
 <div id="reloadTip">换弹中...</div>
@@ -207,30 +202,25 @@
   <div id="scoreDisplay">击杀: 0</div>
 </div>
 
-<div id="enemyHpBar">
-  <div id="enemyHpFill"></div>
-  <div id="enemyHpText">敌人 100 / 100</div>
+<!-- 移动摇杆 -->
+<div id="joyMove">
+  <div id="joyMoveStick"></div>
+  <div class="joy-label">移动</div>
 </div>
 
-<div id="joysticks">
-  <div class="joy-base" id="joyMove">
-    <div class="joy-stick" id="joyMoveStick"></div>
-    <div class="joy-label">移动</div>
-  </div>
-  <div class="joy-base" id="joyAim">
-    <div class="joy-stick" id="joyAimStick"></div>
-    <div class="joy-label">视角 / 开火</div>
-  </div>
-</div>
-
+<!-- 开镜 / 换弹 -->
 <div id="mobileBtns">
-  <div class="mob-btn" id="mobJump">跳跃</div>
   <div class="mob-btn" id="mobScope">开镜</div>
   <div class="mob-btn" id="mobReload">换弹</div>
 </div>
 
+<!-- 开火按钮 -->
+<div id="fireBtn">开火</div>
+
+<div id="lookHint">滑动屏幕<br>转视角</div>
+
 <div id="lockHint">点击画面锁定鼠标</div>
-<div id="pcHint">WASD 移动 · 空格跳跃 · 鼠标瞄准 · 左键开火 · 右键开镜 · R 换弹 · ESC 解锁</div>
+<div id="pcHint">WASD 移动 · 鼠标视角 · 左键开火 · 右键开镜 · R 换弹 · ESC 解锁</div>
 <button id="fsBtn">全屏</button>
 
 <div id="menu">
@@ -246,8 +236,7 @@
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script>
 // ============================================================
-// 3D 联机枪战 · 最终稳定版
-// 跳跃高度保持原样，能站矮台和箱子
+// 3D 联机枪战 · 手机：左摇杆移动 + 屏幕滑动转视角 + 开火按钮
 // ============================================================
 const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
@@ -266,18 +255,7 @@ const MAP_LIMIT = 60;
 const SPREAD = 0.012;
 const SPREAD_SCOPED = 0.003;
 
-// 跳跃高度保持原样
-const GRAVITY = 0.025;
-const JUMP_V = 0.35;
-const BULLET_SUBSTEPS = 4;
-
-const HIT_RADIUS_H = 1.0;
-const HIT_Y_MIN = -0.2;
-const HIT_Y_MAX = 3.0;
-
-const SPAWN_RANGE = 30;
-const FOOTSTEP_INTERVAL = 350;
-
+// ---------- 强制横屏 ----------
 function forceLandscape() {
   var el = document.documentElement;
   if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(function(){});
@@ -291,50 +269,26 @@ function forceLandscape() {
   else if (screen.msLockOrientation) screen.msLockOrientation('landscape');
 }
 
+// ---------- 音效 ----------
 const AudioSys = {
   ctx: null,
   init() { if (this.ctx) return; try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} },
-  shot(vol) {
+  shot() {
     if (!this.ctx) return;
-    vol = (vol === undefined) ? 1 : vol;
     const t = this.ctx.currentTime;
     const o = this.ctx.createOscillator(), g = this.ctx.createGain();
     o.type = 'square'; o.frequency.setValueAtTime(220, t);
     o.frequency.exponentialRampToValueAtTime(60, t + 0.08);
-    g.gain.setValueAtTime(0.15 * vol, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-    o.connect(g); g.connect(this.ctx.destination);
-    o.start(t); o.stop(t + 0.1);
+    g.gain.setValueAtTime(0.15, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t + 0.1);
     const len = Math.floor(this.ctx.sampleRate * 0.08);
     const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
     const d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
     const src = this.ctx.createBufferSource(); src.buffer = buf;
     const f = this.ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1800;
-    const g2 = this.ctx.createGain(); g2.gain.value = 0.15 * vol;
-    src.connect(f); f.connect(g2); g2.connect(this.ctx.destination);
-    src.start(t);
-  },
-  footstep(vol) {
-    if (!this.ctx) return;
-    vol = (vol === undefined) ? 0.6 : vol;
-    const t = this.ctx.currentTime;
-    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(90, t);
-    o.frequency.exponentialRampToValueAtTime(45, t + 0.1);
-    g.gain.setValueAtTime(0.06 * vol, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-    o.connect(g); g.connect(this.ctx.destination);
-    o.start(t); o.stop(t + 0.12);
-    const len = Math.floor(this.ctx.sampleRate * 0.08);
-    const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) * 0.6;
-    const src = this.ctx.createBufferSource(); src.buffer = buf;
-    const f = this.ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 400;
-    const g2 = this.ctx.createGain(); g2.gain.value = 0.09 * vol;
-    src.connect(f); f.connect(g2); g2.connect(this.ctx.destination);
-    src.start(t);
+    const g2 = this.ctx.createGain(); g2.gain.value = 0.15;
+    src.connect(f); f.connect(g2); g2.connect(this.ctx.destination); src.start(t);
   },
   hit() {
     if (!this.ctx) return;
@@ -342,21 +296,8 @@ const AudioSys = {
     const o = this.ctx.createOscillator(), g = this.ctx.createGain();
     o.type = 'sine'; o.frequency.setValueAtTime(880, t);
     o.frequency.exponentialRampToValueAtTime(440, t + 0.05);
-    g.gain.setValueAtTime(0.08, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-    o.connect(g); g.connect(this.ctx.destination);
-    o.start(t); o.stop(t + 0.06);
-  },
-  hitmark() {
-    if (!this.ctx) return;
-    const t = this.ctx.currentTime;
-    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(1400, t);
-    o.frequency.exponentialRampToValueAtTime(2000, t + 0.06);
-    g.gain.setValueAtTime(0.1, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-    o.connect(g); g.connect(this.ctx.destination);
-    o.start(t); o.stop(t + 0.08);
+    g.gain.setValueAtTime(0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+    o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t + 0.06);
   },
   reload() {
     if (!this.ctx) return;
@@ -364,10 +305,8 @@ const AudioSys = {
     [0, 0.18].forEach((d, i) => {
       const o = this.ctx.createOscillator(), g = this.ctx.createGain();
       o.type = 'square'; o.frequency.value = i === 0 ? 300 : 500;
-      g.gain.setValueAtTime(0.06, t + d);
-      g.gain.exponentialRampToValueAtTime(0.001, t + d + 0.08);
-      o.connect(g); g.connect(this.ctx.destination);
-      o.start(t + d); o.stop(t + d + 0.09);
+      g.gain.setValueAtTime(0.06, t + d); g.gain.exponentialRampToValueAtTime(0.001, t + d + 0.08);
+      o.connect(g); g.connect(this.ctx.destination); o.start(t + d); o.stop(t + d + 0.09);
     });
   },
   death() {
@@ -376,24 +315,12 @@ const AudioSys = {
     const o = this.ctx.createOscillator(), g = this.ctx.createGain();
     o.type = 'sawtooth'; o.frequency.setValueAtTime(200, t);
     o.frequency.exponentialRampToValueAtTime(40, t + 0.5);
-    g.gain.setValueAtTime(0.2, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
-    o.connect(g); g.connect(this.ctx.destination);
-    o.start(t); o.stop(t + 0.55);
-  },
-  jump() {
-    if (!this.ctx) return;
-    const t = this.ctx.currentTime;
-    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(400, t);
-    o.frequency.exponentialRampToValueAtTime(800, t + 0.1);
-    g.gain.setValueAtTime(0.06, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-    o.connect(g); g.connect(this.ctx.destination);
-    o.start(t); o.stop(t + 0.12);
+    g.gain.setValueAtTime(0.2, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t + 0.55);
   }
 };
 
+// ---------- Three.js ----------
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0a12);
 scene.fog = new THREE.Fog(0x0a0a12, 30, 120);
@@ -462,9 +389,7 @@ const OBSTACLE_BOXES = [
 
 for (const b of OBSTACLE_BOXES) {
   const geo = new THREE.BoxGeometry(b.w, b.h, b.d);
-  const mat = new THREE.MeshStandardMaterial({
-    color: 0x2a3550, emissive: 0x0a1525, emissiveIntensity: 0.5, roughness: 0.7, metalness: 0.3
-  });
+  const mat = new THREE.MeshStandardMaterial({ color: 0x2a3550, emissive: 0x0a1525, emissiveIntensity: 0.5, roughness: 0.7, metalness: 0.3 });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.set(b.x, b.h / 2, b.z);
   scene.add(mesh);
@@ -477,46 +402,19 @@ function createPlayerMesh(color) {
   const group = new THREE.Group();
   const bodyMat = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.7 });
   const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.4), bodyMat);
-  body.position.y = 0.9;
-  group.add(body);
+  body.position.y = 0.9; group.add(body);
   const head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), bodyMat);
-  head.position.y = 1.8;
-  group.add(head);
-  const gun = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.8),
-    new THREE.MeshStandardMaterial({ color: 0x333333 }));
-  gun.position.set(0.3, 1.2, -0.5);
-  group.add(gun);
+  head.position.y = 1.8; group.add(head);
+  const gun = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.8), new THREE.MeshStandardMaterial({ color: 0x333333 }));
+  gun.position.set(0.3, 1.2, -0.5); group.add(gun);
   return group;
 }
 
 const bulletGeom = new THREE.SphereGeometry(0.1, 6, 6);
-function createBullet(color) {
-  return new THREE.Mesh(bulletGeom, new THREE.MeshBasicMaterial({ color }));
-}
+function createBullet(color) { return new THREE.Mesh(bulletGeom, new THREE.MeshBasicMaterial({ color })); }
 
-function safeSpawnNear(cx, cz) {
-  cx = cx || 0; cz = cz || 0;
-  for (let i = 0; i < 60; i++) {
-    const a = Math.random() * Math.PI * 2;
-    const r = Math.random() * SPAWN_RANGE;
-    const x = cx + Math.cos(a) * r;
-    const z = cz + Math.sin(a) * r;
-    if (Math.abs(x) > MAP_LIMIT - 2 || Math.abs(z) > MAP_LIMIT - 2) continue;
-    let ok = true;
-    for (const b of OBSTACLE_BOXES) {
-      if (Math.abs(x - b.x) < b.w / 2 + PLAYER_RADIUS + 1 &&
-          Math.abs(z - b.z) < b.d / 2 + PLAYER_RADIUS + 1) { ok = false; break; }
-    }
-    if (ok) return { x, z };
-  }
-  return { x: cx, z: cz };
-}
-
-const me = {
-  x: 15, z: -25, y: 0, vy: 0, onGround: true,
-  yaw: 0, pitch: 0, hp: 100, alive: true, kills: 0,
-  shootCd: 0, respawnAt: 0, ammo: MAG_SIZE, reloading: false, reloadEnd: 0, scoped: false
-};
+// ---------- 状态 ----------
+const me = { x: 0, z: -30, yaw: 0, pitch: 0, hp: 100, alive: true, kills: 0, shootCd: 0, respawnAt: 0, ammo: MAG_SIZE, reloading: false, reloadEnd: 0, scoped: false };
 const others = {};
 let bullets = [];
 const localBullets = [];
@@ -526,93 +424,44 @@ let peer = null, conn = null, isHost = false, roomId = '';
 const keys = { w: false, a: false, s: false, d: false };
 let mouseDown = false, pointerLocked = false, rightDown = false;
 const joyMove = { active: false, dx: 0, dy: 0 };
-const joyAim = { active: false, dx: 0, dy: 0 };
 
-let lastMyFootstep = 0;
+// 手机滑动转视角
+let lookTouchId = null;
+let lookLastX = 0, lookLastY = 0;
+// 手机开火按钮
+let fireBtnPressed = false;
 
 const now = () => performance.now();
 const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 
-// 站墙版 collideMove（支持站到障碍物顶部）
-function collideMove(px, pz, dx, dz, py) {
-  py = py || 0;
-  function blocked(nx, nz) {
-    for (const b of OBSTACLE_BOXES) {
-      // 脚底已经超过这个障碍物高度，就无视它
-      if (py >= b.h - 0.01) continue;
-      if (Math.abs(nx - b.x) < b.w / 2 + PLAYER_RADIUS &&
-          Math.abs(nz - b.z) < b.d / 2 + PLAYER_RADIUS) return true;
-    }
-    return false;
-  }
-  // 已经卡在墙里 → 允许移动脱困
-  if (blocked(px, pz)) {
-    return {
-      x: clamp(px + dx, -MAP_LIMIT, MAP_LIMIT),
-      z: clamp(pz + dz, -MAP_LIMIT, MAP_LIMIT)
-    };
-  }
+function collideMove(px, pz, dx, dz) {
   let nx = clamp(px + dx, -MAP_LIMIT, MAP_LIMIT);
-  let nz = clamp(pz + dz, -MAP_LIMIT, MAP_LIMIT);
-  if (blocked(nx, pz)) nx = px;
-  if (blocked(nx, nz)) nz = pz;
-  return { x: nx, z: nz };
-}
-
-// 站墙版 updatePhysics
-function updatePhysics(dt) {
-  const prevY = me.y;
-  me.vy -= GRAVITY * dt;
-  me.y += me.vy * dt;
-
-  // 检测是否踩到障碍物顶部
-  let landedOn = null;
   for (const b of OBSTACLE_BOXES) {
-    if (Math.abs(me.x - b.x) < b.w / 2 + PLAYER_RADIUS &&
-        Math.abs(me.z - b.z) < b.d / 2 + PLAYER_RADIUS) {
-      if (me.vy <= 0 && prevY >= b.h - 0.01 && me.y <= b.h) {
-        landedOn = b;
-        break;
-      }
+    if (Math.abs(nx - b.x) < b.w / 2 + PLAYER_RADIUS && Math.abs(pz - b.z) < b.d / 2 + PLAYER_RADIUS) {
+      if (b.h < 1.6) continue;
+      nx = px; break;
     }
   }
-  if (landedOn) {
-    me.y = landedOn.h;
-    me.vy = 0;
-    me.onGround = true;
-    return;
+  let nz = clamp(pz + dz, -MAP_LIMIT, MAP_LIMIT);
+  for (const b of OBSTACLE_BOXES) {
+    if (Math.abs(nx - b.x) < b.w / 2 + PLAYER_RADIUS && Math.abs(nz - b.z) < b.d / 2 + PLAYER_RADIUS) {
+      if (b.h < 1.6) continue;
+      nz = pz; break;
+    }
   }
-  if (me.y <= 0) {
-    me.y = 0;
-    me.vy = 0;
-    me.onGround = true;
-  } else {
-    me.onGround = false;
-  }
-}
-
-function tryJump() {
-  if (!me.alive) return;
-  if (me.onGround) {
-    me.vy = JUMP_V;
-    me.onGround = false;
-    AudioSys.jump();
-  }
+  return { x: nx, z: nz };
 }
 
 function setStatus(text, cls) {
   const el = document.getElementById('status');
-  el.textContent = text;
-  el.className = cls || '';
+  el.textContent = text; el.className = cls || '';
 }
 function checkOrientation() {
   const tip = document.getElementById('rotate-tip');
   if (!IS_MOBILE) { tip.style.display = 'none'; return; }
   if (window.innerHeight > window.innerWidth) {
     tip.style.display = 'flex';
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(function(){});
-    }
+    if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function(){});
   } else {
     tip.style.display = 'none';
   }
@@ -622,14 +471,12 @@ window.addEventListener('resize', checkOrientation);
 window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 200));
 
 document.getElementById('hostBtn').onclick = () => {
-  forceLandscape();
-  AudioSys.init();
+  forceLandscape(); AudioSys.init();
   roomId = document.getElementById('roomInput').value.trim() || '1234';
   isHost = true; startPeer('gf3d-' + roomId);
 };
 document.getElementById('joinBtn').onclick = () => {
-  forceLandscape();
-  AudioSys.init();
+  forceLandscape(); AudioSys.init();
   roomId = document.getElementById('roomInput').value.trim() || '1234';
   isHost = false; startPeer(null);
 };
@@ -642,37 +489,17 @@ document.getElementById('fsBtn').onclick = () => {
 function startPeer(peerId) {
   if (peer) peer.destroy();
   setStatus(isHost ? '正在创建房间...' : '正在连接...');
-  try {
-    peer = new Peer(peerId, { debug: 0 });
-  } catch (e) {
-    setStatus('PeerJS 初始化失败：' + e.message, 'err');
-    return;
-  }
+  peer = new Peer(peerId, { debug: 0 });
   peer.on('open', () => {
     if (isHost) setStatus('房间已创建！等待对手... 房间号: ' + roomId, 'ok');
-    else {
-      setStatus('正在加入房间...');
-      conn = peer.connect('gf3d-' + roomId, { reliable: true });
-      setupConn();
-    }
+    else { setStatus('正在加入房间...'); conn = peer.connect('gf3d-' + roomId, { reliable: true }); setupConn(); }
   });
-  peer.on('connection', (c) => {
-    if (isHost) { conn = c; setupConn(); setStatus('对手已加入！开始战斗', 'ok'); startGame(); }
-  });
+  peer.on('connection', (c) => { if (isHost) { conn = c; setupConn(); setStatus('对手已加入！开始战斗', 'ok'); startGame(); } });
   peer.on('error', (err) => {
     if (err.type === 'peer-unavailable') setStatus('找不到房间', 'err');
     else if (err.type === 'unavailable-id') setStatus('房间号被占用，换一个', 'err');
     else setStatus('连接错误: ' + err.type, 'err');
   });
-  // 10秒超时提醒
-  setTimeout(function() {
-    if (!conn && peer && !peer.destroyed) {
-      var st = document.getElementById('status');
-      if (st && st.className !== 'ok') {
-        setStatus('连接超时，检查网络或换手机热点重试', 'err');
-      }
-    }
-  }, 10000);
 }
 
 function setupConn() {
@@ -683,32 +510,19 @@ function setupConn() {
       if (data.type === 'input') {
         const id = conn.peer;
         if (!others[id]) {
-          const sp = safeSpawnNear(0, 0);
           const mesh = createPlayerMesh(0xff4444);
           scene.add(mesh);
-          others[id] = { x: sp.x, z: sp.z, y: 0, yaw: 0, hp: 100, alive: true, kills: 0, mesh, respawnAt: 0, lastShot: 0, targetX: sp.x, targetZ: sp.z, targetY: 0, onGround: true, vy: 0, lastFootstep: 0 };
+          others[id] = { x: 0, z: 30, yaw: 0, hp: 100, alive: true, kills: 0, mesh, respawnAt: 0, lastShot: 0, targetX: 0, targetZ: 30 };
         }
         const o = others[id];
         if (o.alive) {
           const inp = data.input;
-          const r = collideMove(o.x, o.z, inp.dx * SPEED, inp.dz * SPEED, o.y);
+          const r = collideMove(o.x, o.z, inp.dx * SPEED, inp.dz * SPEED);
           o.x = r.x; o.z = r.z;
           o.yaw = inp.yaw;
-
-          const oMoving = (Math.abs(inp.dx) + Math.abs(inp.dz)) > 0.1 && o.onGround;
-          if (oMoving && now() - (o.lastFootstep || 0) > FOOTSTEP_INTERVAL) {
-            o.lastFootstep = now();
-            AudioSys.footstep(0.45);
-          }
-
-          if (inp.jump && o.onGround !== false) {
-            o.vy = JUMP_V;
-            o.onGround = false;
-          }
           if (inp.shoot && now() - o.lastShot > SHOOT_CD) {
             o.lastShot = now();
-            AudioSys.shot(0.45);
-            fireBullet(o.x, EYE_HEIGHT + o.y, o.z, inp.yaw, inp.pitch, id, false);
+            fireBullet(o.x, EYE_HEIGHT, o.z, inp.yaw, inp.pitch, id, false);
           }
         }
       }
@@ -722,10 +536,9 @@ function setupConn() {
           if (!others[id]) {
             const mesh = createPlayerMesh(0xff4444);
             scene.add(mesh);
-            others[id] = { x: p.x, z: p.z, y: p.y || 0, yaw: p.yaw, hp: p.hp, alive: p.alive, kills: p.kills, mesh, respawnAt: p.respawnAt, lastShot: 0, targetX: p.x, targetZ: p.z, targetY: p.y || 0 };
+            others[id] = { x: p.x, z: p.z, yaw: p.yaw, hp: p.hp, alive: p.alive, kills: p.kills, mesh, respawnAt: p.respawnAt, lastShot: 0, targetX: p.x, targetZ: p.z };
           } else {
             others[id].targetX = p.x; others[id].targetZ = p.z;
-            others[id].targetY = p.y || 0;
             others[id].yaw = p.yaw; others[id].hp = p.hp;
             others[id].alive = p.alive; others[id].kills = p.kills;
             others[id].respawnAt = p.respawnAt;
@@ -740,21 +553,11 @@ function setupConn() {
           const dx = my.x - me.x, dz = my.z - me.z;
           if (Math.abs(dx) > 0.1 || Math.abs(dz) > 0.1) { me.x += dx * 0.3; me.z += dz * 0.3; }
           if (my.hp < prevHp) { flashHit(); AudioSys.hit(); }
-          if (!my.alive && me.alive) {
-            me.alive = false; me.respawnAt = now() + RESPAWN_TIME;
-            AudioSys.death();
-            addKillFeed('你被击杀了');
-          }
+          if (!my.alive && me.alive) { me.alive = false; me.respawnAt = now() + RESPAWN_TIME; AudioSys.death(); addKillFeed('你被击杀了'); }
           if (my.alive && !me.alive) { me.alive = true; me.hp = 100; }
         }
-        updateEnemyHpUI();
       } else if (data.type === 'killfeed') {
         addKillFeed(data.text);
-      } else if (data.type === 'hitmarker') {
-        showHitmarker();
-      } else if (data.type === 'sfx') {
-        if (data.kind === 'enemyShot') AudioSys.shot(0.45);
-        else if (data.kind === 'footstep') AudioSys.footstep(0.45);
       }
     }
   });
@@ -765,8 +568,7 @@ function fireBullet(x, y, z, yaw, pitch, owner, isLocal) {
   const spread = me.scoped ? SPREAD_SCOPED : SPREAD;
   const rx = (Math.random() - 0.5) * spread;
   const ry = (Math.random() - 0.5) * spread;
-  const yawJ = yaw + rx;
-  const pitchJ = pitch + ry;
+  const yawJ = yaw + rx, pitchJ = pitch + ry;
   const b = {
     x, y, z,
     vx: -Math.sin(yawJ) * Math.cos(pitchJ) * BULLET_SPEED,
@@ -774,8 +576,7 @@ function fireBullet(x, y, z, yaw, pitch, owner, isLocal) {
     vz: -Math.cos(yawJ) * Math.cos(pitchJ) * BULLET_SPEED,
     owner, life: BULLET_LIFE,
   };
-  if (isLocal) localBullets.push(b);
-  else bullets.push(b);
+  if (isLocal) localBullets.push(b); else bullets.push(b);
   return b;
 }
 
@@ -784,34 +585,12 @@ function flashHit() {
   el.classList.add('on');
   setTimeout(() => el.classList.remove('on'), 120);
 }
-function showHitmarker() {
-  const el = document.getElementById('hitmarker');
-  el.classList.remove('show');
-  void el.offsetWidth;
-  el.classList.add('show');
-  AudioSys.hitmark();
-}
 function addKillFeed(text) {
   const feed = document.getElementById('killFeed');
   const div = document.createElement('div');
-  div.className = 'kill-msg';
-  div.textContent = text;
+  div.className = 'kill-msg'; div.textContent = text;
   feed.appendChild(div);
   setTimeout(() => div.remove(), 3000);
-}
-
-function updateEnemyHpUI() {
-  const bar = document.getElementById('enemyHpBar');
-  const fill = document.getElementById('enemyHpFill');
-  const text = document.getElementById('enemyHpText');
-  let found = null;
-  for (const id in others) {
-    if (others[id].alive) { found = others[id]; break; }
-  }
-  if (!found) { bar.style.display = 'none'; return; }
-  bar.style.display = 'block';
-  fill.style.width = Math.max(0, found.hp / 100 * 100) + '%';
-  text.textContent = '敌人 ' + Math.max(0, Math.round(found.hp)) + ' / 100';
 }
 
 function startGame() {
@@ -819,8 +598,10 @@ function startGame() {
   document.getElementById('hud').style.display = 'flex';
   document.getElementById('crosshair').style.display = 'block';
   if (IS_MOBILE) {
-    document.getElementById('joysticks').style.display = 'block';
+    document.getElementById('joyMove').style.display = 'block';
+    document.getElementById('fireBtn').style.display = 'flex';
     document.getElementById('mobileBtns').style.display = 'flex';
+    document.getElementById('lookHint').style.display = 'block';
   } else {
     document.getElementById('pcHint').style.display = 'block';
     document.getElementById('lockHint').style.display = 'block';
@@ -856,27 +637,28 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
+// ✅ 键盘 + 左摇杆 + 滑动转视角 + 开火按钮
 function readLocalInput() {
   let dx = 0, dz = 0, shoot = false;
   const fwd = { x: -Math.sin(me.yaw), z: -Math.cos(me.yaw) };
   const right = { x: Math.cos(me.yaw), z: -Math.sin(me.yaw) };
 
+  // 键盘
   if (keys.w) { dx += fwd.x; dz += fwd.z; }
   if (keys.s) { dx -= fwd.x; dz -= fwd.z; }
   if (keys.a) { dx -= right.x; dz -= right.z; }
   if (keys.d) { dx += right.x; dz += right.z; }
   if (mouseDown) shoot = true;
 
+  // 左摇杆移动
   if (joyMove.active) {
     const mx = joyMove.dx, my = -joyMove.dy;
     dx += right.x * mx + fwd.x * my;
     dz += right.z * mx + fwd.z * my;
   }
-  if (joyAim.active) {
-    me.yaw -= joyAim.dx * 0.06;
-    me.pitch = clamp(me.pitch - joyAim.dy * 0.06, -Math.PI / 2 + 0.1, Math.PI / 2 - 0.1);
-    if (Math.abs(joyAim.dx) > 0.3 || Math.abs(joyAim.dy) > 0.3) shoot = true;
-  }
+
+  // 开火按钮
+  if (fireBtnPressed) shoot = true;
 
   const len = Math.hypot(dx, dz);
   if (len > 1) { dx /= len; dz /= len; }
@@ -889,7 +671,7 @@ function tryShoot() {
     return false;
   }
   me.ammo--;
-  AudioSys.shot(1);
+  AudioSys.shot();
   return true;
 }
 
@@ -903,28 +685,11 @@ function startReload() {
 
 function hostUpdate(dt) {
   if (me.alive) {
-    updatePhysics(dt);
     const inp = readLocalInput();
-    const r = collideMove(me.x, me.z, inp.dx * SPEED * dt, inp.dz * SPEED * dt, me.y);
+    const r = collideMove(me.x, me.z, inp.dx * SPEED * dt, inp.dz * SPEED * dt);
     me.x = r.x; me.z = r.z;
-
-    const myMoving = (Math.abs(inp.dx) + Math.abs(inp.dz)) > 0.1 && me.onGround;
-    if (myMoving && now() - lastMyFootstep > FOOTSTEP_INTERVAL) {
-      lastMyFootstep = now();
-      AudioSys.footstep(0.6);
-      if (conn && conn.open) {
-        try { conn.send({ type: 'sfx', kind: 'footstep' }); } catch (e) {}
-      }
-    }
-
     if (inp.shoot && now() - me.shootCd > SHOOT_CD) {
-      if (tryShoot()) {
-        me.shootCd = now();
-        if (conn && conn.open) {
-          try { conn.send({ type: 'sfx', kind: 'enemyShot' }); } catch (e) {}
-        }
-        fireBullet(me.x, EYE_HEIGHT + me.y, me.z, me.yaw, me.pitch, peer.id, false);
-      }
+      if (tryShoot()) { me.shootCd = now(); fireBullet(me.x, EYE_HEIGHT, me.z, me.yaw, me.pitch, peer.id, false); }
     }
     if (me.reloading && now() > me.reloadEnd) {
       me.reloading = false; me.ammo = MAG_SIZE;
@@ -932,115 +697,75 @@ function hostUpdate(dt) {
     }
   } else if (now() > me.respawnAt) {
     me.alive = true; me.hp = 100; me.ammo = MAG_SIZE; me.reloading = false;
-    me.y = 0; me.vy = 0; me.onGround = true;
-    const sp = safeSpawnNear(0, 0);
-    me.x = sp.x; me.z = sp.z;
+    me.x = (Math.random() - 0.5) * 100; me.z = (Math.random() - 0.5) * 100;
   }
   for (const id in others) {
     const o = others[id];
     if (!o.alive && now() > o.respawnAt) {
       o.alive = true; o.hp = 100;
-      o.y = 0; o.vy = 0; o.onGround = true;
-      const sp = safeSpawnNear(0, 0);
-      o.x = sp.x; o.z = sp.z;
-      o.targetX = sp.x; o.targetZ = sp.z;
-    }
-    if (o.alive) {
-      o.y += o.vy * dt * 0.0166;
-      o.vy -= GRAVITY * dt * 0.0166;
-      if (o.y <= 0) { o.y = 0; o.vy = 0; o.onGround = true; }
+      o.x = (Math.random() - 0.5) * 100; o.z = (Math.random() - 0.5) * 100;
     }
   }
-
-  const substepDt = dt / BULLET_SUBSTEPS;
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
-    let dead = false;
-    const dx = b.vx * substepDt;
-    const dy = b.vy * substepDt;
-    const dz = b.vz * substepDt;
-    for (let s = 0; s < BULLET_SUBSTEPS; s++) {
-      b.x += dx; b.y += dy; b.z += dz;
-      for (const ob of OBSTACLE_BOXES) {
-        if (Math.abs(b.x - ob.x) < ob.w / 2 + 0.05 &&
-            Math.abs(b.z - ob.z) < ob.d / 2 + 0.05 &&
-            b.y > 0 && b.y < ob.h) {
-          dead = true; break;
+    b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
+    b.life -= dt * 0.0166;
+    if (b.life <= 0) { bullets.splice(i, 1); continue; }
+    let hitWall = false;
+    for (const ob of OBSTACLE_BOXES) {
+      if (Math.abs(b.x - ob.x) < ob.w / 2 && Math.abs(b.z - ob.z) < ob.d / 2 && b.y > 0 && b.y < ob.h) { hitWall = true; break; }
+    }
+    if (hitWall) { bullets.splice(i, 1); continue; }
+    let hit = false;
+    if (b.owner !== peer.id && me.alive) {
+      if (Math.hypot(b.x - me.x, b.z - me.z) < PLAYER_RADIUS + 0.15 && b.y > 0.3 && b.y < 1.8) {
+        me.hp -= BULLET_DMG; hit = true; flashHit(); AudioSys.hit();
+        if (me.hp <= 0) {
+          me.hp = 0; me.alive = false; me.respawnAt = now() + RESPAWN_TIME; AudioSys.death();
+          if (others[b.owner]) others[b.owner].kills = (others[b.owner].kills || 0) + 1;
+          if (conn && conn.open) conn.send({ type: 'killfeed', text: '对手击杀了你' });
+          addKillFeed('对手击杀了你');
         }
       }
-      if (dead) break;
-
-      if (b.owner !== peer.id && me.alive) {
-        const hDist = Math.hypot(b.x - me.x, b.z - me.z);
-        if (hDist < HIT_RADIUS_H && b.y > HIT_Y_MIN && b.y < HIT_Y_MAX) {
-          me.hp -= BULLET_DMG; dead = true;
-          flashHit(); AudioSys.hit();
-          if (me.hp <= 0) {
-            me.hp = 0; me.alive = false; me.respawnAt = now() + RESPAWN_TIME;
-            AudioSys.death();
-            if (others[b.owner]) others[b.owner].kills = (others[b.owner].kills || 0) + 1;
-            if (conn && conn.open) conn.send({ type: 'killfeed', text: '对手击杀了你' });
-            addKillFeed('对手击杀了你');
-          }
-          if (conn && conn.open) conn.send({ type: 'hitmarker' });
-          break;
-        }
-      }
-
+    }
+    if (!hit) {
       for (const id in others) {
         const o = others[id];
         if (b.owner === id || !o.alive) continue;
-        const hDist = Math.hypot(b.x - o.x, b.z - o.z);
-        if (hDist < HIT_RADIUS_H && b.y > HIT_Y_MIN && b.y < HIT_Y_MAX) {
-          o.hp -= BULLET_DMG; dead = true;
+        if (Math.hypot(b.x - o.x, b.z - o.z) < PLAYER_RADIUS + 0.15 && b.y > 0.3 && b.y < 1.8) {
+          o.hp -= BULLET_DMG; hit = true;
           if (o.hp <= 0) {
             o.hp = 0; o.alive = false; o.respawnAt = now() + RESPAWN_TIME;
             if (b.owner === peer.id) {
-              me.kills++;
-              addKillFeed('你击杀了对手');
+              me.kills++; addKillFeed('你击杀了对手');
               if (conn && conn.open) conn.send({ type: 'killfeed', text: '你被击杀了' });
-            }
-            else if (others[b.owner]) others[b.owner].kills = (others[b.owner].kills || 0) + 1;
+            } else if (others[b.owner]) others[b.owner].kills = (others[b.owner].kills || 0) + 1;
           }
-          if (b.owner === peer.id) showHitmarker();
           break;
         }
       }
-      if (dead) break;
     }
-    b.life -= dt * 0.0166;
-    if (dead || b.life <= 0) bullets.splice(i, 1);
+    if (hit) bullets.splice(i, 1);
   }
 }
 
 function broadcastState() {
   const players = {};
-  players[peer.id] = { x: me.x, z: me.z, y: me.y, yaw: me.yaw, hp: me.hp, alive: me.alive, kills: me.kills, respawnAt: me.respawnAt };
+  players[peer.id] = { x: me.x, z: me.z, yaw: me.yaw, hp: me.hp, alive: me.alive, kills: me.kills, respawnAt: me.respawnAt };
   for (const id in others) {
     const o = others[id];
-    players[id] = { x: o.x, z: o.z, y: o.y, yaw: o.yaw, hp: o.hp, alive: o.alive, kills: o.kills, respawnAt: o.respawnAt };
+    players[id] = { x: o.x, z: o.z, yaw: o.yaw, hp: o.hp, alive: o.alive, kills: o.kills, respawnAt: o.respawnAt };
   }
   try { conn.send({ type: 'state', players, bullets }); } catch (e) {}
 }
 
 function clientUpdate(dt) {
   if (me.alive) {
-    updatePhysics(dt);
     const inp = readLocalInput();
-    const r = collideMove(me.x, me.z, inp.dx * SPEED * dt, inp.dz * SPEED * dt, me.y);
+    const r = collideMove(me.x, me.z, inp.dx * SPEED * dt, inp.dz * SPEED * dt);
     me.x = r.x; me.z = r.z;
-
-    const myMoving = (Math.abs(inp.dx) + Math.abs(inp.dz)) > 0.1 && me.onGround;
-    if (myMoving && now() - lastMyFootstep > FOOTSTEP_INTERVAL) {
-      lastMyFootstep = now();
-      AudioSys.footstep(0.6);
-    }
-
     if (inp.shoot && now() - me.shootCd > SHOOT_CD) {
-      if (tryShoot()) {
-        me.shootCd = now();
-        fireBullet(me.x, EYE_HEIGHT + me.y, me.z, me.yaw, me.pitch, 'local-predict', true);
-      }
+      if (tryShoot()) { me.shootCd = now(); fireBullet(me.x, EYE_HEIGHT, me.z, me.yaw, me.pitch, 'local-predict', true); }
     }
     if (me.reloading && now() > me.reloadEnd) {
       me.reloading = false; me.ammo = MAG_SIZE;
@@ -1048,40 +773,20 @@ function clientUpdate(dt) {
     }
   } else if (now() > me.respawnAt) {
     me.alive = true; me.hp = 100; me.ammo = MAG_SIZE; me.reloading = false;
-    me.y = 0; me.vy = 0; me.onGround = true;
   }
-  const substepDt = dt / BULLET_SUBSTEPS;
   for (let i = localBullets.length - 1; i >= 0; i--) {
     const b = localBullets[i];
-    let dead = false;
-    const dx = b.vx * substepDt;
-    const dy = b.vy * substepDt;
-    const dz = b.vz * substepDt;
-    for (let s = 0; s < BULLET_SUBSTEPS; s++) {
-      b.x += dx; b.y += dy; b.z += dz;
-      for (const ob of OBSTACLE_BOXES) {
-        if (Math.abs(b.x - ob.x) < ob.w / 2 + 0.05 &&
-            Math.abs(b.z - ob.z) < ob.d / 2 + 0.05 &&
-            b.y > 0 && b.y < ob.h) {
-          dead = true; break;
-        }
-      }
-      if (dead) break;
-    }
+    b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
     b.life -= dt * 0.0166;
-    if (dead || b.life <= 0) localBullets.splice(i, 1);
+    if (b.life <= 0) localBullets.splice(i, 1);
   }
 }
 
 function sendInput() {
   if (!conn || !conn.open) return;
   const inp = readLocalInput();
-  const jumpFlag = !me.onGround && me.vy > 0;
   try {
-    conn.send({ type: 'input', input: {
-      dx: inp.dx, dz: inp.dz, yaw: inp.yaw, pitch: inp.pitch, shoot: inp.shoot,
-      jump: jumpFlag, y: me.y
-    }});
+    conn.send({ type: 'input', input: { dx: inp.dx, dz: inp.dz, yaw: inp.yaw, pitch: inp.pitch, shoot: inp.shoot } });
   } catch (e) {}
 }
 
@@ -1091,8 +796,7 @@ function updateOtherMeshes(dt) {
     if (o.mesh) {
       o.x += (o.targetX - o.x) * Math.min(1, dt * 0.3);
       o.z += (o.targetZ - o.z) * Math.min(1, dt * 0.3);
-      o.y += (o.targetY - o.y) * Math.min(1, dt * 0.3);
-      o.mesh.position.set(o.x, o.y || 0, o.z);
+      o.mesh.position.set(o.x, 0, o.z);
       o.mesh.rotation.y = o.yaw;
       o.mesh.visible = o.alive;
     }
@@ -1108,8 +812,7 @@ function updateBulletMeshes() {
     let mesh = bulletMeshes.get(b._key);
     if (!mesh) {
       mesh = createBullet(b._key.startsWith('local-') ? 0x00ffff : 0xff8800);
-      scene.add(mesh);
-      bulletMeshes.set(b._key, mesh);
+      scene.add(mesh); bulletMeshes.set(b._key, mesh);
     }
     mesh.position.set(b.x, b.y, b.z);
   }
@@ -1119,7 +822,7 @@ function updateBulletMeshes() {
 }
 
 function render() {
-  camera.position.set(me.x, EYE_HEIGHT + me.y, me.z);
+  camera.position.set(me.x, EYE_HEIGHT, me.z);
   camera.rotation.y = me.yaw;
   camera.rotation.x = me.pitch;
   camera.fov = me.scoped ? 35 : 75;
@@ -1134,13 +837,13 @@ function updateHUD() {
   document.getElementById('crosshair').classList.toggle('scoped', me.scoped);
 }
 
+// 电脑键盘输入
 window.addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
   if (k === 'w' || k === 'arrowup') keys.w = true;
   if (k === 's' || k === 'arrowdown') keys.s = true;
   if (k === 'a' || k === 'arrowleft') keys.a = true;
   if (k === 'd' || k === 'arrowright') keys.d = true;
-  if (k === ' ') { e.preventDefault(); tryJump(); }
   if (k === 'r') startReload();
 });
 window.addEventListener('keyup', (e) => {
@@ -1171,42 +874,31 @@ document.addEventListener('mouseup', (e) => {
 });
 document.addEventListener('contextmenu', e => e.preventDefault());
 
-document.getElementById('mobJump').addEventListener('touchstart', (e) => {
-  e.preventDefault(); tryJump();
-}, { passive: false });
-document.getElementById('mobReload').addEventListener('touchstart', (e) => {
-  e.preventDefault(); startReload();
-}, { passive: false });
-document.getElementById('mobScope').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  me.scoped = !me.scoped;
-  document.getElementById('mobScope').style.borderColor = me.scoped ? 'rgba(255,60,60,0.9)' : 'rgba(0,255,255,0.5)';
-}, { passive: false });
-
-function bindJoy(baseEl, stickEl, target) {
+// ---------- 手机：左摇杆移动 ----------
+(function bindMoveJoy() {
+  const baseEl = document.getElementById('joyMove');
+  const stickEl = document.getElementById('joyMoveStick');
   let pid = null;
-  const R = 55;
-  function update(clientX, clientY) {
+  const R = 60;
+  function update(cx, cy) {
     const rect = baseEl.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    let dx = clientX - cx, dy = clientY - cy;
+    const bcx = rect.left + rect.width / 2, bcy = rect.top + rect.height / 2;
+    let dx = cx - bcx, dy = cy - bcy;
     const len = Math.hypot(dx, dy);
     if (len > R) { dx = dx / len * R; dy = dy / len * R; }
     stickEl.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-    target.active = true;
-    target.dx = dx / R; target.dy = dy / R;
+    joyMove.active = true;
+    joyMove.dx = dx / R; joyMove.dy = dy / R;
   }
   function end() {
     stickEl.style.transform = 'translate(-50%, -50%)';
-    target.active = false; target.dx = 0; target.dy = 0;
+    joyMove.active = false; joyMove.dx = 0; joyMove.dy = 0;
     pid = null;
   }
   baseEl.addEventListener('touchstart', (e) => {
     e.preventDefault();
     const t = e.changedTouches[0];
-    pid = t.identifier;
-    update(t.clientX, t.clientY);
+    pid = t.identifier; update(t.clientX, t.clientY);
   }, { passive: false });
   baseEl.addEventListener('touchmove', (e) => {
     e.preventDefault();
@@ -1217,10 +909,87 @@ function bindJoy(baseEl, stickEl, target) {
     for (const t of e.changedTouches) if (t.identifier === pid) end();
   }, { passive: false });
   baseEl.addEventListener('touchcancel', (e) => { e.preventDefault(); end(); }, { passive: false });
-}
-bindJoy(document.getElementById('joyMove'), document.getElementById('joyMoveStick'), joyMove);
-bindJoy(document.getElementById('joyAim'), document.getElementById('joyAimStick'), joyAim);
+})();
 
+// ---------- 手机：滑动屏幕转视角 ----------
+function isInElement(clientX, clientY, el) {
+  if (!el) return false;
+  const r = el.getBoundingClientRect();
+  return clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom;
+}
+document.addEventListener('touchstart', (e) => {
+  if (!IS_MOBILE) return;
+  const joyEl = document.getElementById('joyMove');
+  const fireEl = document.getElementById('fireBtn');
+  const btnEl = document.getElementById('mobileBtns');
+  for (const t of e.changedTouches) {
+    if (isInElement(t.clientX, t.clientY, joyEl)) continue;
+    if (isInElement(t.clientX, t.clientY, fireEl)) continue;
+    if (isInElement(t.clientX, t.clientY, btnEl)) continue;
+    if (lookTouchId === null) {
+      lookTouchId = t.identifier;
+      lookLastX = t.clientX;
+      lookLastY = t.clientY;
+    }
+  }
+}, { passive: false });
+
+document.addEventListener('touchmove', (e) => {
+  if (lookTouchId === null) return;
+  for (const t of e.changedTouches) {
+    if (t.identifier === lookTouchId) {
+      const dx = t.clientX - lookLastX;
+      const dy = t.clientY - lookLastY;
+      const sens = me.scoped ? 0.003 : 0.006;
+      me.yaw -= dx * sens;
+      me.pitch = clamp(me.pitch - dy * sens, -Math.PI / 2 + 0.1, Math.PI / 2 - 0.1);
+      lookLastX = t.clientX;
+      lookLastY = t.clientY;
+    }
+  }
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchend', (e) => {
+  for (const t of e.changedTouches) {
+    if (t.identifier === lookTouchId) lookTouchId = null;
+  }
+}, { passive: false });
+document.addEventListener('touchcancel', (e) => {
+  for (const t of e.changedTouches) {
+    if (t.identifier === lookTouchId) lookTouchId = null;
+  }
+}, { passive: false });
+
+// ---------- 手机：开火按钮 ----------
+(function bindFireBtn() {
+  const btn = document.getElementById('fireBtn');
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    fireBtnPressed = true;
+    btn.classList.add('pressed');
+  }, { passive: false });
+  btn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    fireBtnPressed = false;
+    btn.classList.remove('pressed');
+  }, { passive: false });
+  btn.addEventListener('touchcancel', (e) => {
+    e.preventDefault();
+    fireBtnPressed = false;
+    btn.classList.remove('pressed');
+  }, { passive: false });
+})();
+
+// ---------- 手机：开镜 / 换弹 ----------
+document.getElementById('mobReload').addEventListener('touchstart', (e) => { e.preventDefault(); startReload(); }, { passive: false });
+document.getElementById('mobScope').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  me.scoped = !me.scoped;
+  document.getElementById('mobScope').style.borderColor = me.scoped ? 'rgba(255,60,60,0.9)' : 'rgba(0,255,255,0.5)';
+}, { passive: false });
+
+// 防止双击缩放
 document.addEventListener('gesturestart', e => e.preventDefault());
 document.addEventListener('contextmenu', e => e.preventDefault());
 let lastTouchEnd = 0;
