@@ -246,7 +246,8 @@
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script>
 // ============================================================
-// 3D 联机枪战 · 音频反馈 + 就近重生
+// 3D 联机枪战 · 最终稳定版
+// 跳跃高度保持原样，能站矮台和箱子
 // ============================================================
 const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
@@ -265,6 +266,7 @@ const MAP_LIMIT = 60;
 const SPREAD = 0.012;
 const SPREAD_SCOPED = 0.003;
 
+// 跳跃高度保持原样
 const GRAVITY = 0.025;
 const JUMP_V = 0.35;
 const BULLET_SUBSTEPS = 4;
@@ -273,9 +275,7 @@ const HIT_RADIUS_H = 1.0;
 const HIT_Y_MIN = -0.2;
 const HIT_Y_MAX = 3.0;
 
-// 重生范围（缩小了，不让飞太远）
 const SPAWN_RANGE = 30;
-// 脚步声间隔
 const FOOTSTEP_INTERVAL = 350;
 
 function forceLandscape() {
@@ -294,7 +294,6 @@ function forceLandscape() {
 const AudioSys = {
   ctx: null,
   init() { if (this.ctx) return; try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} },
-  // 枪声，vol 控制音量（1 = 自己，0.45 = 敌人远处）
   shot(vol) {
     if (!this.ctx) return;
     vol = (vol === undefined) ? 1 : vol;
@@ -316,7 +315,6 @@ const AudioSys = {
     src.connect(f); f.connect(g2); g2.connect(this.ctx.destination);
     src.start(t);
   },
-  // 脚步声
   footstep(vol) {
     if (!this.ctx) return;
     vol = (vol === undefined) ? 0.6 : vol;
@@ -396,7 +394,6 @@ const AudioSys = {
   }
 };
 
-// ---------- Three.js ----------
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0a12);
 scene.fog = new THREE.Fog(0x0a0a12, 30, 120);
@@ -497,7 +494,6 @@ function createBullet(color) {
   return new THREE.Mesh(bulletGeom, new THREE.MeshBasicMaterial({ color }));
 }
 
-// 就近重生：以指定点为中心，在 SPAWN_RANGE 范围内找空地
 function safeSpawnNear(cx, cz) {
   cx = cx || 0; cz = cz || 0;
   for (let i = 0; i < 60; i++) {
@@ -532,64 +528,44 @@ let mouseDown = false, pointerLocked = false, rightDown = false;
 const joyMove = { active: false, dx: 0, dy: 0 };
 const joyAim = { active: false, dx: 0, dy: 0 };
 
-// 脚步计时器
 let lastMyFootstep = 0;
 
 const now = () => performance.now();
 const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 
+// 站墙版 collideMove（支持站到障碍物顶部）
 function collideMove(px, pz, dx, dz, py) {
   py = py || 0;
-  let stuck = false;
-  for (const b of OBSTACLE_BOXES) {
-    if (py >= b.h) continue;
-    if (Math.abs(px - b.x) < b.w / 2 + PLAYER_RADIUS &&
-        Math.abs(pz - b.z) < b.d / 2 + PLAYER_RADIUS) {
-      if (b.h >= 1.6) { stuck = true; break; }
+  function blocked(nx, nz) {
+    for (const b of OBSTACLE_BOXES) {
+      // 脚底已经超过这个障碍物高度，就无视它
+      if (py >= b.h - 0.01) continue;
+      if (Math.abs(nx - b.x) < b.w / 2 + PLAYER_RADIUS &&
+          Math.abs(nz - b.z) < b.d / 2 + PLAYER_RADIUS) return true;
     }
+    return false;
   }
-  if (stuck) {
+  // 已经卡在墙里 → 允许移动脱困
+  if (blocked(px, pz)) {
     return {
       x: clamp(px + dx, -MAP_LIMIT, MAP_LIMIT),
       z: clamp(pz + dz, -MAP_LIMIT, MAP_LIMIT)
     };
   }
   let nx = clamp(px + dx, -MAP_LIMIT, MAP_LIMIT);
-  for (const b of OBSTACLE_BOXES) {
-    if (py >= b.h) continue;
-    if (Math.abs(nx - b.x) < b.w / 2 + PLAYER_RADIUS &&
-        Math.abs(pz - b.z) < b.d / 2 + PLAYER_RADIUS) {
-      if (b.h < 1.6) continue;
-      nx = px; break;
-    }
-  }
   let nz = clamp(pz + dz, -MAP_LIMIT, MAP_LIMIT);
-  for (const b of OBSTACLE_BOXES) {
-    if (py >= b.h) continue;
-    if (Math.abs(nx - b.x) < b.w / 2 + PLAYER_RADIUS &&
-        Math.abs(nz - b.z) < b.d / 2 + PLAYER_RADIUS) {
-      if (b.h < 1.6) continue;
-      nz = pz; break;
-    }
-  }
+  if (blocked(nx, pz)) nx = px;
+  if (blocked(nx, nz)) nz = pz;
   return { x: nx, z: nz };
 }
 
-function tryJump() {
-  if (!me.alive) return;
-  if (me.onGround) {
-    me.vy = JUMP_V;
-    me.onGround = false;
-    AudioSys.jump();
-  }
-}
-
+// 站墙版 updatePhysics
 function updatePhysics(dt) {
   const prevY = me.y;
   me.vy -= GRAVITY * dt;
   me.y += me.vy * dt;
 
-  // 下落中检测是否踩到了某个障碍物顶部
+  // 检测是否踩到障碍物顶部
   let landedOn = null;
   for (const b of OBSTACLE_BOXES) {
     if (Math.abs(me.x - b.x) < b.w / 2 + PLAYER_RADIUS &&
@@ -612,6 +588,33 @@ function updatePhysics(dt) {
     me.onGround = true;
   } else {
     me.onGround = false;
+  }
+}
+
+function tryJump() {
+  if (!me.alive) return;
+  if (me.onGround) {
+    me.vy = JUMP_V;
+    me.onGround = false;
+    AudioSys.jump();
+  }
+}
+
+function setStatus(text, cls) {
+  const el = document.getElementById('status');
+  el.textContent = text;
+  el.className = cls || '';
+}
+function checkOrientation() {
+  const tip = document.getElementById('rotate-tip');
+  if (!IS_MOBILE) { tip.style.display = 'none'; return; }
+  if (window.innerHeight > window.innerWidth) {
+    tip.style.display = 'flex';
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(function(){});
+    }
+  } else {
+    tip.style.display = 'none';
   }
 }
 checkOrientation();
@@ -639,7 +642,12 @@ document.getElementById('fsBtn').onclick = () => {
 function startPeer(peerId) {
   if (peer) peer.destroy();
   setStatus(isHost ? '正在创建房间...' : '正在连接...');
-  peer = new Peer(peerId, { debug: 0 });
+  try {
+    peer = new Peer(peerId, { debug: 0 });
+  } catch (e) {
+    setStatus('PeerJS 初始化失败：' + e.message, 'err');
+    return;
+  }
   peer.on('open', () => {
     if (isHost) setStatus('房间已创建！等待对手... 房间号: ' + roomId, 'ok');
     else {
@@ -656,6 +664,15 @@ function startPeer(peerId) {
     else if (err.type === 'unavailable-id') setStatus('房间号被占用，换一个', 'err');
     else setStatus('连接错误: ' + err.type, 'err');
   });
+  // 10秒超时提醒
+  setTimeout(function() {
+    if (!conn && peer && !peer.destroyed) {
+      var st = document.getElementById('status');
+      if (st && st.className !== 'ok') {
+        setStatus('连接超时，检查网络或换手机热点重试', 'err');
+      }
+    }
+  }, 10000);
 }
 
 function setupConn() {
@@ -678,7 +695,6 @@ function setupConn() {
           o.x = r.x; o.z = r.z;
           o.yaw = inp.yaw;
 
-          // 玩家移动 → 主机听到敌人的脚步声
           const oMoving = (Math.abs(inp.dx) + Math.abs(inp.dz)) > 0.1 && o.onGround;
           if (oMoving && now() - (o.lastFootstep || 0) > FOOTSTEP_INTERVAL) {
             o.lastFootstep = now();
@@ -691,7 +707,6 @@ function setupConn() {
           }
           if (inp.shoot && now() - o.lastShot > SHOOT_CD) {
             o.lastShot = now();
-            // 主机听到敌人的枪声（远一点，小一点）
             AudioSys.shot(0.45);
             fireBullet(o.x, EYE_HEIGHT + o.y, o.z, inp.yaw, inp.pitch, id, false);
           }
@@ -738,7 +753,6 @@ function setupConn() {
       } else if (data.type === 'hitmarker') {
         showHitmarker();
       } else if (data.type === 'sfx') {
-        // 主机发来的音效
         if (data.kind === 'enemyShot') AudioSys.shot(0.45);
         else if (data.kind === 'footstep') AudioSys.footstep(0.45);
       }
@@ -894,7 +908,6 @@ function hostUpdate(dt) {
     const r = collideMove(me.x, me.z, inp.dx * SPEED * dt, inp.dz * SPEED * dt, me.y);
     me.x = r.x; me.z = r.z;
 
-    // 主机自己移动 → 播放脚步 + 通知客户端
     const myMoving = (Math.abs(inp.dx) + Math.abs(inp.dz)) > 0.1 && me.onGround;
     if (myMoving && now() - lastMyFootstep > FOOTSTEP_INTERVAL) {
       lastMyFootstep = now();
@@ -907,7 +920,6 @@ function hostUpdate(dt) {
     if (inp.shoot && now() - me.shootCd > SHOOT_CD) {
       if (tryShoot()) {
         me.shootCd = now();
-        // 通知客户端：敌人开枪了
         if (conn && conn.open) {
           try { conn.send({ type: 'sfx', kind: 'enemyShot' }); } catch (e) {}
         }
@@ -921,7 +933,6 @@ function hostUpdate(dt) {
   } else if (now() > me.respawnAt) {
     me.alive = true; me.hp = 100; me.ammo = MAG_SIZE; me.reloading = false;
     me.y = 0; me.vy = 0; me.onGround = true;
-    // 就近重生：以原点为中心
     const sp = safeSpawnNear(0, 0);
     me.x = sp.x; me.z = sp.z;
   }
@@ -1019,7 +1030,6 @@ function clientUpdate(dt) {
     const r = collideMove(me.x, me.z, inp.dx * SPEED * dt, inp.dz * SPEED * dt, me.y);
     me.x = r.x; me.z = r.z;
 
-    // 客户端自己移动 → 本地播放脚步（主机通过输入听到）
     const myMoving = (Math.abs(inp.dx) + Math.abs(inp.dz)) > 0.1 && me.onGround;
     if (myMoving && now() - lastMyFootstep > FOOTSTEP_INTERVAL) {
       lastMyFootstep = now();
