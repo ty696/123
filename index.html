@@ -72,6 +72,7 @@ window.pendingGame = null;
     <li><a href="#" onclick="go('space');return false;">星际守卫</a><div class="desc">全屏拖动飞船，自动开火。击杀怪物有几率掉落技能球！加入精英怪！</div></li>
   </ul>
   <div id="custom-games-list" style="margin-top: 10px;"></div>
+
   <div id="media-section" style="margin-top: 30px;">
     <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">图片与视频区</h2>
     <img src="ab.jpg" alt="图片1" onerror="this.style.display='none'">
@@ -79,6 +80,14 @@ window.pendingGame = null;
     <img src="3.jpg" alt="图片3" onerror="this.style.display='none'">
     <div id="media-list"></div>
   </div>
+
+  <!-- ✅ 评论区搬到这里：图片与视频区下面 -->
+  <div id="comment-section" style="max-width: 800px; margin: 40px auto 20px; padding: 0 15px; box-sizing: border-box;">
+    <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">💬 评论区</h2>
+    <p style="font-size: 13px; color: #888; margin: 8px 0 16px;">用 GitHub 账号登录即可发表评论</p>
+    <div class="giscus"></div>
+  </div>
+
 </div>
 
 <div id="p-snake" class="page">
@@ -658,14 +667,7 @@ window.onload = function() {
     </div>
 </div>
 
-</body>
-    <!-- 评论区 -->
-<div id="comment-section" style="max-width: 800px; margin: 40px auto 20px; padding: 0 15px; box-sizing: border-box;">
-  <h2 style="font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">💬 评论区</h2>
-  <p style="font-size: 13px; color: #888; margin: 8px 0 16px;">用 GitHub 账号登录即可发表评论</p>
-  <div class="giscus"></div>
-</div>
-
+<!-- Giscus 评论区脚本 -->
 <script src="https://giscus.app/client.js"
         data-repo="ty696/123"
         data-repo-id="R_kgDOUhAk8Q"
@@ -681,4 +683,6 @@ window.onload = function() {
         crossorigin="anonymous"
         async>
 </script>
+
+</body>
 </html>
