@@ -100,6 +100,36 @@
     box-shadow:0 0 24px rgba(60,140,220,.35);
   }
 
+  /* ---------- 通关遮罩 ---------- */
+  #win{
+    position:fixed;inset:0;z-index:65;
+    display:none;flex-direction:column;
+    align-items:center;justify-content:center;
+    background:radial-gradient(ellipse at center,#04140c 0%,#000 82%);
+    color:#9fe0c0;gap:18px;
+    transition:opacity .5s ease;
+  }
+  #win.on{ display:flex; }
+  #win h1{
+    font-size:34px;letter-spacing:12px;font-weight:700;
+    color:#c9ffe4;
+    text-shadow:0 0 22px rgba(90,255,180,.85),0 0 48px rgba(40,180,120,.5);
+  }
+  #win .sub{
+    font-size:13px;letter-spacing:3px;color:#4f9070;
+  }
+  #win .stat{
+    margin-top:6px;font-size:15px;letter-spacing:3px;color:#8fd8b4;
+    text-shadow:0 0 12px rgba(80,220,150,.5);
+  }
+  #win .btn{
+    margin-top:16px;padding:12px 40px;
+    border:1px solid rgba(110,255,190,.55);
+    border-radius:6px;color:#d6ffee;font-size:15px;letter-spacing:6px;
+    background:rgba(20,90,60,.3);
+    box-shadow:0 0 24px rgba(60,220,150,.35);
+  }
+
   /* ---------- 强制横屏提示 ---------- */
   #rotate{
     display:none;position:fixed;inset:0;z-index:200;
@@ -118,6 +148,147 @@
   @media (orientation:portrait) and (max-width:900px){
     #rotate{display:flex;}
   }
+
+  /* =========================================================
+     答题界面
+     ========================================================= */
+  #quiz{
+    position:fixed;inset:0;z-index:50;
+    display:none;
+    flex-direction:column;
+    padding:12px 22px 8px;
+    background:
+      radial-gradient(ellipse at 50% 42%,
+        rgba(10,26,44,.955) 0%,
+        rgba(3,6,11,.985) 72%,
+        rgba(0,0,0,.995) 100%);
+    color:#bcd8ef;
+    overflow:hidden;
+  }
+  #quiz.on{ display:flex; }
+
+  .q-head{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:clamp(11px,1.9vh,15px);
+    letter-spacing:2px;
+    color:#5f8db3;
+    padding-bottom:6px;
+    flex:0 0 auto;
+  }
+  .q-head .q-title{ color:#8ab4d6; }
+
+  .q-text{
+    flex:0 0 auto;
+    max-height:29vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    background:rgba(12,24,38,.62);
+    border-left:3px solid #3d7fb8;
+    border-radius:4px;
+    padding:clamp(8px,1.6vh,16px) clamp(10px,1.6vw,20px);
+    font-size:clamp(12px,2.15vh,17px);
+    line-height:1.55;
+    color:#cfe4f5;
+    letter-spacing:.4px;
+    box-shadow:0 0 22px rgba(30,80,140,.20) inset;
+  }
+  .q-text::-webkit-scrollbar{ width:3px; }
+  .q-text::-webkit-scrollbar-thumb{ background:rgba(90,150,210,.5); }
+
+  .q-opts{
+    flex:1 1 auto;
+    display:flex;
+    gap:clamp(12px,2.6vw,34px);
+    margin-top:clamp(8px,1.6vh,18px);
+    min-height:0;
+  }
+
+  .opt{
+    flex:1 1 0;
+    display:flex;
+    align-items:center;
+    position:relative;
+    border:1.5px solid rgba(70,130,190,.34);
+    border-radius:10px;
+    padding:clamp(8px,1.6vh,18px) clamp(10px,1.4vw,18px) clamp(8px,1.6vh,18px) 46px;
+    background:linear-gradient(180deg,rgba(14,28,46,.62),rgba(8,16,28,.48));
+    box-shadow:0 0 20px rgba(0,0,0,.45) inset;
+    transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    overflow:hidden;
+  }
+  .opt .opt-txt{
+    font-size:clamp(11px,2.0vh,16px);
+    line-height:1.5;
+    color:#a9c9e2;
+    letter-spacing:.3px;
+    word-break:break-word;
+  }
+
+  .opt.ok{
+    border-color:rgba(78,232,154,.95);
+    background:linear-gradient(180deg,rgba(18,64,48,.72),rgba(10,34,26,.6));
+    box-shadow:0 0 26px rgba(78,232,154,.42);
+  }
+  .opt.ok .opt-txt{ color:#b6ffe0; }
+
+  .opt.bad{
+    border-color:rgba(255,90,110,.95);
+    background:linear-gradient(180deg,rgba(70,20,28,.72),rgba(38,10,16,.6));
+    box-shadow:0 0 26px rgba(255,90,110,.40);
+  }
+  .opt.bad .opt-txt{ color:#ffc4cc; }
+
+  .q-tip{
+    flex:0 0 auto;
+    text-align:center;
+    font-size:clamp(10px,1.6vh,13px);
+    letter-spacing:2px;
+    color:#4a6d8c;
+    padding-top:clamp(4px,1.0vh,12px);
+  }
+
+  /* 三角形光标 */
+  #qCursor{
+    position:absolute;
+    left:0;top:0;
+    width:26px;height:32px;
+    color:#5fe8ff;
+    filter:drop-shadow(0 0 8px rgba(95,232,255,.95))
+           drop-shadow(0 0 18px rgba(60,180,255,.55));
+    transition:left .15s cubic-bezier(.2,.8,.3,1), top .15s cubic-bezier(.2,.8,.3,1);
+    pointer-events:none;
+    animation:curBlink 1.15s ease-in-out infinite;
+    z-index:3;
+  }
+  #qCursor svg{ display:block;width:100%;height:100%; }
+
+  @keyframes curBlink{
+    0%,100%{ opacity:1; }
+    50%    { opacity:.32; }
+  }
+
+  /* Toast */
+  #toast{
+    position:fixed;left:50%;top:14%;
+    transform:translate(-50%,-14px);
+    z-index:70;
+    padding:10px 22px;
+    border:1px solid rgba(110,180,255,.45);
+    border-radius:6px;
+    background:rgba(8,20,34,.92);
+    color:#cfe8ff;
+    font-size:clamp(11px,1.9vh,15px);
+    letter-spacing:2px;
+    box-shadow:0 0 28px rgba(40,120,200,.45);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease, transform .3s ease;
+    white-space:nowrap;
+  }
+  #toast.on{
+    opacity:1;
+    transform:translate(-50%,0);
+  }
 </style>
 </head>
 <body>
@@ -133,10 +304,47 @@
   <div class="tag" id="hudHint">滑动屏幕转动视角 · 左下摇杆移动</div>
 </div>
 
+<div id="toast"></div>
+
+<!-- ============ 答题界面 ============ -->
+<div id="quiz">
+  <div class="q-head">
+    <span id="qProg">第 1 / 15 题</span>
+    <span class="q-title" id="qTitle">课代表A</span>
+  </div>
+
+  <div class="q-text" id="qText"></div>
+
+  <div class="q-opts">
+    <div class="opt" id="optL"><div class="opt-txt" id="optLTxt"></div></div>
+    <div class="opt" id="optR"><div class="opt-txt" id="optRTxt"></div></div>
+  </div>
+
+  <div class="q-tip">← 左右滑动切换选项 · 点击屏幕确认 →</div>
+
+  <div id="qCursor">
+    <svg viewBox="0 0 32 40" preserveAspectRatio="xMidYMid meet">
+      <path d="M7 5 L26 20 L7 35"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="4.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+    </svg>
+  </div>
+</div>
+
 <div id="start">
   <h1>逃离政治老师</h1>
   <div class="sub">YIN XING LOU · BUILDING 2</div>
   <div class="btn" id="startBtn">点 击 进 入</div>
+</div>
+
+<div id="win">
+  <h1>成 功 逃 离</h1>
+  <div class="sub">你已走出银杏楼二栋</div>
+  <div class="stat" id="winStat"></div>
+  <div class="btn" id="againBtn">再 来 一 次</div>
 </div>
 
 <div id="rotate">
@@ -174,8 +382,11 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.setSize(window.innerWidth, window.innerHeight, false);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type    = THREE.PCFShadowMap;
+
+/* 【性能修复】关闭阴影贴图：本场景静态装饰多，实时阴影收益极低，
+   在移动端关闭后帧率显著提升。 */
+renderer.shadowMap.enabled = false;
+
 if (THREE.sRGBEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
 
 const scene = new THREE.Scene();
@@ -215,7 +426,6 @@ function makeFloorTexture(){
       g.fillRect(i * s + 1.5, j * s + 1.5, s - 3, s - 3);
     }
   }
-  // 污渍噪点
   const img = g.getImageData(0, 0, 256, 256);
   const d = img.data;
   for (let i = 0; i < d.length; i += 4){
@@ -239,12 +449,10 @@ function makeWallTexture(){
   g.fillStyle = '#20242c';
   g.fillRect(0, 0, 256, 256);
 
-  // 横向分层缝
   g.fillStyle = '#171a21';
   for (let j = 0; j < 256; j += 64){
     g.fillRect(0, j, 256, 3);
   }
-  // 竖向砖缝
   g.fillStyle = 'rgba(14,16,20,.7)';
   for (let j = 0; j < 256; j += 64){
     const off = (j / 64) % 2 === 0 ? 0 : 32;
@@ -252,7 +460,6 @@ function makeWallTexture(){
       g.fillRect(i, j, 2, 64);
     }
   }
-  // 噪点
   const img = g.getImageData(0, 0, 256, 256);
   const d = img.data;
   for (let i = 0; i < d.length; i += 4){
@@ -269,7 +476,7 @@ function makeWallTexture(){
   return t;
 }
 
-/* --- 楼顶发光招牌“银杏楼二栋” --- */
+/* --- 楼顶发光招牌 --- */
 function makeSignTexture(text){
   const W = 2048, H = 512;
   const c = makeCanvas(W, H);
@@ -280,7 +487,6 @@ function makeSignTexture(text){
   g.textBaseline = 'middle';
   g.font = 'bold 290px "PingFang SC","Microsoft YaHei","Heiti SC","SimHei",sans-serif';
 
-  // 多层外发光
   const glows = [
     { blur: 90, color: 'rgba(255,140,20,.85)' },
     { blur: 55, color: 'rgba(255,190,60,.95)' },
@@ -294,7 +500,6 @@ function makeSignTexture(text){
     g.fillText(text, W/2, H/2);
   });
 
-  // 灯管本体（近白）
   g.shadowBlur = 10;
   g.shadowColor = '#fff6cc';
   g.fillStyle = '#fffdf2';
@@ -343,6 +548,49 @@ function makeDoorPlateTexture(){
   return t;
 }
 
+/* --- 光晕（课代表用） --- */
+function makeGlowTexture(){
+  const c = makeCanvas(128, 128);
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grd.addColorStop(0,    'rgba(255,255,255,1)');
+  grd.addColorStop(0.22, 'rgba(170,235,255,.72)');
+  grd.addColorStop(0.55, 'rgba(80,175,255,.20)');
+  grd.addColorStop(1,    'rgba(0,0,0,0)');
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 128, 128);
+  const t = new THREE.CanvasTexture(c);
+  if (THREE.sRGBEncoding !== undefined) t.encoding = THREE.sRGBEncoding;
+  return t;
+}
+
+/* --- 【新增】楼梯指示牌 --- */
+function makeStairTex(text, colorHex){
+  const W = 512, H = 256;
+  const c = makeCanvas(W, H);
+  const g = c.getContext('2d');
+  g.clearRect(0, 0, W, H);
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.font = 'bold 130px "PingFang SC","Microsoft YaHei",sans-serif';
+
+  g.shadowColor = colorHex;
+  g.shadowBlur  = 44;
+  g.fillStyle   = colorHex;
+  g.fillText(text, W/2, H/2);
+  g.fillText(text, W/2, H/2);
+
+  g.shadowColor = '#ffffff';
+  g.shadowBlur  = 12;
+  g.fillStyle   = '#ffffff';
+  g.fillText(text, W/2, H/2);
+
+  const t = new THREE.CanvasTexture(c);
+  if (THREE.sRGBEncoding !== undefined) t.encoding = THREE.sRGBEncoding;
+  t.anisotropy = 8;
+  return t;
+}
+
 /* =========================================================
    3. 灯光
    ========================================================= */
@@ -356,21 +604,17 @@ scene.add(moon);
 /* --- 手电筒 --- */
 const torch = new THREE.SpotLight(0xfff2d6, 5.2, 30, Math.PI / 8, 0.42, 1.5);
 torch.position.set(0.22, -0.18, 0);
-torch.castShadow = true;
-torch.shadow.mapSize.set(1024, 1024);
-torch.shadow.camera.near = 0.4;
-torch.shadow.camera.far  = 30;
-torch.shadow.bias        = -0.0016;
+/* 【性能修复】关闭聚光灯阴影 */
+torch.castShadow = false;
 torch.target.position.set(0, 0, -1);
 camera.add(torch);
 camera.add(torch.target);
 
-/* --- 手电近身补光（避免脚下全黑） --- */
 const torchFill = new THREE.PointLight(0xffe9c4, 1.15, 5.5, 1.7);
 torchFill.position.set(0.1, -0.1, -0.3);
 camera.add(torchFill);
 
-/* --- 体积光锥（视觉氛围） --- */
+/* --- 体积光锥 --- */
 (function(){
   const coneGeo = new THREE.ConeGeometry(2.6, 11, 24, 1, true);
   const coneMat = new THREE.MeshBasicMaterial({
@@ -396,6 +640,7 @@ const wallTex  = makeWallTexture();
 const signTex  = makeSignTexture('银杏楼二栋');
 const exitTex  = makeExitTexture();
 const plateTex = makeDoorPlateTexture();
+const glowTex  = makeGlowTexture();
 
 const MAT = {
   floor : new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.9,  metalness: 0.06 }),
@@ -413,11 +658,7 @@ const MAT = {
     emissive: 0x3d3210, emissiveIntensity: 0.85
   }),
   roof  : new THREE.MeshStandardMaterial({ color: 0x14171c, roughness: 1.0 }),
-  metal : new THREE.MeshStandardMaterial({ color: 0x40464f, roughness: 0.55, metalness: 0.65 }),
-  panel : new THREE.MeshStandardMaterial({
-    color: 0xd8e4f0, emissive: 0x9fb6cc, emissiveIntensity: 0.55,
-    roughness: 0.6, side: THREE.DoubleSide
-  })
+  metal : new THREE.MeshStandardMaterial({ color: 0x40464f, roughness: 0.55, metalness: 0.65 })
 };
 
 const building = new THREE.Group();
@@ -427,35 +668,27 @@ scene.add(building);
 for (let f = 0; f < FLOORS; f++){
   const y0 = f * FLOOR_H;
 
-  /* 走廊地板 */
   const floor = new THREE.Mesh(
     new THREE.BoxGeometry(BW, 0.2, BZS - BZO),
     MAT.floor
   );
   floor.position.set(0, y0 - 0.1, (BZO + BZS) / 2);
-  floor.receiveShadow = true;
   building.add(floor);
 
-  /* 走廊天花板 */
   const ceil = new THREE.Mesh(
     new THREE.BoxGeometry(BW, 0.2, BZS - BZO),
     MAT.ceil
   );
   ceil.position.set(0, y0 + FLOOR_H - 0.1, (BZO + BZS) / 2);
-  ceil.receiveShadow = true;
   building.add(ceil);
 
-  /* 教室体块（不可进入） */
   const cls = new THREE.Mesh(
     new THREE.BoxGeometry(BW, FLOOR_H, BZB - BZS),
     MAT.class
   );
   cls.position.set(0, y0 + FLOOR_H / 2, (BZS + BZB) / 2);
-  cls.castShadow = true;
-  cls.receiveShadow = true;
   building.add(cls);
 
-  /* 教室门 + 门牌 */
   const doorCount = 7;
   for (let i = 0; i < doorCount; i++){
     const dx = -24 + i * 8;
@@ -476,23 +709,19 @@ for (let f = 0; f < FLOORS; f++){
 
     const plate = new THREE.Mesh(
       new THREE.PlaneGeometry(0.62, 0.31),
-      new THREE.MeshBasicMaterial({ map: plateTex, transparent: false })
+      new THREE.MeshBasicMaterial({ map: plateTex })
     );
     plate.position.set(dx + 0.62, y0 + 2.45, BZS - 0.18);
     building.add(plate);
   }
 
-  /* 走廊外侧墙（z = BZO） */
   const outWall = new THREE.Mesh(
     new THREE.BoxGeometry(BW, FLOOR_H, 0.3),
     MAT.wall
   );
   outWall.position.set(0, y0 + FLOOR_H / 2, BZO - 0.15);
-  outWall.castShadow = true;
-  outWall.receiveShadow = true;
   building.add(outWall);
 
-  /* 窗户（外侧） */
   for (let i = 0; i < 11; i++){
     const wx = -25 + i * 5;
     const lit = Math.random() < 0.18;
@@ -504,7 +733,6 @@ for (let f = 0; f < FLOORS; f++){
     win.rotation.y = Math.PI;
     building.add(win);
 
-    /* 窗框 */
     const frameH = new THREE.Mesh(
       new THREE.BoxGeometry(2.9, 0.12, 0.1),
       MAT.metal
@@ -528,7 +756,6 @@ for (let f = 0; f < FLOORS; f++){
     building.add(frameV2);
   }
 
-  /* 走廊天花板灯管（自发光装饰） */
   for (let i = 0; i < 5; i++){
     const lx = -22 + i * 11;
     const tube = new THREE.Mesh(
@@ -543,7 +770,6 @@ for (let f = 0; f < FLOORS; f++){
     building.add(tube);
   }
 
-  /* 走廊立柱（分隔教室外墙视觉） */
   for (let i = 0; i <= 7; i++){
     const px = -28 + i * 8;
     const pillar = new THREE.Mesh(
@@ -551,8 +777,6 @@ for (let f = 0; f < FLOORS; f++){
       MAT.wall
     );
     pillar.position.set(px, y0 + FLOOR_H / 2, BZS - 0.2);
-    pillar.castShadow = true;
-    pillar.receiveShadow = true;
     building.add(pillar);
   }
 }
@@ -564,10 +788,52 @@ for (let f = 0; f < FLOORS; f++){
     MAT.wall
   );
   side.position.set(x + (x < 0 ? -0.2 : 0.2), FLOOR_H * FLOORS / 2, (BZO + BZB) / 2);
-  side.castShadow = true;
-  side.receiveShadow = true;
   building.add(side);
 });
+
+/* ---------- 【新增】4.2b 楼梯指示牌 ---------- */
+(function(){
+  const upTex = makeStairTex('↑ 上楼', '#5fe8ff');
+  const dnTex = makeStairTex('↓ 下楼', '#ffd166');
+
+  for (let f = 0; f < FLOORS; f++){
+    const y0 = f * FLOOR_H;
+
+    /* 右端：向上 */
+    if (f < FLOORS - 1){
+      const sUp = new THREE.Mesh(
+        new THREE.PlaneGeometry(3.4, 1.7),
+        new THREE.MeshBasicMaterial({
+          map: upTex,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          fog: false
+        })
+      );
+      sUp.position.set(27.85, y0 + 2.25, -7);
+      sUp.rotation.y = -Math.PI / 2;
+      building.add(sUp);
+    }
+
+    /* 左端：向下 */
+    if (f > 0){
+      const sDn = new THREE.Mesh(
+        new THREE.PlaneGeometry(3.4, 1.7),
+        new THREE.MeshBasicMaterial({
+          map: dnTex,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          fog: false
+        })
+      );
+      sDn.position.set(-27.85, y0 + 2.25, -7);
+      sDn.rotation.y = Math.PI / 2;
+      building.add(sDn);
+    }
+  }
+})();
 
 /* ---------- 4.3 楼顶 ---------- */
 const roof = new THREE.Mesh(
@@ -575,11 +841,8 @@ const roof = new THREE.Mesh(
   MAT.roof
 );
 roof.position.set(0, FLOOR_H * FLOORS + 0.25, (BZO + BZB) / 2);
-roof.castShadow = true;
-roof.receiveShadow = true;
 building.add(roof);
 
-/* 女儿墙 */
 (function(){
   const h = 1.1;
   const y = FLOOR_H * FLOORS + 0.5 + h / 2;
@@ -617,7 +880,6 @@ building.add(roof);
   sign.rotation.y = Math.PI;
   building.add(sign);
 
-  /* 招牌背板 */
   const back = new THREE.Mesh(
     new THREE.BoxGeometry(signW + 1, signH + 0.8, 0.25),
     new THREE.MeshStandardMaterial({ color: 0x0a0c10, roughness: 1 })
@@ -625,7 +887,6 @@ building.add(roof);
   back.position.set(0, FLOOR_H * FLOORS + 3.6, BZO - 0.85);
   building.add(back);
 
-  /* 支架 */
   for (let i = -1; i <= 1; i++){
     const bar = new THREE.Mesh(
       new THREE.BoxGeometry(0.16, 2.4, 0.16),
@@ -635,7 +896,6 @@ building.add(roof);
     building.add(bar);
   }
 
-  /* 招牌暖光 */
   const signLight = new THREE.PointLight(0xffb347, 1.6, 26, 1.6);
   signLight.position.set(0, FLOOR_H * FLOORS + 3.2, BZO - 3.2);
   building.add(signLight);
@@ -643,7 +903,6 @@ building.add(roof);
 
 /* ---------- 4.5 一楼大门 + 门廊 ---------- */
 (function(){
-  /* 大门开口（用深色凹陷表示） */
   const doorway = new THREE.Mesh(
     new THREE.BoxGeometry(6.4, 3.9, 0.5),
     new THREE.MeshStandardMaterial({ color: 0x05070a, roughness: 1 })
@@ -651,7 +910,6 @@ building.add(roof);
   doorway.position.set(0, 1.95, BZO - 0.18);
   building.add(doorway);
 
-  /* 玻璃门 */
   const glassDoor = new THREE.Mesh(
     new THREE.PlaneGeometry(5.6, 3.4),
     new THREE.MeshStandardMaterial({
@@ -664,7 +922,6 @@ building.add(roof);
   glassDoor.rotation.y = Math.PI;
   building.add(glassDoor);
 
-  /* 门框 */
   const doorFrameMat = MAT.metal;
   const df1 = new THREE.Mesh(new THREE.BoxGeometry(6.8, 0.3, 0.4), doorFrameMat);
   df1.position.set(0, 3.9, BZO - 0.3);
@@ -678,12 +935,10 @@ building.add(roof);
   df3.position.x = 3.4;
   building.add(df3);
 
-  /* 中缝 */
   const dfMid = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.4, 0.2), doorFrameMat);
   dfMid.position.set(0, 1.85, BZO - 0.44);
   building.add(dfMid);
 
-  /* 安全出口标识 */
   const exitSign = new THREE.Mesh(
     new THREE.PlaneGeometry(1.6, 0.8),
     new THREE.MeshBasicMaterial({ map: exitTex, fog: false })
@@ -692,28 +947,24 @@ building.add(roof);
   exitSign.rotation.y = Math.PI;
   building.add(exitSign);
 
-  /* 门廊地面 */
   const porch = new THREE.Mesh(
     new THREE.BoxGeometry(14, 0.3, 7),
     MAT.floor
   );
   porch.position.set(0, -0.15, BZO - 3.5);
-  porch.receiveShadow = true;
   building.add(porch);
 
-  /* 门廊台阶 */
   for (let i = 0; i < 3; i++){
     const step = new THREE.Mesh(
       new THREE.BoxGeometry(14, 0.18, 1.0),
       new THREE.MeshStandardMaterial({ color: 0x1e2229, roughness: 1 })
     );
     step.position.set(0, -0.09 - i * 0.18, BZO - 7.0 - i * 1.0);
-    step.receiveShadow = true;
     building.add(step);
   }
 })();
 
-/* ---------- 4.6 楼体外部周围地面 ---------- */
+/* ---------- 4.6 地面 ---------- */
 (function(){
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(200, 200),
@@ -721,11 +972,10 @@ building.add(roof);
   );
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.55;
-  ground.receiveShadow = true;
   scene.add(ground);
 })();
 
-/* ---------- 4.7 走廊微弱应急灯（点光源） ---------- */
+/* ---------- 4.7 走廊应急灯 ---------- */
 (function(){
   const l1 = new THREE.PointLight(0x2a5a8a, 0.85, 16, 1.8);
   l1.position.set(-16, 15.4, -7);
@@ -741,7 +991,7 @@ building.add(roof);
 })();
 
 /* =========================================================
-   5. 可行走区域（4 层走廊）
+   5. 可行走区域
    ========================================================= */
 const AREAS = [];
 for (let f = 0; f < FLOORS; f++){
@@ -755,6 +1005,36 @@ for (let f = 0; f < FLOORS; f++){
 }
 /* 一楼门廊 */
 AREAS.push({ x1: -6.5, x2: 6.5, z1: BZO - 7.2, z2: BZO + 0.5, y: 0 });
+
+/* =========================================================
+   5.1 【新增】楼梯触发区
+   ---------------------------------------------------------
+   右端 x∈[26.2,27.5] 向上；左端 x∈[-27.5,-26.2] 向下。
+   exitX 用于把玩家推离触发区，避免连续触发。
+   ========================================================= */
+const STAIRS = [];
+for (let f = 0; f < FLOORS; f++){
+  if (f < FLOORS - 1){
+    STAIRS.push({
+      x1: 26.2, x2: 27.5,
+      z1: -9.5, z2: -4.5,
+      y : f * FLOOR_H,
+      to: (f + 1) * FLOOR_H,
+      exitX: 24.6
+    });
+  }
+  if (f > 0){
+    STAIRS.push({
+      x1: -27.5, x2: -26.2,
+      z1: -9.5, z2: -4.5,
+      y : f * FLOOR_H,
+      to: (f - 1) * FLOOR_H,
+      exitX: -24.6
+    });
+  }
+}
+
+let stairCooldown = 0;
 
 /* =========================================================
    6. 玩家状态
@@ -771,25 +1051,721 @@ const player = {
 const joy = { x: 0, y: 0, active: false };
 
 /* =========================================================
-   7. 输入系统
+   7. 题库数据（45 题）
+   ========================================================= */
+const QUESTION_BANK = [
+/* ============ 课代表 A · 第1课 ============ */
+{
+  name: "课代表A · 第1课 开启初中生活",
+  questions: [
+    { q:"中学生活是一段新的人生旅程，而我们对新生活充满了期待。下列属于对新生活期待的有（　）",
+      o:["①各种问题和困难 ②更多的发展机会 ③丰富多样的课程",
+         "①各种问题和困难 ②更多的发展机会 ④各种各样的社会实践",
+         "①各种问题和困难 ③丰富多样的课程 ④各种各样的社会实践",
+         "②更多的发展机会 ③丰富多样的课程 ④各种各样的社会实践"],
+      a:3 },
+
+    { q:"初中阶段，是人生美好的年华，也是规划未来之路的重要时期。因为初中阶段（　）",
+      o:["①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值",
+         "①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ④对我们一生的发展起着决定作用",
+         "①为我们的发展提供了新的机会 ③对我们的人生具有独特的价值 ④对我们一生的发展起着决定作用",
+         "②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值 ④对我们一生的发展起着决定作用"],
+      a:0 },
+
+    { q:"袁隆平回忆中学时光时说：“博学中学是我最感亲切的母校，她给予我的培养和教育，对我的成长起了决定性的作用。”这蕴含的道理是（　）",
+      o:["初中生活重新塑造一个完美的“自我”",
+         "初中阶段为我们的成长打下坚实基础",
+         "初中生活能彻底改变我们的人生目标",
+         "只要努力学习，就一定能成为科学家"],
+      a:1 },
+
+    { q:"“千里之行，始于足下。”面对各种可能与挑战，我们要（　）",
+      o:["把握机遇，不懈努力",
+         "珍视当下，放弃学业",
+         "顺其自然，得过且过",
+         "不择手段，发展自我"],
+      a:0 },
+
+    { q:"习近平总书记强调，广大青年要争做有理想、敢担当、能吃苦、肯奋斗的新时代好青年。这要求刚升入初中的我们（　）",
+      o:["志存高远求知识，脚踏实地勇前行",
+         "贪图安逸享生活，逃避责任怕困难",
+         "盲目跟风随大流，不思进取混日子",
+         "自私自利顾自己，不顾集体与国家"],
+      a:0 },
+
+    { q:"在中学时代，我们应该（　）",
+      o:["①努力学习，勤于思考，拒绝参加任何活动 ②珍惜时光，挖掘潜能，随意发展自己个性",
+         "①努力学习，勤于思考，拒绝参加任何活动 ④珍视当下，把握机遇，做敢担当的中学生",
+         "②珍惜时光，挖掘潜能，随意发展自己个性 ③明确目标，挑战自我，做有理想的中学生",
+         "③明确目标，挑战自我，做有理想的中学生 ④珍视当下，把握机遇，做敢担当的中学生"],
+      a:3 },
+
+    { q:"小亮的爷爷回忆初中生活时说：“中学时代，一群同龄人一起学习，一起成长……总是让我难以忘怀!”爷爷难忘的可能是（　）",
+      o:["①不断超越自我的成就感 ②学习知识时的不懈坚持 ③努力追梦与圆梦的经历",
+         "①不断超越自我的成就感 ②学习知识时的不懈坚持 ④展现自身才华的愉悦感",
+         "①不断超越自我的成就感 ③努力追梦与圆梦的经历 ④展现自身才华的愉悦感",
+         "②学习知识时的不懈坚持 ③努力追梦与圆梦的经历 ④展现自身才华的愉悦感"],
+      a:2 },
+
+    { q:"进入初中意味着我们的人生将进入一个新的阶段，为抓住机遇、迎接挑战，我们应（　）",
+      o:["合理规划，设定合理的发展目标",
+         "勇于担当，梦想自会实现",
+         "享受生活，迎接时代变革与挑战",
+         "随遇而安，听从命运的安排"],
+      a:0 },
+
+    /* 【修复】原第 9 题选项结构不统一（“①②都值得借鉴”写法），
+       已改为与全卷一致的 ①②③④ 组合式选项。 */
+    { q:"凡事预则立，不预则废。如何做好初中生活规划，以下值得借鉴的是（　）",
+      o:["①结合自己的兴趣爱好、性格特点来设定目标 ②考虑自己的实际能力和社会发展需要 ③完全听从父母的安排，不需要自己思考",
+         "①结合自己的兴趣爱好、性格特点来设定目标 ②考虑自己的实际能力和社会发展需要 ④目标定得越高越好，不用考虑实际",
+         "①结合自己的兴趣爱好、性格特点来设定目标 ③完全听从父母的安排，不需要自己思考 ④目标定得越高越好，不用考虑实际",
+         "②考虑自己的实际能力和社会发展需要 ③完全听从父母的安排，不需要自己思考 ④目标定得越高越好，不用考虑实际"],
+      a:0 },
+
+    { q:"进入初中后，富有挑战的课程和学习任务、丰富多彩的社团活动等，为我们的发展提供了新的机会。“新的机会”是指（　）",
+      o:["①提供了更多培养兴趣的平台 ②打开了认识社会的大门 ③对一生的发展起决定性作用",
+         "①提供了更多培养兴趣的平台 ②打开了认识社会的大门 ④带领我们探索新的知识领域",
+         "①提供了更多培养兴趣的平台 ③对一生的发展起决定性作用 ④带领我们探索新的知识领域",
+         "②打开了认识社会的大门 ③对一生的发展起决定性作用 ④带领我们探索新的知识领域"],
+      a:1 },
+
+    { q:"下列属于初中阶段可以培养的兴趣的是（　）",
+      o:["①阅读课外书 ②利用休息时间彻夜玩网络游戏 ③学习剪纸，弘扬中华优秀传统文化",
+         "①阅读课外书 ②利用休息时间彻夜玩网络游戏 ④学习中国武术，增强体质",
+         "①阅读课外书 ③学习剪纸，弘扬中华优秀传统文化 ④学习中国武术，增强体质",
+         "②利用休息时间彻夜玩网络游戏 ③学习剪纸，弘扬中华优秀传统文化 ④学习中国武术，增强体质"],
+      a:2 },
+
+    { q:"“人生的扣子从一开始就要扣好。”这句话对刚迈入初中生活的我们的启示是（　）",
+      o:["初中生的价值观初步形成，需要精心引导",
+         "要仪表端庄，树立良好的初中生形象",
+         "要珍惜新起点，把准人生方向",
+         "务必做到十全十美"],
+      a:2 },
+
+    { q:"初中阶段对我们的成长提出了新的要求，激励我们变得（　）",
+      o:["①越来越坚强，有韧劲 ②越来越上进，敢表达 ③越来越有活力，能包容",
+         "①越来越坚强，有韧劲 ②越来越上进，敢表达 ④越来越孤单，能独立",
+         "①越来越坚强，有韧劲 ③越来越有活力，能包容 ④越来越孤单，能独立",
+         "②越来越上进，敢表达 ③越来越有活力，能包容 ④越来越孤单，能独立"],
+      a:0 },
+
+    { q:"某校七年级(1)班召开“奏响中学序曲”主题班会，其中正确的是（　）",
+      o:["中学时代是人生一段新的旅程，但和小学生活没有什么不同",
+         "面对中学生活的各种可能与挑战，我们要珍惜当下，把握机遇",
+         "中学时代是人生最美好的年华，我们要尽情享受",
+         "中学时代见证着一个人一生的追求，我们要随遇而安"],
+      a:1 },
+
+    { q:"金秋九月，我们带着好奇和梦想，步入了初中阶段。初中阶段（　）",
+      o:["①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值",
+         "①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ④是我们世界观、人生观、价值观形成的最终时期",
+         "①为我们的发展提供了新的机会 ③对我们的人生具有独特的价值 ④是我们世界观、人生观、价值观形成的最终时期",
+         "②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值 ④是我们世界观、人生观、价值观形成的最终时期"],
+      a:0 }
+  ]
+},
+
+/* ============ 课代表 B · 第2课 ============ */
+{
+  name: "课代表B · 第2课 正确认识自我",
+  questions: [
+    { q:"幼时因意外永失右臂的徐楚贻，几乎做到完全自理，还主动帮助同学、参加公益。她的人生经历激励我们要（　）",
+      o:["①学会接纳自己，做更好的自己 ②勇担责任，厚植家国情怀 ③呵护友谊，让友谊之树常青",
+         "①学会接纳自己，做更好的自己 ②勇担责任，厚植家国情怀 ④埋头劳动，积极面对学习",
+         "①学会接纳自己，做更好的自己 ③呵护友谊，让友谊之树常青 ④埋头劳动，积极面对学习",
+         "②勇担责任，厚植家国情怀 ③呵护友谊，让友谊之树常青 ④埋头劳动，积极面对学习"],
+      a:0 },
+
+    { q:"“尺有所短，寸有所长；物有所不足，智有所不明。”这句名言启示我们做更好的自己要（　）",
+      o:["改正缺点，不断进步",
+         "正视自己，扬长避短",
+         "激发潜能，实现跨越",
+         "学会知足，得过且过"],
+      a:1 },
+
+    { q:"升入初中，小浩决心做更好的自己。下列做法正确的是（　）",
+      o:["①积极参加社团活动，培养兴趣爱好 ②积极与同学交往，互帮互助 ③努力改掉做题马虎的毛病，并请同学监督",
+         "①积极参加社团活动，培养兴趣爱好 ②积极与同学交往，互帮互助 ④努力学习优势学科，放弃不擅长的学科",
+         "①积极参加社团活动，培养兴趣爱好 ③努力改掉做题马虎的毛病，并请同学监督 ④努力学习优势学科，放弃不擅长的学科",
+         "②积极与同学交往，互帮互助 ③努力改掉做题马虎的毛病，并请同学监督 ④努力学习优势学科，放弃不擅长的学科"],
+      a:0 },
+
+    { q:"张雨霏说：“没有人可以一直站在第一的位置上，我们要接受自己是一个不完美的人。”这启示我们（　）",
+      o:["要学会接纳自己的全部",
+         "要善于发现自己的不足",
+         "要重视他人的态度和评价",
+         "要不断激发自己的潜能"],
+      a:0 },
+
+    { q:"谢震业说：“要突破的，从来都是过去的自己。”他的经历启示我们（　）",
+      o:["不要全面接受别人的评价",
+         "不断激发潜能，成就更好的自己",
+         "真诚面对自我，知耻而后勇",
+         "培养兴趣爱好，注重合作"],
+      a:1 },
+
+    { q:"通过他人能更好地认识自己。下列名言和谚语揭示的道理能印证这一观点的是（　）",
+      o:["①知人者智，自知者明 ②赠人玫瑰，手留余香",
+         "①知人者智，自知者明 ③当局者迷，旁观者清",
+         "②赠人玫瑰，手留余香 ④牛不知角弯，马不知脸长",
+         "③当局者迷，旁观者清 ④牛不知角弯，马不知脸长"],
+      a:3 },
+
+    { q:"“认识自己，方能认识更多的朋友。”“若是看透了自己，便不会再小看别人。”以下理解最合理的是（　）",
+      o:["正确认识自己能准确把握自己的禀赋",
+         "朋友越多，认识自我的途径就越多",
+         "正确认识自己可以促进与他人的交往",
+         "认识自己的最终目的是改造外部世界"],
+      a:2 },
+
+    { q:"正确认识自己对我们的成长有着重要作用。下列认识可以归为一类的是（　）",
+      o:["①我认为自己性格比较急躁 ②老师说我的学习很用功 ③妈妈说我很体贴和善良",
+         "②老师说我的学习很用功 ③妈妈说我很体贴和善良 ④班里有同学认为我性格内向",
+         "①我认为自己性格比较急躁 ③妈妈说我很体贴和善良 ④班里有同学认为我性格内向",
+         "①我认为自己性格比较急躁 ②老师说我的学习很用功 ④班里有同学认为我性格内向"],
+      a:1 },
+
+    { q:"吴明在校演讲比赛初赛就被淘汰了，他静下心反思自己为什么没被选上，有哪些地方需要改进。吴明认识自己的途径是（　）",
+      o:["通过自我评价认识自己",
+         "通过他人评价认识自己",
+         "通过集体活动认识自己",
+         "通过社会比较认识自己"],
+      a:0 },
+
+    { q:"下列属于正确认识自己的是（　）",
+      o:["我长得不好看，所以什么都做不好",
+         "我数学成绩好，但体育是短板，需要多锻炼",
+         "我什么都比不过别人，太没用了",
+         "我天下第一，谁都不如我"],
+      a:1 },
+
+    { q:"做更好的自己，需要（　）",
+      o:["①扬长避短 ②主动改正缺点 ③不断激发自己的潜能",
+         "①扬长避短 ②主动改正缺点 ④完全模仿他人",
+         "①扬长避短 ③不断激发自己的潜能 ④完全模仿他人",
+         "②主动改正缺点 ③不断激发自己的潜能 ④完全模仿他人"],
+      a:0 },
+
+    { q:"小明觉得自己性格内向，但他发现自己在绘画方面很有天赋，于是专心练习，最终在市级比赛中获奖。这启示我们（　）",
+      o:["内向的人更适合画画",
+         "要善于发现自己的优势，做更好的自己",
+         "只要画画就能获奖",
+         "不要在意自己的缺点"],
+      a:1 },
+
+    { q:"对“金无足赤，人无完人”理解正确的是（　）",
+      o:["每个人都有缺点，不必在意",
+         "我们要接纳自己的不完美，并努力改进",
+         "完美的人不存在，所以可以放纵自己",
+         "只有完美的人才值得被尊重"],
+      a:1 },
+
+    { q:"小丽经常通过写日记来反思自己的行为和想法，这种认识自己的方法是（　）",
+      o:["通过他人评价认识自己",
+         "通过自我评价认识自己",
+         "通过集体认识自己",
+         "通过比较认识自己"],
+      a:1 },
+
+    { q:"面对他人的评价，我们应该（　）",
+      o:["完全接受",
+         "完全拒绝",
+         "冷静分析，既不盲从也不忽视",
+         "只接受表扬，拒绝批评"],
+      a:2 }
+  ]
+},
+
+/* ============ 课代表 C · 第3课 ============ */
+{
+  name: "课代表C · 第3课 梦想始于当下",
+  questions: [
+    { q:"郑钦文说：“远大的梦想，唯有坚持才能抵达。”这表明（　）",
+      o:["树立远大梦想比实践更重要",
+         "有了梦想就一定能成功",
+         "梦想能激发我们的热情和勇气",
+         "只要努力就一定能实现梦想"],
+      a:2 },
+
+    { q:"关于“梦想如果不能实现，还有意义吗？”正确的回答是（　）",
+      o:["有意义，梦想让我们的生活更加充实、更有色彩",
+         "无意义，梦想能不断激发我们对生命的热情和勇气",
+         "有意义，梦想对我们至关重要，有梦想就能前进",
+         "无意义，但是只要我们努力，就能实现梦想"],
+      a:0 },
+
+    { q:"王永志少年立志，一生追梦，将祖国的需要作为自己的前进方向。这启示我们（　）",
+      o:["①做有梦想的少年，应树立远大志向 ②做有梦想的少年，应紧扣时代脉搏",
+         "①做有梦想的少年，应树立远大志向 ③越早立志立大志，越容易实现梦想",
+         "②做有梦想的少年，应紧扣时代脉搏 ④立大志的人必然能取得更大的成就",
+         "③越早立志立大志，越容易实现梦想 ④立大志的人必然能取得更大的成就"],
+      a:0 },
+
+    { q:"袁隆平童年时常见到饿殍，十分痛心，因此“让大家吃饱饭”成为他一生的志向。这启示我们（　）",
+      o:["①志向是人生的航标 ②梦想确定要标新立异",
+         "①志向是人生的航标 ③梦想要紧扣时代脉搏",
+         "②梦想确定要标新立异 ④立大志就能报效祖国",
+         "③梦想要紧扣时代脉搏 ④立大志就能报效祖国"],
+      a:1 },
+
+    { q:"“梦想，不会轻轻松松变成收获被捏在你的手中，但执着的赶路人分明能真真切切聆听到它遥远的呼唤。”梦想的力量在于（　）",
+      o:["激发生命热情",
+         "提升道德品质",
+         "紧扣时代脉搏",
+         "憧憬美好未来"],
+      a:0 },
+
+    { q:"对下图中焦虑的男孩，劝说合理的是（　）",
+      o:["个人的梦想是无足轻重的",
+         "只要有梦想，就一定能成功",
+         "梦想即使实现不了，也能让生活更有色彩",
+         "有梦想，就有希望，将梦想视为一种臆想"],
+      a:2 },
+
+    { q:"“学习稍有懈怠，我们就会落伍；每个人的世界就像一个圆，学习是半径，半径越大，我们拥有的世界就越广阔。”这表明（　）",
+      o:["①学习是立身做人的永恒主题 ③学习使我们面前的世界更广阔",
+         "②学习是成就梦想的唯一路径 ③学习使我们面前的世界更广阔",
+         "①学习是立身做人的永恒主题 ④实现中国梦离不开我们的学习",
+         "②学习是成就梦想的唯一路径 ④实现中国梦离不开我们的学习"],
+      a:0 },
+
+    { q:"“学习并不局限在学校，我们生活中的所看、所听、所尝、所触、所做都可以是学习。”这说明（　）",
+      o:["学习既有知识的获取，又有能力的提升",
+         "课堂学习与社会实践都有教育意义",
+         "学习并不局限在学校，生活处处是学习",
+         "实践活动仅仅是为了放松身心"],
+      a:2 },
+
+    { q:"三位同学在学习省级行政区简称时采用了不同的方法，这说明（　）",
+      o:["良好的学习习惯很重要",
+         "学习方法因人而异，要掌握科学的学习方法",
+         "要参加社会实践活动",
+         "要保持学习兴趣"],
+      a:1 },
+
+    { q:"“行走的思政课”让学生感受大自然风光、绿色发展及科技发展的魅力，这有利于（　）",
+      o:["培养学生亲社会行为，增强综合素养",
+         "提升创新能力，投身祖国建设",
+         "参与志愿服务",
+         "放松身心，不用学习"],
+      a:0 },
+
+    { q:"某班班级日志记录了多种学习活动，这说明（　）",
+      o:["学习场所和形式可以多样化",
+         "科学的学习方法很重要",
+         "书本内容的学习也可以有趣快乐",
+         "课内活动和课外活动都有利于学生获取知识"],
+      a:0 },
+
+    { q:"某校保安通过自学不断提升自身技能，实现了“人生逆袭”，说明（　）",
+      o:["学习让我们拥有实现梦想的持续力量",
+         "学习不仅表现为接受和掌握",
+         "书本知识和社会实践都有用",
+         "学习关乎着民族的未来和发展"],
+      a:0 },
+
+    { q:"小铭学习上的变化体现的道理是（　）",
+      o:["要养成良好的学习习惯",
+         "要善于思考，虚心请教",
+         "要掌握科学的学习方法",
+         "要参加社会实践活动"],
+      a:1 },
+
+    { q:"关于学习，下列说法正确的是（　）",
+      o:["①学习不仅局限在学校 ②学习表现为接受和掌握，也表现为探究、发现、感悟 ④参观游览不是学习",
+         "①学习不仅局限在学校 ②学习表现为接受和掌握，也表现为探究、发现、感悟 ③学习能给我们带来美妙感受",
+         "①学习不仅局限在学校 ③学习能给我们带来美妙感受 ④参观游览不是学习",
+         "②学习表现为接受和掌握，也表现为探究、发现、感悟 ③学习能给我们带来美妙感受 ④参观游览不是学习"],
+      a:1 },
+
+    { q:"下列对学习的认识正确的是（　）",
+      o:["学习只是在学校里听课、写作业",
+         "学习是成就梦想的唯一路径",
+         "生活中的所看、所听、所做都可以是学习",
+         "学习只是为了考试取得好成绩"],
+      a:2 }
+  ]
+}
+];
+
+/* =========================================================
+   8. 课代表（临时占位点 —— 第三步将替换为出生点）
+   ========================================================= */
+const REP_DEFS = [
+  { key:0, name:"课代表A", pos:new THREE.Vector3(-20, 3 * FLOOR_H, -7) },
+  { key:1, name:"课代表B", pos:new THREE.Vector3(  8, 3 * FLOOR_H, -7) },
+  { key:2, name:"课代表C", pos:new THREE.Vector3( 20, 3 * FLOOR_H, -7) }
+];
+
+const REP_COLOR = [0x5fe8ff, 0xa78bff, 0x66ffb0];
+
+const REPS = [];
+
+REP_DEFS.forEach(function(def, idx){
+  const group = new THREE.Group();
+  group.position.copy(def.pos);
+  scene.add(group);
+
+  const color = REP_COLOR[idx % REP_COLOR.length];
+
+  // 主体八面体
+  const core = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.42, 0),
+    new THREE.MeshStandardMaterial({
+      color: color,
+      emissive: color,
+      emissiveIntensity: 1.5,
+      roughness: 0.25,
+      metalness: 0.5,
+      flatShading: true
+    })
+  );
+  core.position.y = 1.05;
+  group.add(core);
+
+  // 外圈线框
+  const cage = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.66, 0),
+    new THREE.MeshBasicMaterial({
+      color: color,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.45,
+      fog: false
+    })
+  );
+  cage.position.y = 1.05;
+  group.add(cage);
+
+  // 光晕
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: glowTex,
+    color: color,
+    transparent: true,
+    opacity: 0.85,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: false
+  }));
+  glow.scale.set(3.4, 3.4, 1);
+  glow.position.y = 1.05;
+  group.add(glow);
+
+  // 点光源
+  const pl = new THREE.PointLight(color, 1.1, 8, 2);
+  pl.position.y = 1.05;
+  group.add(pl);
+
+  // 地面光圈
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(0.72, 0.94, 40),
+    new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.5,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      fog: false
+    })
+  );
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 0.03;
+  group.add(ring);
+
+  REPS.push({
+    def   : def,
+    group : group,
+    core  : core,
+    cage  : cage,
+    glow  : glow,
+    ring  : ring,
+    done  : false,
+    phase : Math.random() * Math.PI * 2
+  });
+});
+
+/* =========================================================
+   9. 答题系统
+   ========================================================= */
+const quizEl   = document.getElementById('quiz');
+const qProgEl  = document.getElementById('qProg');
+const qTitleEl = document.getElementById('qTitle');
+const qTextEl  = document.getElementById('qText');
+const optLEl   = document.getElementById('optL');
+const optREl   = document.getElementById('optR');
+const optLTxtEl= document.getElementById('optLTxt');
+const optRTxtEl= document.getElementById('optRTxt');
+const qCursorEl= document.getElementById('qCursor');
+const toastEl  = document.getElementById('toast');
+
+const QUIZ = {
+  active        : false,
+  locked        : false,
+  setIndex      : 0,
+  qIndex        : 0,
+  cursorSide    : 'left',
+  leftIsCorrect : true,
+  correctCount  : 0
+};
+
+/* ---------- 提示条 ---------- */
+let toastTimer = null;
+function showToast(msg, ms){
+  toastEl.textContent = msg;
+  toastEl.classList.add('on');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){
+    toastEl.classList.remove('on');
+  }, ms || 2200);
+}
+
+/* ---------- 光标定位 ---------- */
+function positionCursor(){
+  if (!QUIZ.active) return;
+
+  const card = (QUIZ.cursorSide === 'left') ? optLEl : optREl;
+  const cr = card.getBoundingClientRect();
+  const qr = quizEl.getBoundingClientRect();
+
+  const cw = qCursorEl.offsetWidth  || 26;
+  const ch = qCursorEl.offsetHeight || 32;
+
+  let left = cr.left - qr.left + 12;
+  let top  = cr.top  - qr.top + (cr.height - ch) / 2;
+
+  // 越界保护
+  if (left < 4) left = 4;
+  if (top < 0) top = 0;
+
+  qCursorEl.style.left = left + 'px';
+  qCursorEl.style.top  = top  + 'px';
+}
+
+function setCursorSide(side){
+  if (QUIZ.cursorSide === side) return;
+  QUIZ.cursorSide = side;
+  positionCursor();
+}
+
+/* ---------- 渲染题目 ---------- */
+function renderQuestion(){
+  const set = QUESTION_BANK[QUIZ.setIndex];
+  const q   = set.questions[QUIZ.qIndex];
+
+  qProgEl.textContent  = '第 ' + (QUIZ.qIndex + 1) + ' / ' + set.questions.length + ' 题';
+  qTitleEl.textContent = set.name;
+  qTextEl.textContent  = q.q;
+  qTextEl.scrollTop    = 0;
+
+  /* 抽取正确项 + 一个干扰项 */
+  const correctText = q.o[q.a];
+
+  /* 【修复】干扰项按文本去重，避免左右显示相同内容 */
+  let wrongIdx = -1;
+  let guard = 0;
+  while (guard++ < 80){
+    const wi = Math.floor(Math.random() * q.o.length);
+    if (wi !== q.a && q.o[wi] && q.o[wi] !== correctText){
+      wrongIdx = wi;
+      break;
+    }
+  }
+  const wrongText = (wrongIdx >= 0) ? q.o[wrongIdx] : '——';
+
+  /* 随机左右 */
+  const correctOnLeft = Math.random() < 0.5;
+  QUIZ.leftIsCorrect  = correctOnLeft;
+
+  optLTxtEl.textContent = correctOnLeft ? correctText : wrongText;
+  optRTxtEl.textContent = correctOnLeft ? wrongText  : correctText;
+
+  optLEl.classList.remove('ok', 'bad');
+  optREl.classList.remove('ok', 'bad');
+
+  /* 光标随机初始位置 */
+  QUIZ.cursorSide = Math.random() < 0.5 ? 'left' : 'right';
+
+  requestAnimationFrame(function(){
+    requestAnimationFrame(positionCursor);
+  });
+}
+
+/* ---------- 开始答题 ---------- */
+function startQuiz(setIndex){
+  if (QUIZ.active) return;
+
+  QUIZ.active       = true;
+  QUIZ.locked       = false;
+  QUIZ.setIndex     = setIndex;
+  QUIZ.qIndex       = 0;
+  QUIZ.correctCount = 0;
+
+  // 清空输入
+  lookTouch = null;
+  moveTouch = null;
+  joy.x = 0; joy.y = 0; joy.active = false;
+  stickEl.style.opacity = '0';
+  knobEl.style.transform = 'translate(0px,0px)';
+
+  quizEl.classList.add('on');
+  renderQuestion();
+}
+
+/* ---------- 提交答案 ---------- */
+function submitAnswer(side){
+  if (!QUIZ.active || QUIZ.locked) return;
+  QUIZ.locked = true;
+
+  const isCorrect = (side === 'left') ? QUIZ.leftIsCorrect : !QUIZ.leftIsCorrect;
+  const card = (side === 'left') ? optLEl : optREl;
+  const other = (side === 'left') ? optREl : optLEl;
+
+  if (isCorrect){
+    card.classList.add('ok');
+    QUIZ.correctCount++;
+  } else {
+    card.classList.add('bad');
+    // 同时把正确的那一项也标绿，便于学习
+    other.classList.add('ok');
+  }
+
+  setTimeout(function(){
+    card.classList.remove('ok', 'bad');
+    other.classList.remove('ok', 'bad');
+    nextQuestion();
+  }, isCorrect ? 380 : 780);
+}
+
+/* ---------- 下一题 ---------- */
+function nextQuestion(){
+  QUIZ.qIndex++;
+
+  const set = QUESTION_BANK[QUIZ.setIndex];
+
+  if (QUIZ.qIndex >= set.questions.length){
+    finishQuiz();
+    return;
+  }
+
+  renderQuestion();
+  QUIZ.locked = false;
+}
+
+/* ---------- 结束本轮 ---------- */
+function finishQuiz(){
+  QUIZ.locked = true;
+
+  const set = QUESTION_BANK[QUIZ.setIndex];
+  const total = set.questions.length;
+  const right = QUIZ.correctCount;
+
+  const rep = REPS[QUIZ.setIndex];
+  if (rep){
+    rep.done = true;
+    rep.group.visible = false;
+  }
+
+  const remain = REPS.filter(function(r){ return !r.done; }).length;
+
+  setTimeout(function(){
+    QUIZ.active = false;
+    quizEl.classList.remove('on');
+
+    if (remain > 0){
+      showToast(set.name + ' 完成 · 答对 ' + right + '/' + total + ' · 剩余课代表 ' + remain, 2600);
+    } else {
+      showToast('三位课代表全部完成 · 前往一楼大门撤离', 3200);
+    }
+  }, 520);
+}
+
+/* =========================================================
+   10. 答题界面输入（滑动切换 + 点击确认）
+   ========================================================= */
+let qStartX = 0, qStartY = 0, qMoved = false, qDown = false;
+
+function quizTouchStart(e){
+  if (!QUIZ.active) return;
+  e.preventDefault();
+  const t = e.changedTouches[0];
+  qStartX = t.clientX;
+  qStartY = t.clientY;
+  qMoved  = false;
+  qDown   = true;
+}
+
+function quizTouchMove(e){
+  if (!QUIZ.active || !qDown) return;
+  e.preventDefault();
+
+  const t = e.changedTouches[0];
+  const dx = t.clientX - qStartX;
+  const dy = t.clientY - qStartY;
+
+  if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy)){
+    if (dx > 0){
+      setCursorSide('right');
+    } else {
+      setCursorSide('left');
+    }
+    // 允许连续切换
+    qStartX = t.clientX;
+    qStartY = t.clientY;
+    qMoved  = true;
+  }
+}
+
+function quizTouchEnd(e){
+  if (!QUIZ.active || !qDown) return;
+  e.preventDefault();
+  qDown = false;
+
+  if (!qMoved){
+    submitAnswer(QUIZ.cursorSide);
+  }
+}
+
+quizEl.addEventListener('touchstart', quizTouchStart, { passive:false });
+quizEl.addEventListener('touchmove',  quizTouchMove,  { passive:false });
+quizEl.addEventListener('touchend',   quizTouchEnd,   { passive:false });
+quizEl.addEventListener('touchcancel',function(e){
+  e.preventDefault(); qDown = false; qMoved = false;
+}, { passive:false });
+
+/* 鼠标（桌面调试）：点击卡片直接选择 */
+optLEl.addEventListener('click', function(){
+  if (!QUIZ.active || QUIZ.locked) return;
+  setCursorSide('left');
+  submitAnswer('left');
+});
+optREl.addEventListener('click', function(){
+  if (!QUIZ.active || QUIZ.locked) return;
+  setCursorSide('right');
+  submitAnswer('right');
+});
+
+/* =========================================================
+   11. 输入系统
    ========================================================= */
 const stickEl = document.getElementById('stick');
 const knobEl  = document.getElementById('knob');
 const START   = document.getElementById('start');
 
-let lookTouch = null;   // { id, x, y }
-let moveTouch = null;   // { id, ox, oy }
+let lookTouch = null;
+let moveTouch = null;
 
 const STICK_R = 55;
 
-/* ---------- 触摸 ---------- */
 function onTouchStart(e){
+  if (QUIZ.active) return;
   e.preventDefault();
+
   for (let i = 0; i < e.changedTouches.length; i++){
     const t = e.changedTouches[i];
     const x = t.clientX, y = t.clientY;
 
-    // 左下角区域 → 摇杆
     const isLeftBottom = (x < window.innerWidth * 0.42) &&
                          (y > window.innerHeight * 0.40);
 
@@ -807,7 +1783,9 @@ function onTouchStart(e){
 }
 
 function onTouchMove(e){
+  if (QUIZ.active) return;
   e.preventDefault();
+
   for (let i = 0; i < e.changedTouches.length; i++){
     const t = e.changedTouches[i];
     const x = t.clientX, y = t.clientY;
@@ -838,7 +1816,9 @@ function onTouchMove(e){
 }
 
 function onTouchEnd(e){
+  if (QUIZ.active) return;
   e.preventDefault();
+
   for (let i = 0; i < e.changedTouches.length; i++){
     const t = e.changedTouches[i];
 
@@ -860,17 +1840,18 @@ canvas.addEventListener('touchmove',  onTouchMove,  { passive: false });
 canvas.addEventListener('touchend',   onTouchEnd,   { passive: false });
 canvas.addEventListener('touchcancel',onTouchEnd,   { passive: false });
 
-/* ---------- 桌面调试：鼠标 / WASD ---------- */
+/* ---------- 桌面调试 ---------- */
 let mouseDown = false;
 let lastMX = 0, lastMY = 0;
 const keys = {};
 
 canvas.addEventListener('mousedown', function(e){
+  if (QUIZ.active) return;
   mouseDown = true; lastMX = e.clientX; lastMY = e.clientY;
 });
 window.addEventListener('mouseup', function(){ mouseDown = false; });
 window.addEventListener('mousemove', function(e){
-  if (!mouseDown) return;
+  if (!mouseDown || QUIZ.active) return;
   const dx = e.clientX - lastMX;
   const dy = e.clientY - lastMY;
   player.yaw   -= dx * LOOK_SENS;
@@ -880,6 +1861,19 @@ window.addEventListener('mousemove', function(e){
 });
 window.addEventListener('keydown', function(e){
   keys[e.code] = true;
+
+  if (!QUIZ.active) return;
+
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA'){
+    setCursorSide('left');
+  } else if (e.code === 'ArrowRight' || e.code === 'KeyD'){
+    setCursorSide('right');
+  } else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowUp'){
+    submitAnswer(QUIZ.cursorSide);
+  }
+  if (e.code === 'Enter' || e.code === 'Space'){
+    e.preventDefault();
+  }
 });
 window.addEventListener('keyup', function(e){
   keys[e.code] = false;
@@ -891,11 +1885,11 @@ document.addEventListener('contextmenu',  function(e){ e.preventDefault(); });
 document.addEventListener('dblclick',     function(e){ e.preventDefault(); });
 
 /* =========================================================
-   8. 地面高度查询
+   12. 地面高度查询
    ========================================================= */
 function groundAt(x, z, currentY){
   let best = null;
-  let bestD = 1.4;    // 最大允许台阶高度
+  let bestD = 1.4;
 
   for (let i = 0; i < AREAS.length; i++){
     const a = AREAS[i];
@@ -914,14 +1908,64 @@ function groundAt(x, z, currentY){
 }
 
 /* =========================================================
-   9. 主循环
+   12.1 【新增】楼梯检测
+   ---------------------------------------------------------
+   玩家进入楼梯触发区后，把 groundY 切换到目标楼层，
+   同时水平位移到 exitX，离开触发区。
+   相机 y 由 updatePlayer 的插值平滑过渡，视觉上像走楼梯。
+   ========================================================= */
+function checkStairs(dt){
+  if (stairCooldown > 0) stairCooldown -= dt;
+  if (QUIZ.active || stairCooldown > 0) return;
+
+  for (let i = 0; i < STAIRS.length; i++){
+    const s = STAIRS[i];
+
+    if (Math.abs(player.groundY - s.y) > 0.4) continue;
+    if (player.pos.x < s.x1 || player.pos.x > s.x2) continue;
+    if (player.pos.z < s.z1 || player.pos.z > s.z2) continue;
+
+    player.groundY = s.to;
+    player.pos.x   = s.exitX;
+    stairCooldown  = 0.9;
+
+    const nf = Math.round(s.to / FLOOR_H) + 1;
+    showToast('已到达 ' + nf + ' 楼', 1200);
+    return;
+  }
+}
+
+/* =========================================================
+   12.2 【新增】一楼撤离判定
+   ========================================================= */
+let ESCAPED = false;
+const winEl     = document.getElementById('win');
+const winStatEl = document.getElementById('winStat');
+
+function checkEscape(){
+  if (ESCAPED || QUIZ.active) return;
+  if (REPS.some(function(r){ return !r.done; })) return;
+  if (Math.abs(player.groundY) > 0.6) return;
+  if (player.pos.z > -10.5) return;
+  if (player.pos.x < -6.5 || player.pos.x > 6.5) return;
+
+  ESCAPED = true;
+  winStatEl.textContent = '三份答卷 · 全部提交';
+  winEl.classList.add('on');
+}
+
+document.getElementById('againBtn').addEventListener('click', function(){
+  window.location.reload();
+});
+
+/* =========================================================
+   13. 主循环
    ========================================================= */
 const clock = new THREE.Clock();
 let torchFlicker = 1;
 let flickerTimer = 0;
 
 function updateTorch(dt){
-  // 手电筒轻微呼吸 + 随机闪烁
   flickerTimer -= dt;
   if (flickerTimer <= 0){
     flickerTimer = 0.06 + Math.random() * 0.18;
@@ -929,16 +1973,21 @@ function updateTorch(dt){
   }
 
   const breathe = 1 + Math.sin(performance.now() * 0.0016) * 0.035;
-  torch.intensity     = 5.2 * breathe * torchFlicker;
+  torch.intensity     = 5.2  * breathe * torchFlicker;
   torchFill.intensity = 1.15 * breathe * torchFlicker;
 
-  // 光锥轻微摆动
   torch.position.x = 0.22 + Math.sin(performance.now() * 0.0022) * 0.02;
   torch.position.y = -0.18 + Math.cos(performance.now() * 0.0019) * 0.018;
 }
 
+/* ---------- 玩家更新 ---------- */
 function updatePlayer(dt){
-  /* --- 移动输入 --- */
+  if (QUIZ.active){
+    camera.position.set(player.pos.x, player.pos.y + player.bobY, player.pos.z);
+    camera.rotation.set(player.pitch, player.yaw, 0);
+    return;
+  }
+
   let ix = joy.x;
   let iy = joy.y;
 
@@ -958,9 +2007,7 @@ function updatePlayer(dt){
     const sinY = Math.sin(player.yaw);
     const cosY = Math.cos(player.yaw);
 
-    // 前方向量
     const fx = -sinY, fz = -cosY;
-    // 右方向量
     const rx =  cosY, rz = -sinY;
 
     const vx = (fx * iy + rx * ix) * MOVE_SPEED * dt;
@@ -976,13 +2023,11 @@ function updatePlayer(dt){
       player.pos.z = nz;
       player.groundY = g;
     } else {
-      // X 轴滑动
       g = groundAt(nx, player.pos.z, player.groundY);
       if (g !== null){
         player.pos.x = nx;
         player.groundY = g;
       } else {
-        // Z 轴滑动
         g = groundAt(player.pos.x, nz, player.groundY);
         if (g !== null){
           player.pos.z = nz;
@@ -991,7 +2036,6 @@ function updatePlayer(dt){
       }
     }
 
-    // 走路颠簸
     player.bobT += dt * 9.5;
     player.bobY = Math.sin(player.bobT) * 0.045;
   } else {
@@ -999,11 +2043,9 @@ function updatePlayer(dt){
     player.bobY += (0 - player.bobY) * Math.min(1, dt * 8);
   }
 
-  /* --- 高度平滑 --- */
   const targetY = player.groundY + EYE_H;
   player.pos.y += (targetY - player.pos.y) * Math.min(1, dt * 14);
 
-  /* --- 应用相机 --- */
   camera.position.set(
     player.pos.x,
     player.pos.y + player.bobY,
@@ -1011,30 +2053,77 @@ function updatePlayer(dt){
   );
   camera.rotation.set(player.pitch, player.yaw, 0);
 
-  /* --- HUD 楼层显示 --- */
   const f = Math.round(player.groundY / FLOOR_H);
   const names = ['一楼走廊', '二楼走廊', '三楼走廊', '四楼走廊'];
   const el = document.getElementById('hudFloor');
-  if (el && el.textContent !== names[f]) el.textContent = names[f] || '';
+  const label = names[f] || '';
+  if (el && el.textContent !== label) el.textContent = label;
 }
 
-/* =========================================================
-   10. 渲染循环
-   ========================================================= */
+/* ---------- 课代表动画 & 触发 ---------- */
+function updateReps(dt, t){
+  for (let i = 0; i < REPS.length; i++){
+    const r = REPS[i];
+    if (r.done) continue;
+
+    const ph = t * 1.6 + r.phase;
+
+    r.core.position.y = 1.05 + Math.sin(ph) * 0.14;
+    r.core.rotation.y += dt * 1.1;
+    r.core.rotation.x += dt * 0.45;
+
+    r.cage.position.y = r.core.position.y;
+    r.cage.rotation.y -= dt * 0.7;
+    r.cage.rotation.z += dt * 0.35;
+
+    r.glow.position.y = r.core.position.y;
+    const sc = 3.2 + Math.sin(ph * 1.3) * 0.45;
+    r.glow.scale.set(sc, sc, 1);
+
+    const pulse = 0.4 + Math.abs(Math.sin(ph * 0.9)) * 0.35;
+    r.ring.material.opacity = pulse;
+    r.ring.scale.setScalar(1 + Math.sin(ph * 1.7) * 0.06);
+  }
+}
+
+function checkTriggers(){
+  if (QUIZ.active || ESCAPED) return;
+
+  for (let i = 0; i < REPS.length; i++){
+    const r = REPS[i];
+    if (r.done) continue;
+
+    const dx = player.pos.x - r.def.pos.x;
+    const dz = player.pos.z - r.def.pos.z;
+    const dy = player.groundY - r.def.pos.y;
+
+    if (dx * dx + dz * dz < 2.7 * 2.7 && Math.abs(dy) < 1.2){
+      startQuiz(i);
+      return;
+    }
+  }
+}
+
+/* ---------- 主循环 ---------- */
 function animate(){
   requestAnimationFrame(animate);
 
   const dt = Math.min(clock.getDelta(), 0.05);
+  const t  = performance.now() * 0.001;
 
   updatePlayer(dt);
   updateTorch(dt);
+  updateReps(dt, t);
+  checkTriggers();
+  checkStairs(dt);
+  checkEscape();
 
   renderer.render(scene, camera);
 }
 animate();
 
 /* =========================================================
-   11. 窗口尺寸
+   14. 窗口尺寸
    ========================================================= */
 function onResize(){
   const w = window.innerWidth;
@@ -1043,6 +2132,10 @@ function onResize(){
   camera.updateProjectionMatrix();
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(w, h, false);
+
+  if (QUIZ.active){
+    requestAnimationFrame(positionCursor);
+  }
 }
 window.addEventListener('resize', onResize);
 window.addEventListener('orientationchange', function(){
@@ -1051,7 +2144,7 @@ window.addEventListener('orientationchange', function(){
 onResize();
 
 /* =========================================================
-   12. 开始遮罩
+   15. 开始遮罩
    ========================================================= */
 document.getElementById('startBtn').addEventListener('click', function(){
   START.style.opacity = '0';
@@ -1059,13 +2152,16 @@ document.getElementById('startBtn').addEventListener('click', function(){
     START.style.display = 'none';
   }, 520);
 
-  // 进入全屏（移动端体验更好）
   const el = document.documentElement;
   if (el.requestFullscreen) {
     el.requestFullscreen().catch(function(){});
   } else if (el.webkitRequestFullscreen) {
     try { el.webkitRequestFullscreen(); } catch(err){}
   }
+
+  setTimeout(function(){
+    showToast('找到 3 位课代表并完成答题', 2600);
+  }, 900);
 });
 
 })();
