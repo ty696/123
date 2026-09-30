@@ -2,2167 +2,1584 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#000000">
 <title>逃离政治老师</title>
 <style>
-  *{
-    margin:0;padding:0;box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
-    -webkit-touch-callout:none;
-    -webkit-user-select:none;user-select:none;
-  }
-  html,body{
-    width:100%;height:100%;overflow:hidden;background:#000;
-    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
-    touch-action:none;overscroll-behavior:none;
-  }
-  #c{
-    position:fixed;inset:0;display:block;width:100%;height:100%;
-    background:#000;
-  }
-
-  /* ---------- 摇杆 ---------- */
-  #stick{
-    position:fixed;left:-200px;top:-200px;
-    width:120px;height:120px;border-radius:50%;
-    border:2px solid rgba(110,160,210,.30);
-    background:radial-gradient(circle,rgba(30,50,75,.35),rgba(10,18,28,.15));
-    z-index:20;pointer-events:none;opacity:0;
-    transition:opacity .15s ease;
-    box-shadow:0 0 24px rgba(0,0,0,.6) inset;
-  }
-  #knob{
-    position:absolute;left:50%;top:50%;
-    width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%,rgba(170,215,255,.55),rgba(60,110,160,.35));
-    border:2px solid rgba(160,210,255,.55);
-    box-shadow:0 0 20px rgba(100,180,255,.45);
-    will-change:transform;
-  }
-
-  /* ---------- 准星 ---------- */
-  #cross{
-    position:fixed;left:50%;top:50%;
-    width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;
-    background:rgba(200,230,255,.45);
-    box-shadow:0 0 6px rgba(150,200,255,.7);
-    z-index:10;pointer-events:none;
-  }
-
-  /* ---------- 手电光晕 ---------- */
-  #vignette{
-    position:fixed;inset:0;z-index:8;pointer-events:none;
-    background:radial-gradient(ellipse at 50% 50%,
-      rgba(0,0,0,0) 32%,
-      rgba(0,0,0,.35) 62%,
-      rgba(0,0,0,.82) 100%);
-  }
-
-  /* ---------- 顶部 HUD ---------- */
-  #hud{
-    position:fixed;left:0;right:0;top:0;
-    padding:10px 16px;z-index:12;pointer-events:none;
-    display:flex;justify-content:space-between;align-items:flex-start;
-    font-size:13px;letter-spacing:1px;
-    color:#7fa6c8;text-shadow:0 0 8px rgba(80,160,255,.5);
-  }
-  #hud .tag{
-    background:rgba(10,20,32,.55);
-    border:1px solid rgba(80,140,200,.28);
-    border-radius:4px;padding:4px 10px;
-  }
-
-  /* ---------- 开始遮罩 ---------- */
-  #start{
-    position:fixed;inset:0;z-index:60;
-    display:flex;flex-direction:column;
-    align-items:center;justify-content:center;
-    background:radial-gradient(ellipse at center,#0a1018 0%,#000 80%);
-    color:#9fc4e0;gap:18px;
-    transition:opacity .5s ease;
-  }
-  #start h1{
-    font-size:32px;letter-spacing:10px;font-weight:700;
-    color:#d8ecff;
-    text-shadow:0 0 20px rgba(90,170,255,.8),0 0 44px rgba(60,120,200,.5);
-  }
-  #start .sub{
-    font-size:13px;letter-spacing:3px;color:#5b7f9c;
-  }
-  #start .btn{
-    margin-top:12px;padding:12px 40px;
-    border:1px solid rgba(110,180,255,.55);
-    border-radius:6px;color:#cfe8ff;font-size:15px;letter-spacing:6px;
-    background:rgba(30,70,120,.28);
-    box-shadow:0 0 24px rgba(60,140,220,.35);
-  }
-
-  /* ---------- 通关遮罩 ---------- */
-  #win{
-    position:fixed;inset:0;z-index:65;
-    display:none;flex-direction:column;
-    align-items:center;justify-content:center;
-    background:radial-gradient(ellipse at center,#04140c 0%,#000 82%);
-    color:#9fe0c0;gap:18px;
-    transition:opacity .5s ease;
-  }
-  #win.on{ display:flex; }
-  #win h1{
-    font-size:34px;letter-spacing:12px;font-weight:700;
-    color:#c9ffe4;
-    text-shadow:0 0 22px rgba(90,255,180,.85),0 0 48px rgba(40,180,120,.5);
-  }
-  #win .sub{
-    font-size:13px;letter-spacing:3px;color:#4f9070;
-  }
-  #win .stat{
-    margin-top:6px;font-size:15px;letter-spacing:3px;color:#8fd8b4;
-    text-shadow:0 0 12px rgba(80,220,150,.5);
-  }
-  #win .btn{
-    margin-top:16px;padding:12px 40px;
-    border:1px solid rgba(110,255,190,.55);
-    border-radius:6px;color:#d6ffee;font-size:15px;letter-spacing:6px;
-    background:rgba(20,90,60,.3);
-    box-shadow:0 0 24px rgba(60,220,150,.35);
-  }
-
-  /* ---------- 强制横屏提示 ---------- */
-  #rotate{
-    display:none;position:fixed;inset:0;z-index:200;
-    background:#000;color:#7fa6c8;
-    flex-direction:column;align-items:center;justify-content:center;gap:18px;
-    font-size:16px;letter-spacing:3px;
-  }
-  #rotate .ph{
-    width:44px;height:76px;border:2px solid #3d607f;border-radius:8px;
-    animation:rot 1.6s ease-in-out infinite;
-  }
-  @keyframes rot{
-    0%,40%{transform:rotate(0deg)}
-    60%,100%{transform:rotate(90deg)}
-  }
-  @media (orientation:portrait) and (max-width:900px){
-    #rotate{display:flex;}
-  }
-
-  /* =========================================================
-     答题界面
-     ========================================================= */
-  #quiz{
-    position:fixed;inset:0;z-index:50;
-    display:none;
-    flex-direction:column;
-    padding:12px 22px 8px;
-    background:
-      radial-gradient(ellipse at 50% 42%,
-        rgba(10,26,44,.955) 0%,
-        rgba(3,6,11,.985) 72%,
-        rgba(0,0,0,.995) 100%);
-    color:#bcd8ef;
-    overflow:hidden;
-  }
-  #quiz.on{ display:flex; }
-
-  .q-head{
-    display:flex;justify-content:space-between;align-items:center;
-    font-size:clamp(11px,1.9vh,15px);
-    letter-spacing:2px;
-    color:#5f8db3;
-    padding-bottom:6px;
-    flex:0 0 auto;
-  }
-  .q-head .q-title{ color:#8ab4d6; }
-
-  .q-text{
-    flex:0 0 auto;
-    max-height:29vh;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    background:rgba(12,24,38,.62);
-    border-left:3px solid #3d7fb8;
-    border-radius:4px;
-    padding:clamp(8px,1.6vh,16px) clamp(10px,1.6vw,20px);
-    font-size:clamp(12px,2.15vh,17px);
-    line-height:1.55;
-    color:#cfe4f5;
-    letter-spacing:.4px;
-    box-shadow:0 0 22px rgba(30,80,140,.20) inset;
-  }
-  .q-text::-webkit-scrollbar{ width:3px; }
-  .q-text::-webkit-scrollbar-thumb{ background:rgba(90,150,210,.5); }
-
-  .q-opts{
-    flex:1 1 auto;
-    display:flex;
-    gap:clamp(12px,2.6vw,34px);
-    margin-top:clamp(8px,1.6vh,18px);
-    min-height:0;
-  }
-
-  .opt{
-    flex:1 1 0;
-    display:flex;
-    align-items:center;
-    position:relative;
-    border:1.5px solid rgba(70,130,190,.34);
-    border-radius:10px;
-    padding:clamp(8px,1.6vh,18px) clamp(10px,1.4vw,18px) clamp(8px,1.6vh,18px) 46px;
-    background:linear-gradient(180deg,rgba(14,28,46,.62),rgba(8,16,28,.48));
-    box-shadow:0 0 20px rgba(0,0,0,.45) inset;
-    transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
-    overflow:hidden;
-  }
-  .opt .opt-txt{
-    font-size:clamp(11px,2.0vh,16px);
-    line-height:1.5;
-    color:#a9c9e2;
-    letter-spacing:.3px;
-    word-break:break-word;
-  }
-
-  .opt.ok{
-    border-color:rgba(78,232,154,.95);
-    background:linear-gradient(180deg,rgba(18,64,48,.72),rgba(10,34,26,.6));
-    box-shadow:0 0 26px rgba(78,232,154,.42);
-  }
-  .opt.ok .opt-txt{ color:#b6ffe0; }
-
-  .opt.bad{
-    border-color:rgba(255,90,110,.95);
-    background:linear-gradient(180deg,rgba(70,20,28,.72),rgba(38,10,16,.6));
-    box-shadow:0 0 26px rgba(255,90,110,.40);
-  }
-  .opt.bad .opt-txt{ color:#ffc4cc; }
-
-  .q-tip{
-    flex:0 0 auto;
-    text-align:center;
-    font-size:clamp(10px,1.6vh,13px);
-    letter-spacing:2px;
-    color:#4a6d8c;
-    padding-top:clamp(4px,1.0vh,12px);
-  }
-
-  /* 三角形光标 */
-  #qCursor{
-    position:absolute;
-    left:0;top:0;
-    width:26px;height:32px;
-    color:#5fe8ff;
-    filter:drop-shadow(0 0 8px rgba(95,232,255,.95))
-           drop-shadow(0 0 18px rgba(60,180,255,.55));
-    transition:left .15s cubic-bezier(.2,.8,.3,1), top .15s cubic-bezier(.2,.8,.3,1);
-    pointer-events:none;
-    animation:curBlink 1.15s ease-in-out infinite;
-    z-index:3;
-  }
-  #qCursor svg{ display:block;width:100%;height:100%; }
-
-  @keyframes curBlink{
-    0%,100%{ opacity:1; }
-    50%    { opacity:.32; }
-  }
-
-  /* Toast */
-  #toast{
-    position:fixed;left:50%;top:14%;
-    transform:translate(-50%,-14px);
-    z-index:70;
-    padding:10px 22px;
-    border:1px solid rgba(110,180,255,.45);
-    border-radius:6px;
-    background:rgba(8,20,34,.92);
-    color:#cfe8ff;
-    font-size:clamp(11px,1.9vh,15px);
-    letter-spacing:2px;
-    box-shadow:0 0 28px rgba(40,120,200,.45);
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .3s ease, transform .3s ease;
-    white-space:nowrap;
-  }
-  #toast.on{
-    opacity:1;
-    transform:translate(-50%,0);
-  }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  touch-action:none;overscroll-behavior:none;}
+#c{position:fixed;inset:0;display:block;width:100%;height:100%;background:#000;}
+#stick{position:fixed;left:-200px;top:-200px;width:130px;height:130px;border-radius:50%;
+  border:2px solid rgba(110,160,210,.3);background:radial-gradient(circle,rgba(30,50,75,.35),rgba(10,18,28,.15));
+  z-index:20;pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:0 0 24px rgba(0,0,0,.6) inset;}
+#knob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;
+  border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(170,215,255,.55),rgba(60,110,160,.35));
+  border:2px solid rgba(160,210,255,.55);box-shadow:0 0 20px rgba(100,180,255,.45);will-change:transform;}
+#stick.sprint{border-color:rgba(255,180,80,.7);box-shadow:0 0 32px rgba(255,150,60,.6) inset;}
+#stick.sprint #knob{background:radial-gradient(circle at 35% 30%,rgba(255,220,160,.75),rgba(200,120,40,.5));
+  border-color:rgba(255,200,120,.85);}
+#sprintTag{position:fixed;left:50%;bottom:11%;transform:translateX(-50%);z-index:22;
+  padding:6px 18px;border-radius:4px;background:rgba(120,50,10,.7);
+  border:1px solid rgba(255,180,80,.7);color:#ffd9a0;font-size:13px;letter-spacing:4px;
+  text-shadow:0 0 12px rgba(255,180,80,.9);opacity:0;pointer-events:none;transition:opacity .15s;}
+#sprintTag.on{opacity:1;}
+#cross{position:fixed;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;
+  border-radius:50%;background:rgba(200,230,255,.45);box-shadow:0 0 6px rgba(150,200,255,.7);
+  z-index:10;pointer-events:none;}
+#vignette{position:fixed;inset:0;z-index:8;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 32%,rgba(0,0,0,.35) 62%,rgba(0,0,0,.82) 100%);
+  transition:background 1.6s;}
+#vignette.dark{background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 10%,rgba(0,0,0,.75) 38%,rgba(0,0,0,.99) 100%);}
+#hud{position:fixed;left:0;right:0;top:0;padding:10px 16px;z-index:12;pointer-events:none;
+  display:flex;justify-content:space-between;align-items:flex-start;font-size:13px;
+  letter-spacing:1px;color:#7fa6c8;text-shadow:0 0 8px rgba(80,160,255,.5);}
+#hud .tag{background:rgba(10,20,32,.55);border:1px solid rgba(80,140,200,.28);
+  border-radius:4px;padding:4px 10px;}
+#hud .tag.warn{color:#ffb0b0;border-color:rgba(255,90,90,.7);text-shadow:0 0 12px rgba(255,90,90,.9);animation:bl 1s infinite;}
+@keyframes bl{0%,100%{opacity:1;}50%{opacity:.4;}}
+#start,#end,#dead{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;transition:opacity .5s;}
+#start{background:radial-gradient(ellipse at center,#0a1018 0%,#000 80%);color:#9fc4e0;}
+#end,#dead{display:none;}
+#end.on,#dead.on{display:flex;}
+#end{background:radial-gradient(ellipse at center,#04140c 0%,#000 82%);color:#9fe0c0;z-index:66;}
+#dead{background:radial-gradient(ellipse at center,#200000 0%,#000 82%);color:#ffb0b0;z-index:68;}
+#start h1{font-size:30px;letter-spacing:8px;color:#d8ecff;text-shadow:0 0 20px rgba(90,170,255,.8),0 0 44px rgba(60,120,200,.5);}
+#start .sub{font-size:12px;letter-spacing:3px;color:#5b7f9c;}
+#start .hint{font-size:12px;letter-spacing:2px;color:#486a86;line-height:2;text-align:center;max-width:80%;}
+#start .err{font-size:13px;color:#ff9aa6;line-height:1.7;text-align:center;max-width:80%;}
+#start .btn,#end .btn,#dead .btn{margin-top:12px;padding:12px 40px;border-radius:6px;
+  font-size:15px;letter-spacing:6px;cursor:pointer;}
+#start .btn{border:1px solid rgba(110,180,255,.55);color:#cfe8ff;background:rgba(30,70,120,.28);
+  box-shadow:0 0 24px rgba(60,140,220,.35);}
+#end h1{font-size:34px;letter-spacing:12px;color:#c9ffe4;text-shadow:0 0 22px rgba(90,255,180,.85),0 0 48px rgba(40,180,120,.5);}
+#end .sub{font-size:13px;letter-spacing:3px;color:#4f9070;}
+#end .stat{margin-top:6px;font-size:15px;letter-spacing:3px;color:#8fd8b4;}
+#end .btn{border:1px solid rgba(110,255,190,.55);color:#d6ffee;background:rgba(20,90,60,.3);}
+#dead h1{font-size:36px;letter-spacing:14px;color:#ffd0d0;text-shadow:0 0 24px rgba(255,60,60,.95),0 0 54px rgba(180,0,0,.7);}
+#dead .sub{font-size:13px;letter-spacing:3px;color:#a06060;}
+#dead .btn{border:1px solid rgba(255,120,120,.55);color:#ffd6d6;background:rgba(90,20,20,.35);}
+#flash{position:fixed;inset:0;z-index:64;pointer-events:none;background:#000;opacity:0;
+  transition:opacity 1.6s;}
+#flash.on{opacity:1;}
+#hunt{position:fixed;inset:0;z-index:62;pointer-events:none;opacity:0;transition:opacity .6s;
+  background:radial-gradient(ellipse at 50% 50%,rgba(120,0,0,0) 30%,rgba(160,0,0,.35) 75%,rgba(90,0,0,.75) 100%);}
+#hunt.on{opacity:1;}
+#rotate{display:none;position:fixed;inset:0;z-index:200;background:#000;color:#7fa6c8;
+  flex-direction:column;align-items:center;justify-content:center;gap:18px;font-size:16px;letter-spacing:3px;}
+#rotate .ph{width:44px;height:76px;border:2px solid #3d607f;border-radius:8px;
+  animation:rot 1.6s ease-in-out infinite;}
+@keyframes rot{0%,40%{transform:rotate(0);}60%,100%{transform:rotate(90deg);}}
+@media (orientation:portrait) and (max-width:900px){#rotate{display:flex;}}
+#quiz{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;padding:12px 22px 8px;
+  background:radial-gradient(ellipse at 50% 42%,rgba(10,26,44,.955) 0%,rgba(3,6,11,.985) 72%,rgba(0,0,0,.995) 100%);
+  color:#bcd8ef;overflow:hidden;}
+#quiz.on{display:flex;}
+.q-head{display:flex;justify-content:space-between;align-items:center;
+  font-size:clamp(11px,1.9vh,15px);letter-spacing:2px;color:#5f8db3;padding-bottom:6px;}
+.q-head .q-title{color:#8ab4d6;}
+.q-text{max-height:29vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:rgba(12,24,38,.62);border-left:3px solid #3d7fb8;border-radius:4px;
+  padding:clamp(8px,1.6vh,16px) clamp(10px,1.6vw,20px);font-size:clamp(12px,2.15vh,17px);
+  line-height:1.55;color:#cfe4f5;letter-spacing:.4px;box-shadow:0 0 22px rgba(30,80,140,.2) inset;}
+.q-opts{flex:1;display:flex;gap:clamp(12px,2.6vw,34px);margin-top:clamp(8px,1.6vh,18px);min-height:0;}
+.opt{flex:1;display:flex;align-items:center;position:relative;border:1.5px solid rgba(70,130,190,.34);
+  border-radius:10px;padding:clamp(8px,1.6vh,18px) clamp(10px,1.4vw,18px) clamp(8px,1.6vh,18px) 46px;
+  background:linear-gradient(180deg,rgba(14,28,46,.62),rgba(8,16,28,.48));
+  box-shadow:0 0 20px rgba(0,0,0,.45) inset;transition:all .18s;overflow:hidden;cursor:pointer;}
+.opt .opt-txt{font-size:clamp(11px,2vh,16px);line-height:1.5;color:#a9c9e2;word-break:break-word;}
+.opt.ok{border-color:rgba(78,232,154,.95);background:linear-gradient(180deg,rgba(18,64,48,.72),rgba(10,34,26,.6));
+  box-shadow:0 0 26px rgba(78,232,154,.42);}
+.opt.ok .opt-txt{color:#b6ffe0;}
+.opt.bad{border-color:rgba(255,90,110,.95);background:linear-gradient(180deg,rgba(70,20,28,.72),rgba(38,10,16,.6));
+  box-shadow:0 0 26px rgba(255,90,110,.4);}
+.opt.bad .opt-txt{color:#ffc4cc;}
+.q-tip{text-align:center;font-size:clamp(10px,1.6vh,13px);letter-spacing:2px;color:#4a6d8c;
+  padding-top:clamp(4px,1vh,12px);}
+#qCursor{position:absolute;left:0;top:0;width:26px;height:32px;color:#5fe8ff;
+  filter:drop-shadow(0 0 8px rgba(95,232,255,.95)) drop-shadow(0 0 18px rgba(60,180,255,.55));
+  transition:left .15s cubic-bezier(.2,.8,.3,1),top .15s cubic-bezier(.2,.8,.3,1);
+  pointer-events:none;animation:cb 1.15s infinite;z-index:3;}
+@keyframes cb{0%,100%{opacity:1;}50%{opacity:.32;}}
+#qCursor svg{display:block;width:100%;height:100%;}
+#toast{position:fixed;left:50%;top:14%;transform:translate(-50%,-14px);z-index:70;
+  padding:10px 22px;border:1px solid rgba(110,180,255,.45);border-radius:6px;
+  background:rgba(8,20,34,.92);color:#cfe8ff;font-size:clamp(11px,1.9vh,15px);letter-spacing:2px;
+  box-shadow:0 0 28px rgba(40,120,200,.45);opacity:0;pointer-events:none;
+  transition:opacity .3s,transform .3s;white-space:nowrap;}
+#toast.on{opacity:1;transform:translate(-50%,0);}
 </style>
 </head>
 <body>
-
 <canvas id="c"></canvas>
 <div id="vignette"></div>
 <div id="cross"></div>
-
+<div id="hunt"></div>
 <div id="stick"><div id="knob"></div></div>
-
+<div id="sprintTag">跑 起 来</div>
 <div id="hud">
   <div class="tag" id="hudFloor">四楼走廊</div>
-  <div class="tag" id="hudHint">滑动屏幕转动视角 · 左下摇杆移动</div>
+  <div class="tag" id="hudHint">左下摇杆移动 · 滑屏转视角</div>
 </div>
-
 <div id="toast"></div>
+<div id="flash"></div>
 
-<!-- ============ 答题界面 ============ -->
 <div id="quiz">
-  <div class="q-head">
-    <span id="qProg">第 1 / 15 题</span>
-    <span class="q-title" id="qTitle">课代表A</span>
-  </div>
-
+  <div class="q-head"><span id="qProg">第 1 / 15 题</span><span class="q-title" id="qTitle"></span></div>
   <div class="q-text" id="qText"></div>
-
   <div class="q-opts">
     <div class="opt" id="optL"><div class="opt-txt" id="optLTxt"></div></div>
     <div class="opt" id="optR"><div class="opt-txt" id="optRTxt"></div></div>
   </div>
-
   <div class="q-tip">← 左右滑动切换选项 · 点击屏幕确认 →</div>
-
   <div id="qCursor">
-    <svg viewBox="0 0 32 40" preserveAspectRatio="xMidYMid meet">
-      <path d="M7 5 L26 20 L7 35"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="4.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"/>
-    </svg>
+    <svg viewBox="0 0 32 40"><path d="M7 5 L26 20 L7 35" fill="none" stroke="currentColor"
+      stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
 </div>
 
 <div id="start">
   <h1>逃离政治老师</h1>
   <div class="sub">YIN XING LOU · BUILDING 2</div>
+  <div class="hint">
+    3 名课代表随机躲在主楼各层<br>
+    找到 2 名答完题 · 灯会全灭 · 老师持戒尺现身<br>
+    在黑暗里找到最后 1 名 · 完成答题<br>
+    跑到校门口就能逃出去<br>
+    <span style="color:#ffb070">摇杆推满 = 跑步</span>
+  </div>
   <div class="btn" id="startBtn">点 击 进 入</div>
 </div>
-
-<div id="win">
-  <h1>成 功 逃 离</h1>
-  <div class="sub">你已走出银杏楼二栋</div>
-  <div class="stat" id="winStat"></div>
+<div id="end">
+  <h1>逃 出 去 了</h1>
+  <div class="sub">大门在你身后缓缓合上</div>
+  <div class="stat" id="endStat"></div>
   <div class="btn" id="againBtn">再 来 一 次</div>
 </div>
-
-<div id="rotate">
-  <div class="ph"></div>
-  <div>请 横 屏 游 戏</div>
+<div id="dead">
+  <h1>被 抓 住 了</h1>
+  <div class="sub">戒尺落在肩上，你被拖回了教室……</div>
+  <div class="btn" id="retryBtn">重 新 开 始</div>
 </div>
+<div id="rotate"><div class="ph"></div><div>请 横 屏 游 戏</div></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r149/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>if(typeof THREE==='undefined')document.write('<script src="https://unpkg.com/three@0.149.0/build/three.min.js"><\/script>');</script>
+<script>if(typeof THREE==='undefined')document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r149/three.min.js"><\/script>');</script>
+
+<script>
+(function(){
+var START=document.getElementById('start'),BTN=document.getElementById('startBtn');
+function enter(){
+  START.style.opacity='0';
+  setTimeout(function(){START.style.display='none';},520);
+  try{var e=document.documentElement;
+    if(e.requestFullscreen)e.requestFullscreen().catch(function(){});
+    else if(e.webkitRequestFullscreen)e.webkitRequestFullscreen();
+  }catch(x){}
+  if(typeof THREE==='undefined'){
+    setTimeout(function(){
+      START.style.display='flex';START.style.opacity='1';
+      START.innerHTML='<h1 style="color:#ff9aa6">加载失败</h1>'+
+        '<div class="err">3D 引擎未能加载。<br>请检查网络后刷新。<br>（微信内请点右上角“在浏览器中打开”）</div>';
+    },600);
+  }
+}
+BTN.addEventListener('click',enter);
+BTN.addEventListener('touchend',function(e){e.preventDefault();enter();},{passive:false});
+document.getElementById('againBtn').addEventListener('click',function(){location.reload();});
+document.getElementById('retryBtn').addEventListener('click',function(){location.reload();});
+})();
+</script>
+
 <script>
 (function(){
 'use strict';
+if(typeof THREE==='undefined')return;
 
-/* =========================================================
-   0. 基础常量
-   ========================================================= */
-const EYE_H      = 1.65;    // 眼睛高度
-const MOVE_SPEED = 3.4;     // 行走速度 m/s
-const LOOK_SENS  = 0.0042;  // 视角灵敏度
-const PITCH_LIM  = 1.15;    // 上下视角限制
+/* ==================== 常量 ==================== */
+var EYE_H=1.65, WALK=3.4, RUN=6.6, SENS=0.0042, PITCH_LIM=1.15;
+var FLOOR_H=4, FLOORS=4;
+var BX1=-28,BX2=28,BZO=-10,BZS=-4,BZB=10,BW=56;
+/* 操场范围 */
+var PLAY={x1:-44,x2:44,z1:-80,z2:-17};
+/* 大门 */
+var GATE_Z=-92;
+/* 保安亭 */
+var GUARD={x:16,z:-88};
 
-const FLOOR_H    = 4;       // 层高
-const FLOORS     = 4;       // 层数
-const BX1 = -28, BX2 = 28;  // 楼体 X 范围
-const BZO = -10;            // 走廊外侧墙 z
-const BZS = -4;             // 教室隔墙 z
-const BZB = 10;             // 楼体后墙 z
-const BW  = BX2 - BX1;      // 楼宽 56
+/* ==================== 渲染器 ==================== */
+var canvas=document.getElementById('c'), renderer;
+try{renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,powerPreference:'high-performance'});}
+catch(e){
+  document.getElementById('start').innerHTML='<h1 style="color:#ff9aa6">设备不支持</h1><div class="err">无法创建 WebGL。</div>';
+  return;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(innerWidth,innerHeight,false);
+renderer.shadowMap.enabled=false;
+if(THREE.sRGBEncoding!==undefined)renderer.outputEncoding=THREE.sRGBEncoding;
 
-/* =========================================================
-   1. 渲染器 / 场景 / 相机
-   ========================================================= */
-const canvas   = document.getElementById('c');
-const renderer = new THREE.WebGLRenderer({
-  canvas, antialias:true, powerPreference:'high-performance'
-});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-renderer.setSize(window.innerWidth, window.innerHeight, false);
+var scene=new THREE.Scene();
+scene.background=new THREE.Color(0x04060a);
+scene.fog=new THREE.FogExp2(0x04060a,0.022);
 
-/* 【性能修复】关闭阴影贴图：本场景静态装饰多，实时阴影收益极低，
-   在移动端关闭后帧率显著提升。 */
-renderer.shadowMap.enabled = false;
-
-if (THREE.sRGBEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x04060a);
-scene.fog        = new THREE.FogExp2(0x04060a, 0.026);
-
-const camera = new THREE.PerspectiveCamera(
-  76,
-  window.innerWidth / window.innerHeight,
-  0.06,
-  320
-);
-camera.rotation.order = 'YXZ';
+var camera=new THREE.PerspectiveCamera(76,innerWidth/innerHeight,0.06,400);
+camera.rotation.order='YXZ';
 scene.add(camera);
 
-/* =========================================================
-   2. 程序化 Canvas 纹理（禁止外部图片）
-   ========================================================= */
-function makeCanvas(w, h){
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  return c;
-}
-
-/* --- 地砖 --- */
-function makeFloorTexture(){
-  const c = makeCanvas(256, 256);
-  const g = c.getContext('2d');
-  g.fillStyle = '#15181e';
-  g.fillRect(0, 0, 256, 256);
-
-  const n = 4, s = 256 / n;
-  for (let i = 0; i < n; i++){
-    for (let j = 0; j < n; j++){
-      const v = 30 + Math.random() * 12;
-      g.fillStyle = 'rgb(' + (v|0) + ',' + ((v + 3)|0) + ',' + ((v + 8)|0) + ')';
-      g.fillRect(i * s + 1.5, j * s + 1.5, s - 3, s - 3);
-    }
+/* ==================== 纹理 ==================== */
+function mkC(w,h){var c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+function tFloor(){
+  var c=mkC(256,256),g=c.getContext('2d');
+  g.fillStyle='#15181e';g.fillRect(0,0,256,256);
+  for(var i=0;i<4;i++)for(var j=0;j<4;j++){
+    var v=30+Math.random()*12;
+    g.fillStyle='rgb('+(v|0)+','+((v+3)|0)+','+((v+8)|0)+')';
+    g.fillRect(i*64+1.5,j*64+1.5,61,61);
   }
-  const img = g.getImageData(0, 0, 256, 256);
-  const d = img.data;
-  for (let i = 0; i < d.length; i += 4){
-    const nz = (Math.random() - 0.5) * 26;
-    d[i] += nz; d[i+1] += nz; d[i+2] += nz;
+  var im=g.getImageData(0,0,256,256),d=im.data;
+  for(var k=0;k<d.length;k+=4){var nz=(Math.random()-.5)*26;d[k]+=nz;d[k+1]+=nz;d[k+2]+=nz;}
+  g.putImageData(im,0,0);
+  var t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(14,1.6);
+  if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;
+}
+function tWall(){
+  var c=mkC(256,256),g=c.getContext('2d');
+  g.fillStyle='#20242c';g.fillRect(0,0,256,256);
+  g.fillStyle='#171a21';
+  for(var j=0;j<256;j+=64)g.fillRect(0,j,256,3);
+  g.fillStyle='rgba(14,16,20,.7)';
+  for(var jj=0;jj<256;jj+=64){var off=(jj/64)%2===0?0:32;for(var i=off;i<256;i+=64)g.fillRect(i,jj,2,64);}
+  var im=g.getImageData(0,0,256,256),d=im.data;
+  for(var k=0;k<d.length;k+=4){var nz=(Math.random()-.5)*18;d[k]+=nz;d[k+1]+=nz;d[k+2]+=nz;}
+  g.putImageData(im,0,0);
+  var t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(12,2);
+  if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;
+}
+function tSign(text){
+  var W=2048,H=512,c=mkC(W,H),g=c.getContext('2d');
+  g.textAlign='center';g.textBaseline='middle';
+  g.font='bold 290px "PingFang SC","Microsoft YaHei",sans-serif';
+  var gs=[{b:90,c:'rgba(255,140,20,.85)'},{b:55,c:'rgba(255,190,60,.95)'},{b:26,c:'rgba(255,230,140,1)'}];
+  for(var i=0;i<gs.length;i++){g.shadowColor=gs[i].c;g.shadowBlur=gs[i].b;g.fillStyle=gs[i].c;
+    g.fillText(text,W/2,H/2);g.fillText(text,W/2,H/2);}
+  g.shadowBlur=10;g.shadowColor='#fff6cc';g.fillStyle='#fffdf2';g.fillText(text,W/2,H/2);
+  var t=new THREE.CanvasTexture(c);if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;
+  t.anisotropy=8;return t;
+}
+function tExit(){
+  var c=mkC(256,128),g=c.getContext('2d');
+  g.fillStyle='#031a0c';g.fillRect(0,0,256,128);
+  g.fillStyle='#19ff7a';g.font='bold 62px "PingFang SC","Microsoft YaHei",sans-serif';
+  g.textAlign='center';g.textBaseline='middle';
+  g.shadowColor='#19ff7a';g.shadowBlur=18;g.fillText('安全出口',128,64);
+  var t=new THREE.CanvasTexture(c);if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;
+}
+function tPlate(){
+  var c=mkC(128,64),g=c.getContext('2d');
+  g.fillStyle='#2a2f38';g.fillRect(0,0,128,64);
+  g.strokeStyle='#454d59';g.lineWidth=3;g.strokeRect(2,2,124,60);
+  g.fillStyle='#8fa6bd';g.font='bold 30px "PingFang SC","Microsoft YaHei",sans-serif';
+  g.textAlign='center';g.textBaseline='middle';g.fillText('教室',64,34);
+  var t=new THREE.CanvasTexture(c);if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;
+}
+function tGlow(){
+  var c=mkC(128,128),g=c.getContext('2d');
+  var grd=g.createRadialGradient(64,64,0,64,64,64);
+  grd.addColorStop(0,'rgba(255,255,255,1)');grd.addColorStop(.22,'rgba(170,235,255,.72)');
+  grd.addColorStop(.55,'rgba(80,175,255,.2)');grd.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=grd;g.fillRect(0,0,128,128);
+  var t=new THREE.CanvasTexture(c);if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;
+}
+function tStair(txt,col){
+  var W=512,H=256,c=mkC(W,H),g=c.getContext('2d');
+  g.textAlign='center';g.textBaseline='middle';
+  g.font='bold 130px "PingFang SC","Microsoft YaHei",sans-serif';
+  g.shadowColor=col;g.shadowBlur=44;g.fillStyle=col;
+  g.fillText(txt,W/2,H/2);g.fillText(txt,W/2,H/2);
+  g.shadowColor='#fff';g.shadowBlur=12;g.fillStyle='#fff';g.fillText(txt,W/2,H/2);
+  var t=new THREE.CanvasTexture(c);if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;
+  t.anisotropy=8;return t;
+}
+function tTrack(){
+  var c=mkC(256,256),g=c.getContext('2d');
+  g.fillStyle='#5a2018';g.fillRect(0,0,256,256);
+  for(var i=0;i<1000;i++){
+    var r=90+Math.random()*50,b=40+Math.random()*30;
+    g.fillStyle='rgba('+r+','+b+',30,'+(0.2+Math.random()*0.5)+')';
+    g.fillRect(Math.random()*256,Math.random()*256,2,2);
   }
-  g.putImageData(img, 0, 0);
-
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(14, 1.6);
-  if (THREE.sRGBEncoding !== undefined) t.encoding = THREE.sRGBEncoding;
-  t.anisotropy = 4;
-  return t;
+  var t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(16,16);
+  if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;
 }
-
-/* --- 墙面 --- */
-function makeWallTexture(){
-  const c = makeCanvas(256, 256);
-  const g = c.getContext('2d');
-  g.fillStyle = '#20242c';
-  g.fillRect(0, 0, 256, 256);
-
-  g.fillStyle = '#171a21';
-  for (let j = 0; j < 256; j += 64){
-    g.fillRect(0, j, 256, 3);
+function tGrass(){
+  var c=mkC(256,256),g=c.getContext('2d');
+  g.fillStyle='#172412';g.fillRect(0,0,256,256);
+  for(var i=0;i<2200;i++){
+    var v=20+Math.random()*35;
+    g.fillStyle='rgba('+(v*0.6|0)+','+v+','+(v*0.4|0)+','+(0.4+Math.random()*0.4)+')';
+    g.fillRect(Math.random()*256,Math.random()*256,2,3);
   }
-  g.fillStyle = 'rgba(14,16,20,.7)';
-  for (let j = 0; j < 256; j += 64){
-    const off = (j / 64) % 2 === 0 ? 0 : 32;
-    for (let i = off; i < 256; i += 64){
-      g.fillRect(i, j, 2, 64);
-    }
-  }
-  const img = g.getImageData(0, 0, 256, 256);
-  const d = img.data;
-  for (let i = 0; i < d.length; i += 4){
-    const nz = (Math.random() - 0.5) * 18;
-    d[i] += nz; d[i+1] += nz; d[i+2] += nz;
-  }
-  g.putImageData(img, 0, 0);
-
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(12, 2);
-  if (THREE.sRGBEncoding !== undefined) t.encoding = THREE.sRGBEncoding;
-  t.anisotropy = 4;
-  return t;
+  var t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(20,20);
+  if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;
+}
+function tCourt(){
+  var c=mkC(512,256),g=c.getContext('2d');
+  g.fillStyle='#3a4048';g.fillRect(0,0,512,256);
+  g.strokeStyle='#c8d0d8';g.lineWidth=4;
+  g.strokeRect(15,15,482,226);
+  g.beginPath();g.moveTo(256,15);g.lineTo(256,241);g.stroke();
+  g.beginPath();g.arc(256,128,42,0,Math.PI*2);g.stroke();
+  g.beginPath();g.arc(60,128,60,-Math.PI/2,Math.PI/2);g.stroke();
+  g.beginPath();g.arc(452,128,60,Math.PI/2,Math.PI*1.5);g.stroke();
+  var t=new THREE.CanvasTexture(c);if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;
+}
+function tGate(){
+  var c=mkC(512,256),g=c.getContext('2d');
+  g.fillStyle='#0a1418';g.fillRect(0,0,512,256);
+  g.strokeStyle='#c8a850';g.lineWidth=6;
+  for(var i=1;i<8;i++){g.beginPath();g.moveTo(0,i*32);g.lineTo(512,i*32);g.stroke();}
+  for(var j=1;j<16;j++){g.beginPath();g.moveTo(j*32,0);g.lineTo(j*32,256);g.stroke();}
+  var t=new THREE.CanvasTexture(c);if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;
 }
 
-/* --- 楼顶发光招牌 --- */
-function makeSignTexture(text){
-  const W = 2048, H = 512;
-  const c = makeCanvas(W, H);
-  const g = c.getContext('2d');
-  g.clearRect(0, 0, W, H);
+var floorTex=tFloor(),wallTex=tWall(),signTex=tSign('银杏楼二栋');
+var exitTex=tExit(),plateTex=tPlate(),glowTex=tGlow();
+var trackTex=tTrack(),grassTex=tGrass(),courtTex=tCourt(),gateTex=tGate();
 
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.font = 'bold 290px "PingFang SC","Microsoft YaHei","Heiti SC","SimHei",sans-serif';
-
-  const glows = [
-    { blur: 90, color: 'rgba(255,140,20,.85)' },
-    { blur: 55, color: 'rgba(255,190,60,.95)' },
-    { blur: 26, color: 'rgba(255,230,140,1)'   }
-  ];
-  glows.forEach(function(gl){
-    g.shadowColor = gl.color;
-    g.shadowBlur  = gl.blur;
-    g.fillStyle   = gl.color;
-    g.fillText(text, W/2, H/2);
-    g.fillText(text, W/2, H/2);
-  });
-
-  g.shadowBlur = 10;
-  g.shadowColor = '#fff6cc';
-  g.fillStyle = '#fffdf2';
-  g.fillText(text, W/2, H/2);
-
-  const t = new THREE.CanvasTexture(c);
-  if (THREE.sRGBEncoding !== undefined) t.encoding = THREE.sRGBEncoding;
-  t.anisotropy = 8;
-  return t;
-}
-
-/* --- 安全出口标识 --- */
-function makeExitTexture(){
-  const c = makeCanvas(256, 128);
-  const g = c.getContext('2d');
-  g.fillStyle = '#031a0c';
-  g.fillRect(0, 0, 256, 128);
-  g.fillStyle = '#19ff7a';
-  g.font = 'bold 62px "PingFang SC","Microsoft YaHei",sans-serif';
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.shadowColor = '#19ff7a';
-  g.shadowBlur = 18;
-  g.fillText('安全出口', 128, 64);
-  const t = new THREE.CanvasTexture(c);
-  if (THREE.sRGBEncoding !== undefined) t.encoding = THREE.sRGBEncoding;
-  return t;
-}
-
-/* --- 教室门牌 --- */
-function makeDoorPlateTexture(){
-  const c = makeCanvas(128, 64);
-  const g = c.getContext('2d');
-  g.fillStyle = '#2a2f38';
-  g.fillRect(0, 0, 128, 64);
-  g.strokeStyle = '#454d59';
-  g.lineWidth = 3;
-  g.strokeRect(2, 2, 124, 60);
-  g.fillStyle = '#8fa6bd';
-  g.font = 'bold 30px "PingFang SC","Microsoft YaHei",sans-serif';
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.fillText('教室', 64, 34);
-  const t = new THREE.CanvasTexture(c);
-  if (THREE.sRGBEncoding !== undefined) t.encoding = THREE.sRGBEncoding;
-  return t;
-}
-
-/* --- 光晕（课代表用） --- */
-function makeGlowTexture(){
-  const c = makeCanvas(128, 128);
-  const g = c.getContext('2d');
-  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  grd.addColorStop(0,    'rgba(255,255,255,1)');
-  grd.addColorStop(0.22, 'rgba(170,235,255,.72)');
-  grd.addColorStop(0.55, 'rgba(80,175,255,.20)');
-  grd.addColorStop(1,    'rgba(0,0,0,0)');
-  g.fillStyle = grd;
-  g.fillRect(0, 0, 128, 128);
-  const t = new THREE.CanvasTexture(c);
-  if (THREE.sRGBEncoding !== undefined) t.encoding = THREE.sRGBEncoding;
-  return t;
-}
-
-/* --- 【新增】楼梯指示牌 --- */
-function makeStairTex(text, colorHex){
-  const W = 512, H = 256;
-  const c = makeCanvas(W, H);
-  const g = c.getContext('2d');
-  g.clearRect(0, 0, W, H);
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.font = 'bold 130px "PingFang SC","Microsoft YaHei",sans-serif';
-
-  g.shadowColor = colorHex;
-  g.shadowBlur  = 44;
-  g.fillStyle   = colorHex;
-  g.fillText(text, W/2, H/2);
-  g.fillText(text, W/2, H/2);
-
-  g.shadowColor = '#ffffff';
-  g.shadowBlur  = 12;
-  g.fillStyle   = '#ffffff';
-  g.fillText(text, W/2, H/2);
-
-  const t = new THREE.CanvasTexture(c);
-  if (THREE.sRGBEncoding !== undefined) t.encoding = THREE.sRGBEncoding;
-  t.anisotropy = 8;
-  return t;
-}
-
-/* =========================================================
-   3. 灯光
-   ========================================================= */
-const ambient = new THREE.AmbientLight(0x18202c, 0.55);
-scene.add(ambient);
-
-const moon = new THREE.DirectionalLight(0x3a5a8a, 0.22);
-moon.position.set(-40, 60, -50);
-scene.add(moon);
-
-/* --- 手电筒 --- */
-const torch = new THREE.SpotLight(0xfff2d6, 5.2, 30, Math.PI / 8, 0.42, 1.5);
-torch.position.set(0.22, -0.18, 0);
-/* 【性能修复】关闭聚光灯阴影 */
-torch.castShadow = false;
-torch.target.position.set(0, 0, -1);
-camera.add(torch);
-camera.add(torch.target);
-
-const torchFill = new THREE.PointLight(0xffe9c4, 1.15, 5.5, 1.7);
-torchFill.position.set(0.1, -0.1, -0.3);
-camera.add(torchFill);
-
-/* --- 体积光锥 --- */
-(function(){
-  const coneGeo = new THREE.ConeGeometry(2.6, 11, 24, 1, true);
-  const coneMat = new THREE.MeshBasicMaterial({
-    color: 0xfff0cc,
-    transparent: true,
-    opacity: 0.022,
-    side: THREE.DoubleSide,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    fog: false
-  });
-  const cone = new THREE.Mesh(coneGeo, coneMat);
-  cone.rotation.x = Math.PI / 2;
-  cone.position.set(0, -0.1, -5.5);
-  camera.add(cone);
-})();
-
-/* =========================================================
-   4. 场景搭建：银杏楼二栋
-   ========================================================= */
-const floorTex = makeFloorTexture();
-const wallTex  = makeWallTexture();
-const signTex  = makeSignTexture('银杏楼二栋');
-const exitTex  = makeExitTexture();
-const plateTex = makeDoorPlateTexture();
-const glowTex  = makeGlowTexture();
-
-const MAT = {
-  floor : new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.9,  metalness: 0.06 }),
-  wall  : new THREE.MeshStandardMaterial({ map: wallTex,  roughness: 0.96, metalness: 0.02 }),
-  ceil  : new THREE.MeshStandardMaterial({ color: 0x1a1e25, roughness: 1.0 }),
-  class : new THREE.MeshStandardMaterial({ color: 0x262b34, roughness: 0.95 }),
-  door  : new THREE.MeshStandardMaterial({ color: 0x3a2a20, roughness: 0.78, metalness: 0.1 }),
-  frame : new THREE.MeshStandardMaterial({ color: 0x15181d, roughness: 0.9 }),
-  glass : new THREE.MeshStandardMaterial({
-    color: 0x0a1420, roughness: 0.25, metalness: 0.35,
-    emissive: 0x0d1c2c, emissiveIntensity: 0.6
-  }),
-  glassLit : new THREE.MeshStandardMaterial({
-    color: 0x2a2a18, roughness: 0.3, metalness: 0.2,
-    emissive: 0x3d3210, emissiveIntensity: 0.85
-  }),
-  roof  : new THREE.MeshStandardMaterial({ color: 0x14171c, roughness: 1.0 }),
-  metal : new THREE.MeshStandardMaterial({ color: 0x40464f, roughness: 0.55, metalness: 0.65 })
+/* ==================== 材质 ==================== */
+var M={
+  floor:new THREE.MeshStandardMaterial({map:floorTex,roughness:.9,metalness:.06}),
+  wall:new THREE.MeshStandardMaterial({map:wallTex,roughness:.96,metalness:.02}),
+  ceil:new THREE.MeshStandardMaterial({color:0x1a1e25,roughness:1}),
+  class:new THREE.MeshStandardMaterial({color:0x262b34,roughness:.95}),
+  door:new THREE.MeshStandardMaterial({color:0x3a2a20,roughness:.78,metalness:.1}),
+  frame:new THREE.MeshStandardMaterial({color:0x15181d,roughness:.9}),
+  glass:new THREE.MeshStandardMaterial({color:0x0a1420,roughness:.25,metalness:.35,emissive:0x0d1c2c,emissiveIntensity:.6}),
+  glassLit:new THREE.MeshStandardMaterial({color:0x2a2a18,roughness:.3,emissive:0x3d3210,emissiveIntensity:.85}),
+  roof:new THREE.MeshStandardMaterial({color:0x14171c,roughness:1}),
+  metal:new THREE.MeshStandardMaterial({color:0x40464f,roughness:.55,metalness:.65}),
+  track:new THREE.MeshStandardMaterial({map:trackTex,roughness:.9}),
+  grass:new THREE.MeshStandardMaterial({map:grassTex,roughness:1}),
+  court:new THREE.MeshStandardMaterial({map:courtTex,roughness:.85}),
+  concrete:new THREE.MeshStandardMaterial({color:0x5a5f66,roughness:.95}),
+  white:new THREE.MeshStandardMaterial({color:0xdde4ea,roughness:.6}),
+  red:new THREE.MeshStandardMaterial({color:0xb02020,roughness:.7}),
+  skin:new THREE.MeshStandardMaterial({color:0xd4a886,roughness:.8}),
+  darkCloth:new THREE.MeshStandardMaterial({color:0x12161c,roughness:.95}),
+  grayCloth:new THREE.MeshStandardMaterial({color:0x2e333b,roughness:.95}),
+  ruler:new THREE.MeshStandardMaterial({color:0x8a6a3a,roughness:.6,metalness:.15}),
+  signPost:new THREE.MeshStandardMaterial({color:0x9098a0,roughness:.6,metalness:.5}),
+  gate:new THREE.MeshStandardMaterial({map:gateTex,roughness:.85,metalness:.2}),
+  gatePost:new THREE.MeshStandardMaterial({color:0xc8b878,roughness:.7})
 };
 
-const building = new THREE.Group();
-scene.add(building);
+/* ==================== 灯光 ==================== */
+var ambient=new THREE.AmbientLight(0x18202c,.55);scene.add(ambient);
+var moon=new THREE.DirectionalLight(0x3a5a8a,.22);moon.position.set(-40,60,-50);scene.add(moon);
 
-/* ---------- 4.1 楼体主体 ---------- */
-for (let f = 0; f < FLOORS; f++){
-  const y0 = f * FLOOR_H;
+var torch=new THREE.SpotLight(0xfff2d6,5.2,32,Math.PI/8,.42,1.5);
+torch.position.set(.22,-.18,0);torch.castShadow=false;
+torch.target.position.set(0,0,-1);
+camera.add(torch);camera.add(torch.target);
+var torchFill=new THREE.PointLight(0xffe9c4,1.15,6,1.7);
+torchFill.position.set(.1,-.1,-.3);camera.add(torchFill);
 
-  const floor = new THREE.Mesh(
-    new THREE.BoxGeometry(BW, 0.2, BZS - BZO),
-    MAT.floor
-  );
-  floor.position.set(0, y0 - 0.1, (BZO + BZS) / 2);
-  building.add(floor);
+(function(){
+  var cg=new THREE.ConeGeometry(2.6,11,24,1,true);
+  var cm=new THREE.MeshBasicMaterial({color:0xfff0cc,transparent:true,opacity:.022,
+    side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending,fog:false});
+  var cn=new THREE.Mesh(cg,cm);cn.rotation.x=Math.PI/2;cn.position.set(0,-.1,-5.5);
+  camera.add(cn);
+})();
 
-  const ceil = new THREE.Mesh(
-    new THREE.BoxGeometry(BW, 0.2, BZS - BZO),
-    MAT.ceil
-  );
-  ceil.position.set(0, y0 + FLOOR_H - 0.1, (BZO + BZS) / 2);
-  building.add(ceil);
-
-  const cls = new THREE.Mesh(
-    new THREE.BoxGeometry(BW, FLOOR_H, BZB - BZS),
-    MAT.class
-  );
-  cls.position.set(0, y0 + FLOOR_H / 2, (BZS + BZB) / 2);
-  building.add(cls);
-
-  const doorCount = 7;
-  for (let i = 0; i < doorCount; i++){
-    const dx = -24 + i * 8;
-
-    const frame = new THREE.Mesh(
-      new THREE.BoxGeometry(2.0, 2.9, 0.12),
-      MAT.frame
-    );
-    frame.position.set(dx, y0 + 1.45, BZS - 0.06);
-    building.add(frame);
-
-    const door = new THREE.Mesh(
-      new THREE.BoxGeometry(1.7, 2.7, 0.08),
-      MAT.door
-    );
-    door.position.set(dx, y0 + 1.36, BZS - 0.13);
-    building.add(door);
-
-    const plate = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.62, 0.31),
-      new THREE.MeshBasicMaterial({ map: plateTex })
-    );
-    plate.position.set(dx + 0.62, y0 + 2.45, BZS - 0.18);
-    building.add(plate);
+/* 主楼里的走廊应急灯 */
+var corridorLights=[];
+for(var lf=0;lf<FLOORS;lf++){
+  for(var lx=-16;lx<=16;lx+=16){
+    var cl=new THREE.PointLight(0x2a5a8a,.85,16,1.8);
+    cl.position.set(lx, lf*FLOOR_H+3.4, -7);
+    scene.add(cl);corridorLights.push(cl);
   }
-
-  const outWall = new THREE.Mesh(
-    new THREE.BoxGeometry(BW, FLOOR_H, 0.3),
-    MAT.wall
-  );
-  outWall.position.set(0, y0 + FLOOR_H / 2, BZO - 0.15);
-  building.add(outWall);
-
-  for (let i = 0; i < 11; i++){
-    const wx = -25 + i * 5;
-    const lit = Math.random() < 0.18;
-    const win = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.6, 2.0),
-      lit ? MAT.glassLit : MAT.glass
-    );
-    win.position.set(wx, y0 + 2.1, BZO - 0.31);
-    win.rotation.y = Math.PI;
-    building.add(win);
-
-    const frameH = new THREE.Mesh(
-      new THREE.BoxGeometry(2.9, 0.12, 0.1),
-      MAT.metal
-    );
-    frameH.position.set(wx, y0 + 3.16, BZO - 0.30);
-    building.add(frameH);
-
-    const frameH2 = frameH.clone();
-    frameH2.position.y = y0 + 1.04;
-    building.add(frameH2);
-
-    const frameV = new THREE.Mesh(
-      new THREE.BoxGeometry(0.12, 2.2, 0.1),
-      MAT.metal
-    );
-    frameV.position.set(wx - 1.48, y0 + 2.1, BZO - 0.30);
-    building.add(frameV);
-
-    const frameV2 = frameV.clone();
-    frameV2.position.x = wx + 1.48;
-    building.add(frameV2);
-  }
-
-  for (let i = 0; i < 5; i++){
-    const lx = -22 + i * 11;
-    const tube = new THREE.Mesh(
-      new THREE.BoxGeometry(2.6, 0.06, 0.22),
-      new THREE.MeshBasicMaterial({
-        color: 0x223444,
-        transparent: true,
-        opacity: f === 3 ? 0.85 : 0.4
-      })
-    );
-    tube.position.set(lx, y0 + FLOOR_H - 0.24, -7);
-    building.add(tube);
-  }
-
-  for (let i = 0; i <= 7; i++){
-    const px = -28 + i * 8;
-    const pillar = new THREE.Mesh(
-      new THREE.BoxGeometry(0.5, FLOOR_H, 0.5),
-      MAT.wall
-    );
-    pillar.position.set(px, y0 + FLOOR_H / 2, BZS - 0.2);
-    building.add(pillar);
+}
+/* 走廊顶灯管（视觉） */
+var tubeMeshes=[];
+for(var tf=0;tf<FLOORS;tf++){
+  for(var ti=0;ti<5;ti++){
+    var tbx=-22+ti*11;
+    var tb=new THREE.Mesh(new THREE.BoxGeometry(2.6,.06,.22),
+      new THREE.MeshBasicMaterial({color:0x223444,transparent:true,opacity:.85}));
+    tb.position.set(tbx, tf*FLOOR_H+FLOOR_H-.24, -7);
+    scene.add(tb);tubeMeshes.push(tb);
   }
 }
 
-/* ---------- 4.2 两端山墙 ---------- */
-[-28, 28].forEach(function(x){
-  const side = new THREE.Mesh(
-    new THREE.BoxGeometry(0.4, FLOOR_H * FLOORS, BZB - BZO),
-    MAT.wall
-  );
-  side.position.set(x + (x < 0 ? -0.2 : 0.2), FLOOR_H * FLOORS / 2, (BZO + BZB) / 2);
-  building.add(side);
+/* ==================== 主楼 ==================== */
+var building=new THREE.Group();scene.add(building);
+
+for(var f=0;f<FLOORS;f++){
+  var y0=f*FLOOR_H;
+  var fl=new THREE.Mesh(new THREE.BoxGeometry(BW,.2,BZS-BZO),M.floor);
+  fl.position.set(0,y0-.1,(BZO+BZS)/2);building.add(fl);
+  var ce=new THREE.Mesh(new THREE.BoxGeometry(BW,.2,BZS-BZO),M.ceil);
+  ce.position.set(0,y0+FLOOR_H-.1,(BZO+BZS)/2);building.add(ce);
+  var cl=new THREE.Mesh(new THREE.BoxGeometry(BW,FLOOR_H,BZB-BZS),M.class);
+  cl.position.set(0,y0+FLOOR_H/2,(BZS+BZB)/2);building.add(cl);
+
+  for(var di=0;di<7;di++){
+    var dx=-24+di*8;
+    var fr=new THREE.Mesh(new THREE.BoxGeometry(2,2.9,.12),M.frame);
+    fr.position.set(dx,y0+1.45,BZS-.06);building.add(fr);
+    var dr=new THREE.Mesh(new THREE.BoxGeometry(1.7,2.7,.08),M.door);
+    dr.position.set(dx,y0+1.36,BZS-.13);building.add(dr);
+    var pl=new THREE.Mesh(new THREE.PlaneGeometry(.62,.31),
+      new THREE.MeshBasicMaterial({map:plateTex}));
+    pl.position.set(dx+.62,y0+2.45,BZS-.18);building.add(pl);
+  }
+  /* 走廊外侧墙 */
+  var ow=new THREE.Mesh(new THREE.BoxGeometry(BW,FLOOR_H,.3),M.wall);
+  ow.position.set(0,y0+FLOOR_H/2,BZO-.15);building.add(ow);
+  /* 走廊窗 */
+  for(var wi=0;wi<11;wi++){
+    var wx=-25+wi*5;
+    var lit=Math.random()<.2;
+    var wn=new THREE.Mesh(new THREE.PlaneGeometry(2.6,2),lit?M.glassLit:M.glass);
+    wn.position.set(wx,y0+2.1,BZO-.31);wn.rotation.y=Math.PI;building.add(wn);
+    var fh=new THREE.Mesh(new THREE.BoxGeometry(2.9,.12,.1),M.metal);
+    fh.position.set(wx,y0+3.16,BZO-.30);building.add(fh);
+    var fh2=fh.clone();fh2.position.y=y0+1.04;building.add(fh2);
+  }
+  /* 柱子 */
+  for(var pi=0;pi<=7;pi++){
+    var px=-28+pi*8;
+    var pil=new THREE.Mesh(new THREE.BoxGeometry(.5,FLOOR_H,.5),M.wall);
+    pil.position.set(px,y0+FLOOR_H/2,BZS-.2);building.add(pil);
+  }
+}
+
+[-28,28].forEach(function(x){
+  var sd=new THREE.Mesh(new THREE.BoxGeometry(.4,FLOOR_H*FLOORS,BZB-BZO),M.wall);
+  sd.position.set(x+(x<0?-.2:.2),FLOOR_H*FLOORS/2,(BZO+BZB)/2);building.add(sd);
 });
 
-/* ---------- 【新增】4.2b 楼梯指示牌 ---------- */
+/* 楼梯视觉模型（简化版：一段斜坡+台阶） */
 (function(){
-  const upTex = makeStairTex('↑ 上楼', '#5fe8ff');
-  const dnTex = makeStairTex('↓ 下楼', '#ffd166');
-
-  for (let f = 0; f < FLOORS; f++){
-    const y0 = f * FLOOR_H;
-
-    /* 右端：向上 */
-    if (f < FLOORS - 1){
-      const sUp = new THREE.Mesh(
-        new THREE.PlaneGeometry(3.4, 1.7),
-        new THREE.MeshBasicMaterial({
-          map: upTex,
-          transparent: true,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          fog: false
-        })
-      );
-      sUp.position.set(27.85, y0 + 2.25, -7);
-      sUp.rotation.y = -Math.PI / 2;
-      building.add(sUp);
+  var stairMat=new THREE.MeshStandardMaterial({color:0x3a3f48,roughness:.9});
+  var railMat=new THREE.MeshStandardMaterial({color:0x707880,roughness:.6,metalness:.5});
+  for(var sf=0;sf<FLOORS;sf++){
+    if(sf<FLOORS-1){
+      /* 右侧上行楼梯：5级台阶沿 x 方向 */
+      for(var st=0;st<8;st++){
+        var step=new THREE.Mesh(new THREE.BoxGeometry(.8,.2,3.5),stairMat);
+        step.position.set(26+st*0.3, sf*FLOOR_H+st*0.5+.1, -7);
+        building.add(step);
+      }
+      var rail1=new THREE.Mesh(new THREE.BoxGeometry(2.8,.08,.08),railMat);
+      rail1.position.set(27, sf*FLOOR_H+2.2, -5.3);
+      rail1.rotation.z=-Math.PI/6;building.add(rail1);
+      var rail2=rail1.clone();rail2.position.z=-8.7;building.add(rail2);
     }
-
-    /* 左端：向下 */
-    if (f > 0){
-      const sDn = new THREE.Mesh(
-        new THREE.PlaneGeometry(3.4, 1.7),
-        new THREE.MeshBasicMaterial({
-          map: dnTex,
-          transparent: true,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          fog: false
-        })
-      );
-      sDn.position.set(-27.85, y0 + 2.25, -7);
-      sDn.rotation.y = Math.PI / 2;
-      building.add(sDn);
+    if(sf>0){
+      /* 左侧下行楼梯 */
+      for(var st2=0;st2<8;st2++){
+        var step2=new THREE.Mesh(new THREE.BoxGeometry(.8,.2,3.5),stairMat);
+        step2.position.set(-26-st2*0.3, sf*FLOOR_H-st2*0.5+.1, -7);
+        building.add(step2);
+      }
+      var rail3=new THREE.Mesh(new THREE.BoxGeometry(2.8,.08,.08),railMat);
+      rail3.position.set(-27, sf*FLOOR_H-1.2, -5.3);
+      rail3.rotation.z=Math.PI/6;building.add(rail3);
+      var rail4=rail3.clone();rail4.position.z=-8.7;building.add(rail4);
     }
   }
 })();
 
-/* ---------- 4.3 楼顶 ---------- */
-const roof = new THREE.Mesh(
-  new THREE.BoxGeometry(BW + 1.6, 0.5, (BZB - BZO) + 1.6),
-  MAT.roof
-);
-roof.position.set(0, FLOOR_H * FLOORS + 0.25, (BZO + BZB) / 2);
-building.add(roof);
-
+/* 楼梯指示牌 */
 (function(){
-  const h = 1.1;
-  const y = FLOOR_H * FLOORS + 0.5 + h / 2;
-
-  const f1 = new THREE.Mesh(new THREE.BoxGeometry(BW + 1.6, h, 0.3), MAT.wall);
-  f1.position.set(0, y, BZO - 0.8);
-  building.add(f1);
-
-  const f2 = new THREE.Mesh(new THREE.BoxGeometry(BW + 1.6, h, 0.3), MAT.wall);
-  f2.position.set(0, y, BZB + 0.8);
-  building.add(f2);
-
-  const f3 = new THREE.Mesh(new THREE.BoxGeometry(0.3, h, BZB - BZO + 1.6), MAT.wall);
-  f3.position.set(-BX2 - 0.8, y, (BZO + BZB) / 2);
-  building.add(f3);
-
-  const f4 = f3.clone();
-  f4.position.x = BX2 + 0.8;
-  building.add(f4);
+  var upT=tStair('↑ 上楼','#5fe8ff');
+  var dnT=tStair('↓ 下楼','#ffd166');
+  for(var f2=0;f2<FLOORS;f2++){
+    var yy=f2*FLOOR_H;
+    if(f2<FLOORS-1){
+      var s1=new THREE.Mesh(new THREE.PlaneGeometry(3.4,1.7),
+        new THREE.MeshBasicMaterial({map:upT,transparent:true,depthWrite:false,
+          blending:THREE.AdditiveBlending,fog:false}));
+      s1.position.set(27.85,yy+2.25,-7);s1.rotation.y=-Math.PI/2;building.add(s1);
+    }
+    if(f2>0){
+      var s2=new THREE.Mesh(new THREE.PlaneGeometry(3.4,1.7),
+        new THREE.MeshBasicMaterial({map:dnT,transparent:true,depthWrite:false,
+          blending:THREE.AdditiveBlending,fog:false}));
+      s2.position.set(-27.85,yy+2.25,-7);s2.rotation.y=Math.PI/2;building.add(s2);
+    }
+  }
 })();
 
-/* ---------- 4.4 楼顶发光招牌 ---------- */
+/* 楼顶 */
 (function(){
-  const signW = 22, signH = 5.5;
-  const signMat = new THREE.MeshBasicMaterial({
-    map: signTex,
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    fog: false,
-    side: THREE.DoubleSide
+  var rf=new THREE.Mesh(new THREE.BoxGeometry(BW+1.6,.5,(BZB-BZO)+1.6),M.roof);
+  rf.position.set(0,FLOOR_H*FLOORS+.25,(BZO+BZB)/2);building.add(rf);
+  var h=1.1,y=FLOOR_H*FLOORS+.5+h/2;
+  var a=new THREE.Mesh(new THREE.BoxGeometry(BW+1.6,h,.3),M.wall);
+  a.position.set(0,y,BZO-.8);building.add(a);
+  var b=new THREE.Mesh(new THREE.BoxGeometry(BW+1.6,h,.3),M.wall);
+  b.position.set(0,y,BZB+.8);building.add(b);
+  var c=new THREE.Mesh(new THREE.BoxGeometry(.3,h,BZB-BZO+1.6),M.wall);
+  c.position.set(-BX2-.8,y,(BZO+BZB)/2);building.add(c);
+  var d=c.clone();d.position.x=BX2+.8;building.add(d);
+  /* 招牌 */
+  var sw=22,sh=5.5;
+  var sm=new THREE.MeshBasicMaterial({map:signTex,transparent:true,depthWrite:false,
+    blending:THREE.AdditiveBlending,fog:false,side:THREE.DoubleSide});
+  var sg=new THREE.Mesh(new THREE.PlaneGeometry(sw,sh),sm);
+  sg.position.set(0,FLOOR_H*FLOORS+3.6,BZO-1.1);sg.rotation.y=Math.PI;building.add(sg);
+  var bk=new THREE.Mesh(new THREE.BoxGeometry(sw+1,sh+.8,.25),
+    new THREE.MeshStandardMaterial({color:0x0a0c10,roughness:1}));
+  bk.position.set(0,FLOOR_H*FLOORS+3.6,BZO-.85);building.add(bk);
+})();
+
+/* 一楼大门 + 门廊 */
+(function(){
+  var dw=new THREE.Mesh(new THREE.BoxGeometry(6.4,3.9,.5),
+    new THREE.MeshStandardMaterial({color:0x05070a,roughness:1}));
+  dw.position.set(0,1.95,BZO-.18);building.add(dw);
+  var gd=new THREE.Mesh(new THREE.PlaneGeometry(5.6,3.4),
+    new THREE.MeshStandardMaterial({color:0x0c1826,roughness:.15,metalness:.6,
+      emissive:0x122a44,emissiveIntensity:.5,transparent:true,opacity:.85,side:THREE.DoubleSide}));
+  gd.position.set(0,1.85,BZO-.42);gd.rotation.y=Math.PI;building.add(gd);
+  var df1=new THREE.Mesh(new THREE.BoxGeometry(6.8,.3,.4),M.metal);
+  df1.position.set(0,3.9,BZO-.3);building.add(df1);
+  var df2=new THREE.Mesh(new THREE.BoxGeometry(.3,3.9,.4),M.metal);
+  df2.position.set(-3.4,1.95,BZO-.3);building.add(df2);
+  var df3=df2.clone();df3.position.x=3.4;building.add(df3);
+  var es=new THREE.Mesh(new THREE.PlaneGeometry(1.6,.8),
+    new THREE.MeshBasicMaterial({map:exitTex,fog:false}));
+  es.position.set(0,4.5,BZO-.5);es.rotation.y=Math.PI;building.add(es);
+  var pr=new THREE.Mesh(new THREE.BoxGeometry(14,.3,8),M.floor);
+  pr.position.set(0,-.15,BZO-4);building.add(pr);
+})();
+
+/* ==================== 操场 ==================== */
+(function(){
+  /* 地面 */
+  var gr=new THREE.Mesh(new THREE.PlaneGeometry(320,320),
+    new THREE.MeshStandardMaterial({color:0x060a0e,roughness:1}));
+  gr.rotation.x=-Math.PI/2;gr.position.y=-.55;scene.add(gr);
+
+  /* 草坪底 */
+  var lawn=new THREE.Mesh(new THREE.PlaneGeometry(PLAY.x2-PLAY.x1,PLAY.z2-PLAY.z1),M.grass);
+  lawn.rotation.x=-Math.PI/2;
+  lawn.position.set((PLAY.x1+PLAY.x2)/2,-.5,(PLAY.z1+PLAY.z2)/2);
+  scene.add(lawn);
+
+  /* 跑道（红环） */
+  var track=new THREE.Mesh(new THREE.RingGeometry(17,23,64),M.track);
+  track.rotation.x=-Math.PI/2;track.position.set(0,-.48,-50);scene.add(track);
+  /* 跑道白线 */
+  var ln=new THREE.Mesh(new THREE.RingGeometry(19.8,20,.1,64),
+    new THREE.MeshBasicMaterial({color:0xdde4ea,side:THREE.DoubleSide}));
+  ln.rotation.x=-Math.PI/2;ln.position.set(0,-.47,-50);scene.add(ln);
+  /* 内场草地 */
+  var inner=new THREE.Mesh(new THREE.CircleGeometry(17,48),M.grass);
+  inner.rotation.x=-Math.PI/2;inner.position.set(0,-.48,-50);scene.add(inner);
+
+  /* 篮球场（东侧） */
+  var ct=new THREE.Mesh(new THREE.PlaneGeometry(14,26),M.court);
+  ct.rotation.x=-Math.PI/2;ct.position.set(32,-.48,-50);scene.add(ct);
+  /* 篮球架 */
+  [40,24].forEach(function(z){
+    var pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,8),M.metal);
+    pole.position.set(38,1.5,z);scene.add(pole);
+    var arm=new THREE.Mesh(new THREE.BoxGeometry(1.6,.15,.15),M.metal);
+    arm.position.set(37.2,3.4,z);scene.add(arm);
+    var board=new THREE.Mesh(new THREE.BoxGeometry(.15,1.05,1.8),M.white);
+    board.position.set(36.4,3.4,z);scene.add(board);
+    var rim=new THREE.Mesh(new THREE.TorusGeometry(.35,.04,8,20),
+      new THREE.MeshStandardMaterial({color:0xff8800,roughness:.5,metalness:.4}));
+    rim.position.set(36.2,3.05,z);rim.rotation.x=Math.PI/2;scene.add(rim);
   });
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(signW, signH), signMat);
-  sign.position.set(0, FLOOR_H * FLOORS + 3.6, BZO - 1.1);
-  sign.rotation.y = Math.PI;
-  building.add(sign);
 
-  const back = new THREE.Mesh(
-    new THREE.BoxGeometry(signW + 1, signH + 0.8, 0.25),
-    new THREE.MeshStandardMaterial({ color: 0x0a0c10, roughness: 1 })
-  );
-  back.position.set(0, FLOOR_H * FLOORS + 3.6, BZO - 0.85);
-  building.add(back);
-
-  for (let i = -1; i <= 1; i++){
-    const bar = new THREE.Mesh(
-      new THREE.BoxGeometry(0.16, 2.4, 0.16),
-      MAT.metal
-    );
-    bar.position.set(i * 8, FLOOR_H * FLOORS + 1.5, BZO - 0.9);
-    building.add(bar);
-  }
-
-  const signLight = new THREE.PointLight(0xffb347, 1.6, 26, 1.6);
-  signLight.position.set(0, FLOOR_H * FLOORS + 3.2, BZO - 3.2);
-  building.add(signLight);
-})();
-
-/* ---------- 4.5 一楼大门 + 门廊 ---------- */
-(function(){
-  const doorway = new THREE.Mesh(
-    new THREE.BoxGeometry(6.4, 3.9, 0.5),
-    new THREE.MeshStandardMaterial({ color: 0x05070a, roughness: 1 })
-  );
-  doorway.position.set(0, 1.95, BZO - 0.18);
-  building.add(doorway);
-
-  const glassDoor = new THREE.Mesh(
-    new THREE.PlaneGeometry(5.6, 3.4),
-    new THREE.MeshStandardMaterial({
-      color: 0x0c1826, roughness: 0.15, metalness: 0.6,
-      emissive: 0x122a44, emissiveIntensity: 0.5,
-      transparent: true, opacity: 0.85, side: THREE.DoubleSide
-    })
-  );
-  glassDoor.position.set(0, 1.85, BZO - 0.42);
-  glassDoor.rotation.y = Math.PI;
-  building.add(glassDoor);
-
-  const doorFrameMat = MAT.metal;
-  const df1 = new THREE.Mesh(new THREE.BoxGeometry(6.8, 0.3, 0.4), doorFrameMat);
-  df1.position.set(0, 3.9, BZO - 0.3);
-  building.add(df1);
-
-  const df2 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 3.9, 0.4), doorFrameMat);
-  df2.position.set(-3.4, 1.95, BZO - 0.3);
-  building.add(df2);
-
-  const df3 = df2.clone();
-  df3.position.x = 3.4;
-  building.add(df3);
-
-  const dfMid = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.4, 0.2), doorFrameMat);
-  dfMid.position.set(0, 1.85, BZO - 0.44);
-  building.add(dfMid);
-
-  const exitSign = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.6, 0.8),
-    new THREE.MeshBasicMaterial({ map: exitTex, fog: false })
-  );
-  exitSign.position.set(0, 4.5, BZO - 0.5);
-  exitSign.rotation.y = Math.PI;
-  building.add(exitSign);
-
-  const porch = new THREE.Mesh(
-    new THREE.BoxGeometry(14, 0.3, 7),
-    MAT.floor
-  );
-  porch.position.set(0, -0.15, BZO - 3.5);
-  building.add(porch);
-
-  for (let i = 0; i < 3; i++){
-    const step = new THREE.Mesh(
-      new THREE.BoxGeometry(14, 0.18, 1.0),
-      new THREE.MeshStandardMaterial({ color: 0x1e2229, roughness: 1 })
-    );
-    step.position.set(0, -0.09 - i * 0.18, BZO - 7.0 - i * 1.0);
-    building.add(step);
-  }
-})();
-
-/* ---------- 4.6 地面 ---------- */
-(function(){
-  const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(200, 200),
-    new THREE.MeshStandardMaterial({ color: 0x070a0e, roughness: 1 })
-  );
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -0.55;
-  scene.add(ground);
-})();
-
-/* ---------- 4.7 走廊应急灯 ---------- */
-(function(){
-  const l1 = new THREE.PointLight(0x2a5a8a, 0.85, 16, 1.8);
-  l1.position.set(-16, 15.4, -7);
-  scene.add(l1);
-
-  const l2 = new THREE.PointLight(0x2a5a8a, 0.85, 16, 1.8);
-  l2.position.set(0, 15.4, -7);
-  scene.add(l2);
-
-  const l3 = new THREE.PointLight(0x2a5a8a, 0.85, 16, 1.8);
-  l3.position.set(16, 15.4, -7);
-  scene.add(l3);
-})();
-
-/* =========================================================
-   5. 可行走区域
-   ========================================================= */
-const AREAS = [];
-for (let f = 0; f < FLOORS; f++){
-  AREAS.push({
-    x1: BX1 + 0.5,
-    x2: BX2 - 0.5,
-    z1: BZO + 0.5,
-    z2: BZS - 0.5,
-    y : f * FLOOR_H
+  /* 足球门（跑道西侧） */
+  [0,1].forEach(function(side){
+    var gx=side?20:-20;
+    var postMat=M.white;
+    var p1=new THREE.Mesh(new THREE.BoxGeometry(.12,2.4,.12),postMat);
+    p1.position.set(gx,1.2,-57);scene.add(p1);
+    var p2=p1.clone();p2.position.z=-43;scene.add(p2);
+    var bar=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,14.12),postMat);
+    bar.position.set(gx,2.4,-50);scene.add(bar);
   });
-}
-/* 一楼门廊 */
-AREAS.push({ x1: -6.5, x2: 6.5, z1: BZO - 7.2, z2: BZO + 0.5, y: 0 });
 
-/* =========================================================
-   5.1 【新增】楼梯触发区
-   ---------------------------------------------------------
-   右端 x∈[26.2,27.5] 向上；左端 x∈[-27.5,-26.2] 向下。
-   exitX 用于把玩家推离触发区，避免连续触发。
-   ========================================================= */
-const STAIRS = [];
-for (let f = 0; f < FLOORS; f++){
-  if (f < FLOORS - 1){
-    STAIRS.push({
-      x1: 26.2, x2: 27.5,
-      z1: -9.5, z2: -4.5,
-      y : f * FLOOR_H,
-      to: (f + 1) * FLOOR_H,
-      exitX: 24.6
-    });
+  /* 路灯 */
+  for(var li=0;li<6;li++){
+    var lx=-40+li*16;
+    var pole=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,7,8),M.metal);
+    pole.position.set(lx,3.5,-20);scene.add(pole);
+    var head=new THREE.Mesh(new THREE.BoxGeometry(1.2,.2,.4),M.metal);
+    head.position.set(lx,7,-19.6);scene.add(head);
+    var bulb=new THREE.Mesh(new THREE.BoxGeometry(.9,.05,.3),
+      new THREE.MeshBasicMaterial({color:0x2a3a4a}));
+    bulb.position.set(lx,6.88,-19.6);scene.add(bulb);
   }
-  if (f > 0){
-    STAIRS.push({
-      x1: -27.5, x2: -26.2,
-      z1: -9.5, z2: -4.5,
-      y : f * FLOOR_H,
-      to: (f - 1) * FLOOR_H,
-      exitX: -24.6
-    });
+})();
+
+/* ==================== 第二教学楼 ==================== */
+(function(){
+  var g=new THREE.Group();scene.add(g);
+  var bx=-62, bz=-40, bw=32, bd=36, floors=3, fh=4;
+  for(var f3=0;f3<floors;f3++){
+    var y0=f3*fh;
+    var box=new THREE.Mesh(new THREE.BoxGeometry(bw,fh,bd),M.class);
+    box.position.set(bx,y0+fh/2,bz);g.add(box);
+    /* 窗户 */
+    for(var wi=0;wi<5;wi++){
+      var wx=bx-bw/2+3+wi*6;
+      var wn=new THREE.Mesh(new THREE.PlaneGeometry(2,1.6),M.glass);
+      wn.position.set(wx,y0+2.5,bz+bd/2+.01);g.add(wn);
+      var wn2=wn.clone();wn2.rotation.y=Math.PI;wn2.position.z=bz-bd/2-.01;g.add(wn2);
+    }
+    /* 侧窗 */
+    for(var si=0;si<4;si++){
+      var sz=bz-bd/2+5+si*8;
+      var sn=new THREE.Mesh(new THREE.PlaneGeometry(2,1.6),M.glass);
+      sn.position.set(bx+bw/2+.01,y0+2.5,sz);sn.rotation.y=Math.PI/2;g.add(sn);
+      var sn2=sn.clone();sn2.rotation.y=-Math.PI/2;sn2.position.x=bx-bw/2-.01;g.add(sn2);
+    }
+  }
+  /* 楼顶 */
+  var rf=new THREE.Mesh(new THREE.BoxGeometry(bw+1,.4,bd+1),M.roof);
+  rf.position.set(bx,floors*fh+.2,bz);g.add(rf);
+  /* 入口 */
+  var ent=new THREE.Mesh(new THREE.BoxGeometry(4,3,.3),
+    new THREE.MeshStandardMaterial({color:0x05070a,roughness:1}));
+  ent.position.set(bx,1.5,bz+bd/2+.1);g.add(ent);
+  var entF=new THREE.Mesh(new THREE.BoxGeometry(5,.3,.4),M.metal);
+  entF.position.set(bx,3.2,bz+bd/2+.2);g.add(entF);
+  /* 牌子 */
+  var sgT=tSign('教学楼');
+  var sg=new THREE.Mesh(new THREE.PlaneGeometry(8,2),
+    new THREE.MeshBasicMaterial({map:sgT,transparent:true,depthWrite:false,
+      blending:THREE.AdditiveBlending,fog:false,side:THREE.DoubleSide}));
+  sg.position.set(bx,floors*fh+3,bz+bd/2+.2);g.add(sg);
+})();
+
+/* ==================== 大门 + 保安亭 ==================== */
+var gateGroup=new THREE.Group();scene.add(gateGroup);
+var gateLeftPivot, gateRightPivot;
+
+(function(){
+  /* 大门位置：z=-92, 宽度14 */
+  var gx=0, gz=-92, gw=14;
+  /* 两侧立柱 */
+  [-1,1].forEach(function(side){
+    var post=new THREE.Mesh(new THREE.BoxGeometry(1.2,6,1.2),M.gatePost);
+    post.position.set(side*(gw/2+.5),3,gz);gateGroup.add(post);
+    var cap=new THREE.Mesh(new THREE.BoxGeometry(1.6,.4,1.6),M.gatePost);
+    cap.position.set(side*(gw/2+.5),6.2,gz);gateGroup.add(cap);
+  });
+  /* 横梁 */
+  var beam=new THREE.Mesh(new THREE.BoxGeometry(gw+2,.6,1.2),M.gatePost);
+  beam.position.set(0,5.4,gz);gateGroup.add(beam);
+  /* 牌子 */
+  var gsT=tSign('银杏楼二栋');
+  var gs=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),
+    new THREE.MeshBasicMaterial({map:gsT,transparent:true,depthWrite:false,
+      blending:THREE.AdditiveBlending,fog:false,side:THREE.DoubleSide}));
+  gs.position.set(0,5.4,gz+.7);gateGroup.add(gs);
+
+  /* 两扇铁门（Pivot 分别位于两侧立柱内侧） */
+  function makeGate(side){
+    var pivot=new THREE.Group();
+    pivot.position.set(side*(gw/2-.05),0,gz);
+    gateGroup.add(pivot);
+    var panel=new THREE.Mesh(new THREE.BoxGeometry(gw/2,.3,3.2),M.gate);
+    panel.position.set(-side*gw/4, 2.5, 0);
+    pivot.add(panel);
+    /* 竖条 */
+    for(var i=0;i<6;i++){
+      var bar=new THREE.Mesh(new THREE.BoxGeometry(.12,2.4,.12),M.gatePost);
+      bar.position.set(-side*(0.4+i*0.95), 2.5, 0);
+      pivot.add(bar);
+    }
+    return pivot;
+  }
+  gateLeftPivot=makeGate(-1);
+  gateRightPivot=makeGate(1);
+
+  /* 保安亭 */
+  var gd=new THREE.Group();
+  gd.position.set(GUARD.x,0,GUARD.z);scene.add(gd);
+  var base=new THREE.Mesh(new THREE.BoxGeometry(3.2,2.8,3.2),
+    new THREE.MeshStandardMaterial({color:0xd8d8d8,roughness:.85}));
+  base.position.y=1.4;gd.add(base);
+  var win=new THREE.Mesh(new THREE.BoxGeometry(3.24,1.2,3.24),M.glass);
+  win.position.y=1.9;gd.add(win);
+  var roof=new THREE.Mesh(new THREE.BoxGeometry(3.8,.3,3.8),
+    new THREE.MeshStandardMaterial({color:0x3a4048,roughness:.9}));
+  roof.position.y=2.95;gd.add(roof);
+  /* 灯 */
+  var gl=new THREE.PointLight(0xffddaa,1.2,10,1.8);
+  gl.position.set(GUARD.x,2.4,GUARD.z);scene.add(gl);
+  var gb=new THREE.Mesh(new THREE.SphereGeometry(.15,8,8),
+    new THREE.MeshBasicMaterial({color:0xffddaa}));
+  gb.position.set(GUARD.x,2.4,GUARD.z);scene.add(gb);
+})();
+
+/* ==================== 可行走区域 ==================== */
+var AREAS=[];
+for(var af=0;af<FLOORS;af++){
+  AREAS.push({x1:BX1+.5,x2:BX2-.5,z1:BZO+.5,z2:BZS-.5,y:af*FLOOR_H});
+}
+/* 一楼门廊 → 操场（连通走廊） */
+AREAS.push({x1:-6.5,x2:6.5,z1:-17,z2:BZO+.5,y:0});
+/* 操场整体 */
+AREAS.push({x1:PLAY.x1,x2:PLAY.x2,z1:PLAY.z1,z2:PLAY.z2,y:0});
+/* 大门口区域 */
+AREAS.push({x1:-16,x2:16,z1:GATE_Z-2,z2:PLAY.z1+.5,y:0});
+/* 通向第二教学楼的小路（西侧） */
+AREAS.push({x1:PLAY.x1-.5,x2:-44,z1:-58,z2:-22,y:0});
+
+/* 楼梯触发区 */
+var STAIRS=[];
+for(var stf=0;stf<FLOORS;stf++){
+  if(stf<FLOORS-1){
+    STAIRS.push({x1:26.2,x2:27.5,z1:-9.5,z2:-4.5,y:stf*FLOOR_H,to:(stf+1)*FLOOR_H,exitX:24.6});
+  }
+  if(stf>0){
+    STAIRS.push({x1:-27.5,x2:-26.2,z1:-9.5,z2:-4.5,y:stf*FLOOR_H,to:(stf-1)*FLOOR_H,exitX:-24.6});
   }
 }
+var stairCooldown=0;
 
-let stairCooldown = 0;
-
-/* =========================================================
-   6. 玩家状态
-   ========================================================= */
-const player = {
-  pos    : new THREE.Vector3(0, 3 * FLOOR_H + EYE_H, -7),
-  groundY: 3 * FLOOR_H,
-  yaw    : 0,
-  pitch  : 0,
-  bobT   : 0,
-  bobY   : 0
+/* ==================== 玩家 ==================== */
+var player={
+  pos:new THREE.Vector3(0,FLOOR_H*3+EYE_H,-7),
+  groundY:FLOOR_H*3,
+  yaw:0,pitch:0,bobT:0,bobY:0,
+  sprinting:false,
+  sprintFactor:0
 };
+var joy={x:0,y:0,active:false};
+var keys={};
 
-const joy = { x: 0, y: 0, active: false };
-
-/* =========================================================
-   7. 题库数据（45 题）
-   ========================================================= */
-const QUESTION_BANK = [
-/* ============ 课代表 A · 第1课 ============ */
-{
-  name: "课代表A · 第1课 开启初中生活",
-  questions: [
-    { q:"中学生活是一段新的人生旅程，而我们对新生活充满了期待。下列属于对新生活期待的有（　）",
-      o:["①各种问题和困难 ②更多的发展机会 ③丰富多样的课程",
-         "①各种问题和困难 ②更多的发展机会 ④各种各样的社会实践",
-         "①各种问题和困难 ③丰富多样的课程 ④各种各样的社会实践",
-         "②更多的发展机会 ③丰富多样的课程 ④各种各样的社会实践"],
-      a:3 },
-
-    { q:"初中阶段，是人生美好的年华，也是规划未来之路的重要时期。因为初中阶段（　）",
-      o:["①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值",
-         "①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ④对我们一生的发展起着决定作用",
-         "①为我们的发展提供了新的机会 ③对我们的人生具有独特的价值 ④对我们一生的发展起着决定作用",
-         "②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值 ④对我们一生的发展起着决定作用"],
-      a:0 },
-
-    { q:"袁隆平回忆中学时光时说：“博学中学是我最感亲切的母校，她给予我的培养和教育，对我的成长起了决定性的作用。”这蕴含的道理是（　）",
-      o:["初中生活重新塑造一个完美的“自我”",
-         "初中阶段为我们的成长打下坚实基础",
-         "初中生活能彻底改变我们的人生目标",
-         "只要努力学习，就一定能成为科学家"],
-      a:1 },
-
-    { q:"“千里之行，始于足下。”面对各种可能与挑战，我们要（　）",
-      o:["把握机遇，不懈努力",
-         "珍视当下，放弃学业",
-         "顺其自然，得过且过",
-         "不择手段，发展自我"],
-      a:0 },
-
-    { q:"习近平总书记强调，广大青年要争做有理想、敢担当、能吃苦、肯奋斗的新时代好青年。这要求刚升入初中的我们（　）",
-      o:["志存高远求知识，脚踏实地勇前行",
-         "贪图安逸享生活，逃避责任怕困难",
-         "盲目跟风随大流，不思进取混日子",
-         "自私自利顾自己，不顾集体与国家"],
-      a:0 },
-
-    { q:"在中学时代，我们应该（　）",
-      o:["①努力学习，勤于思考，拒绝参加任何活动 ②珍惜时光，挖掘潜能，随意发展自己个性",
-         "①努力学习，勤于思考，拒绝参加任何活动 ④珍视当下，把握机遇，做敢担当的中学生",
-         "②珍惜时光，挖掘潜能，随意发展自己个性 ③明确目标，挑战自我，做有理想的中学生",
-         "③明确目标，挑战自我，做有理想的中学生 ④珍视当下，把握机遇，做敢担当的中学生"],
-      a:3 },
-
-    { q:"小亮的爷爷回忆初中生活时说：“中学时代，一群同龄人一起学习，一起成长……总是让我难以忘怀!”爷爷难忘的可能是（　）",
-      o:["①不断超越自我的成就感 ②学习知识时的不懈坚持 ③努力追梦与圆梦的经历",
-         "①不断超越自我的成就感 ②学习知识时的不懈坚持 ④展现自身才华的愉悦感",
-         "①不断超越自我的成就感 ③努力追梦与圆梦的经历 ④展现自身才华的愉悦感",
-         "②学习知识时的不懈坚持 ③努力追梦与圆梦的经历 ④展现自身才华的愉悦感"],
-      a:2 },
-
-    { q:"进入初中意味着我们的人生将进入一个新的阶段，为抓住机遇、迎接挑战，我们应（　）",
-      o:["合理规划，设定合理的发展目标",
-         "勇于担当，梦想自会实现",
-         "享受生活，迎接时代变革与挑战",
-         "随遇而安，听从命运的安排"],
-      a:0 },
-
-    /* 【修复】原第 9 题选项结构不统一（“①②都值得借鉴”写法），
-       已改为与全卷一致的 ①②③④ 组合式选项。 */
-    { q:"凡事预则立，不预则废。如何做好初中生活规划，以下值得借鉴的是（　）",
-      o:["①结合自己的兴趣爱好、性格特点来设定目标 ②考虑自己的实际能力和社会发展需要 ③完全听从父母的安排，不需要自己思考",
-         "①结合自己的兴趣爱好、性格特点来设定目标 ②考虑自己的实际能力和社会发展需要 ④目标定得越高越好，不用考虑实际",
-         "①结合自己的兴趣爱好、性格特点来设定目标 ③完全听从父母的安排，不需要自己思考 ④目标定得越高越好，不用考虑实际",
-         "②考虑自己的实际能力和社会发展需要 ③完全听从父母的安排，不需要自己思考 ④目标定得越高越好，不用考虑实际"],
-      a:0 },
-
-    { q:"进入初中后，富有挑战的课程和学习任务、丰富多彩的社团活动等，为我们的发展提供了新的机会。“新的机会”是指（　）",
-      o:["①提供了更多培养兴趣的平台 ②打开了认识社会的大门 ③对一生的发展起决定性作用",
-         "①提供了更多培养兴趣的平台 ②打开了认识社会的大门 ④带领我们探索新的知识领域",
-         "①提供了更多培养兴趣的平台 ③对一生的发展起决定性作用 ④带领我们探索新的知识领域",
-         "②打开了认识社会的大门 ③对一生的发展起决定性作用 ④带领我们探索新的知识领域"],
-      a:1 },
-
-    { q:"下列属于初中阶段可以培养的兴趣的是（　）",
-      o:["①阅读课外书 ②利用休息时间彻夜玩网络游戏 ③学习剪纸，弘扬中华优秀传统文化",
-         "①阅读课外书 ②利用休息时间彻夜玩网络游戏 ④学习中国武术，增强体质",
-         "①阅读课外书 ③学习剪纸，弘扬中华优秀传统文化 ④学习中国武术，增强体质",
-         "②利用休息时间彻夜玩网络游戏 ③学习剪纸，弘扬中华优秀传统文化 ④学习中国武术，增强体质"],
-      a:2 },
-
-    { q:"“人生的扣子从一开始就要扣好。”这句话对刚迈入初中生活的我们的启示是（　）",
-      o:["初中生的价值观初步形成，需要精心引导",
-         "要仪表端庄，树立良好的初中生形象",
-         "要珍惜新起点，把准人生方向",
-         "务必做到十全十美"],
-      a:2 },
-
-    { q:"初中阶段对我们的成长提出了新的要求，激励我们变得（　）",
-      o:["①越来越坚强，有韧劲 ②越来越上进，敢表达 ③越来越有活力，能包容",
-         "①越来越坚强，有韧劲 ②越来越上进，敢表达 ④越来越孤单，能独立",
-         "①越来越坚强，有韧劲 ③越来越有活力，能包容 ④越来越孤单，能独立",
-         "②越来越上进，敢表达 ③越来越有活力，能包容 ④越来越孤单，能独立"],
-      a:0 },
-
-    { q:"某校七年级(1)班召开“奏响中学序曲”主题班会，其中正确的是（　）",
-      o:["中学时代是人生一段新的旅程，但和小学生活没有什么不同",
-         "面对中学生活的各种可能与挑战，我们要珍惜当下，把握机遇",
-         "中学时代是人生最美好的年华，我们要尽情享受",
-         "中学时代见证着一个人一生的追求，我们要随遇而安"],
-      a:1 },
-
-    { q:"金秋九月，我们带着好奇和梦想，步入了初中阶段。初中阶段（　）",
-      o:["①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值",
-         "①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ④是我们世界观、人生观、价值观形成的最终时期",
-         "①为我们的发展提供了新的机会 ③对我们的人生具有独特的价值 ④是我们世界观、人生观、价值观形成的最终时期",
-         "②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值 ④是我们世界观、人生观、价值观形成的最终时期"],
-      a:0 }
-  ]
-},
-
-/* ============ 课代表 B · 第2课 ============ */
-{
-  name: "课代表B · 第2课 正确认识自我",
-  questions: [
-    { q:"幼时因意外永失右臂的徐楚贻，几乎做到完全自理，还主动帮助同学、参加公益。她的人生经历激励我们要（　）",
-      o:["①学会接纳自己，做更好的自己 ②勇担责任，厚植家国情怀 ③呵护友谊，让友谊之树常青",
-         "①学会接纳自己，做更好的自己 ②勇担责任，厚植家国情怀 ④埋头劳动，积极面对学习",
-         "①学会接纳自己，做更好的自己 ③呵护友谊，让友谊之树常青 ④埋头劳动，积极面对学习",
-         "②勇担责任，厚植家国情怀 ③呵护友谊，让友谊之树常青 ④埋头劳动，积极面对学习"],
-      a:0 },
-
-    { q:"“尺有所短，寸有所长；物有所不足，智有所不明。”这句名言启示我们做更好的自己要（　）",
-      o:["改正缺点，不断进步",
-         "正视自己，扬长避短",
-         "激发潜能，实现跨越",
-         "学会知足，得过且过"],
-      a:1 },
-
-    { q:"升入初中，小浩决心做更好的自己。下列做法正确的是（　）",
-      o:["①积极参加社团活动，培养兴趣爱好 ②积极与同学交往，互帮互助 ③努力改掉做题马虎的毛病，并请同学监督",
-         "①积极参加社团活动，培养兴趣爱好 ②积极与同学交往，互帮互助 ④努力学习优势学科，放弃不擅长的学科",
-         "①积极参加社团活动，培养兴趣爱好 ③努力改掉做题马虎的毛病，并请同学监督 ④努力学习优势学科，放弃不擅长的学科",
-         "②积极与同学交往，互帮互助 ③努力改掉做题马虎的毛病，并请同学监督 ④努力学习优势学科，放弃不擅长的学科"],
-      a:0 },
-
-    { q:"张雨霏说：“没有人可以一直站在第一的位置上，我们要接受自己是一个不完美的人。”这启示我们（　）",
-      o:["要学会接纳自己的全部",
-         "要善于发现自己的不足",
-         "要重视他人的态度和评价",
-         "要不断激发自己的潜能"],
-      a:0 },
-
-    { q:"谢震业说：“要突破的，从来都是过去的自己。”他的经历启示我们（　）",
-      o:["不要全面接受别人的评价",
-         "不断激发潜能，成就更好的自己",
-         "真诚面对自我，知耻而后勇",
-         "培养兴趣爱好，注重合作"],
-      a:1 },
-
-    { q:"通过他人能更好地认识自己。下列名言和谚语揭示的道理能印证这一观点的是（　）",
-      o:["①知人者智，自知者明 ②赠人玫瑰，手留余香",
-         "①知人者智，自知者明 ③当局者迷，旁观者清",
-         "②赠人玫瑰，手留余香 ④牛不知角弯，马不知脸长",
-         "③当局者迷，旁观者清 ④牛不知角弯，马不知脸长"],
-      a:3 },
-
-    { q:"“认识自己，方能认识更多的朋友。”“若是看透了自己，便不会再小看别人。”以下理解最合理的是（　）",
-      o:["正确认识自己能准确把握自己的禀赋",
-         "朋友越多，认识自我的途径就越多",
-         "正确认识自己可以促进与他人的交往",
-         "认识自己的最终目的是改造外部世界"],
-      a:2 },
-
-    { q:"正确认识自己对我们的成长有着重要作用。下列认识可以归为一类的是（　）",
-      o:["①我认为自己性格比较急躁 ②老师说我的学习很用功 ③妈妈说我很体贴和善良",
-         "②老师说我的学习很用功 ③妈妈说我很体贴和善良 ④班里有同学认为我性格内向",
-         "①我认为自己性格比较急躁 ③妈妈说我很体贴和善良 ④班里有同学认为我性格内向",
-         "①我认为自己性格比较急躁 ②老师说我的学习很用功 ④班里有同学认为我性格内向"],
-      a:1 },
-
-    { q:"吴明在校演讲比赛初赛就被淘汰了，他静下心反思自己为什么没被选上，有哪些地方需要改进。吴明认识自己的途径是（　）",
-      o:["通过自我评价认识自己",
-         "通过他人评价认识自己",
-         "通过集体活动认识自己",
-         "通过社会比较认识自己"],
-      a:0 },
-
-    { q:"下列属于正确认识自己的是（　）",
-      o:["我长得不好看，所以什么都做不好",
-         "我数学成绩好，但体育是短板，需要多锻炼",
-         "我什么都比不过别人，太没用了",
-         "我天下第一，谁都不如我"],
-      a:1 },
-
-    { q:"做更好的自己，需要（　）",
-      o:["①扬长避短 ②主动改正缺点 ③不断激发自己的潜能",
-         "①扬长避短 ②主动改正缺点 ④完全模仿他人",
-         "①扬长避短 ③不断激发自己的潜能 ④完全模仿他人",
-         "②主动改正缺点 ③不断激发自己的潜能 ④完全模仿他人"],
-      a:0 },
-
-    { q:"小明觉得自己性格内向，但他发现自己在绘画方面很有天赋，于是专心练习，最终在市级比赛中获奖。这启示我们（　）",
-      o:["内向的人更适合画画",
-         "要善于发现自己的优势，做更好的自己",
-         "只要画画就能获奖",
-         "不要在意自己的缺点"],
-      a:1 },
-
-    { q:"对“金无足赤，人无完人”理解正确的是（　）",
-      o:["每个人都有缺点，不必在意",
-         "我们要接纳自己的不完美，并努力改进",
-         "完美的人不存在，所以可以放纵自己",
-         "只有完美的人才值得被尊重"],
-      a:1 },
-
-    { q:"小丽经常通过写日记来反思自己的行为和想法，这种认识自己的方法是（　）",
-      o:["通过他人评价认识自己",
-         "通过自我评价认识自己",
-         "通过集体认识自己",
-         "通过比较认识自己"],
-      a:1 },
-
-    { q:"面对他人的评价，我们应该（　）",
-      o:["完全接受",
-         "完全拒绝",
-         "冷静分析，既不盲从也不忽视",
-         "只接受表扬，拒绝批评"],
-      a:2 }
-  ]
-},
-
-/* ============ 课代表 C · 第3课 ============ */
-{
-  name: "课代表C · 第3课 梦想始于当下",
-  questions: [
-    { q:"郑钦文说：“远大的梦想，唯有坚持才能抵达。”这表明（　）",
-      o:["树立远大梦想比实践更重要",
-         "有了梦想就一定能成功",
-         "梦想能激发我们的热情和勇气",
-         "只要努力就一定能实现梦想"],
-      a:2 },
-
-    { q:"关于“梦想如果不能实现，还有意义吗？”正确的回答是（　）",
-      o:["有意义，梦想让我们的生活更加充实、更有色彩",
-         "无意义，梦想能不断激发我们对生命的热情和勇气",
-         "有意义，梦想对我们至关重要，有梦想就能前进",
-         "无意义，但是只要我们努力，就能实现梦想"],
-      a:0 },
-
-    { q:"王永志少年立志，一生追梦，将祖国的需要作为自己的前进方向。这启示我们（　）",
-      o:["①做有梦想的少年，应树立远大志向 ②做有梦想的少年，应紧扣时代脉搏",
-         "①做有梦想的少年，应树立远大志向 ③越早立志立大志，越容易实现梦想",
-         "②做有梦想的少年，应紧扣时代脉搏 ④立大志的人必然能取得更大的成就",
-         "③越早立志立大志，越容易实现梦想 ④立大志的人必然能取得更大的成就"],
-      a:0 },
-
-    { q:"袁隆平童年时常见到饿殍，十分痛心，因此“让大家吃饱饭”成为他一生的志向。这启示我们（　）",
-      o:["①志向是人生的航标 ②梦想确定要标新立异",
-         "①志向是人生的航标 ③梦想要紧扣时代脉搏",
-         "②梦想确定要标新立异 ④立大志就能报效祖国",
-         "③梦想要紧扣时代脉搏 ④立大志就能报效祖国"],
-      a:1 },
-
-    { q:"“梦想，不会轻轻松松变成收获被捏在你的手中，但执着的赶路人分明能真真切切聆听到它遥远的呼唤。”梦想的力量在于（　）",
-      o:["激发生命热情",
-         "提升道德品质",
-         "紧扣时代脉搏",
-         "憧憬美好未来"],
-      a:0 },
-
-    { q:"对下图中焦虑的男孩，劝说合理的是（　）",
-      o:["个人的梦想是无足轻重的",
-         "只要有梦想，就一定能成功",
-         "梦想即使实现不了，也能让生活更有色彩",
-         "有梦想，就有希望，将梦想视为一种臆想"],
-      a:2 },
-
-    { q:"“学习稍有懈怠，我们就会落伍；每个人的世界就像一个圆，学习是半径，半径越大，我们拥有的世界就越广阔。”这表明（　）",
-      o:["①学习是立身做人的永恒主题 ③学习使我们面前的世界更广阔",
-         "②学习是成就梦想的唯一路径 ③学习使我们面前的世界更广阔",
-         "①学习是立身做人的永恒主题 ④实现中国梦离不开我们的学习",
-         "②学习是成就梦想的唯一路径 ④实现中国梦离不开我们的学习"],
-      a:0 },
-
-    { q:"“学习并不局限在学校，我们生活中的所看、所听、所尝、所触、所做都可以是学习。”这说明（　）",
-      o:["学习既有知识的获取，又有能力的提升",
-         "课堂学习与社会实践都有教育意义",
-         "学习并不局限在学校，生活处处是学习",
-         "实践活动仅仅是为了放松身心"],
-      a:2 },
-
-    { q:"三位同学在学习省级行政区简称时采用了不同的方法，这说明（　）",
-      o:["良好的学习习惯很重要",
-         "学习方法因人而异，要掌握科学的学习方法",
-         "要参加社会实践活动",
-         "要保持学习兴趣"],
-      a:1 },
-
-    { q:"“行走的思政课”让学生感受大自然风光、绿色发展及科技发展的魅力，这有利于（　）",
-      o:["培养学生亲社会行为，增强综合素养",
-         "提升创新能力，投身祖国建设",
-         "参与志愿服务",
-         "放松身心，不用学习"],
-      a:0 },
-
-    { q:"某班班级日志记录了多种学习活动，这说明（　）",
-      o:["学习场所和形式可以多样化",
-         "科学的学习方法很重要",
-         "书本内容的学习也可以有趣快乐",
-         "课内活动和课外活动都有利于学生获取知识"],
-      a:0 },
-
-    { q:"某校保安通过自学不断提升自身技能，实现了“人生逆袭”，说明（　）",
-      o:["学习让我们拥有实现梦想的持续力量",
-         "学习不仅表现为接受和掌握",
-         "书本知识和社会实践都有用",
-         "学习关乎着民族的未来和发展"],
-      a:0 },
-
-    { q:"小铭学习上的变化体现的道理是（　）",
-      o:["要养成良好的学习习惯",
-         "要善于思考，虚心请教",
-         "要掌握科学的学习方法",
-         "要参加社会实践活动"],
-      a:1 },
-
-    { q:"关于学习，下列说法正确的是（　）",
-      o:["①学习不仅局限在学校 ②学习表现为接受和掌握，也表现为探究、发现、感悟 ④参观游览不是学习",
-         "①学习不仅局限在学校 ②学习表现为接受和掌握，也表现为探究、发现、感悟 ③学习能给我们带来美妙感受",
-         "①学习不仅局限在学校 ③学习能给我们带来美妙感受 ④参观游览不是学习",
-         "②学习表现为接受和掌握，也表现为探究、发现、感悟 ③学习能给我们带来美妙感受 ④参观游览不是学习"],
-      a:1 },
-
-    { q:"下列对学习的认识正确的是（　）",
-      o:["学习只是在学校里听课、写作业",
-         "学习是成就梦想的唯一路径",
-         "生活中的所看、所听、所做都可以是学习",
-         "学习只是为了考试取得好成绩"],
-      a:2 }
-  ]
-}
+/* ==================== 题库 ==================== */
+/* 格式：[题干, 选项1, 选项2, 选项3, 选项4, 正确索引] */
+var QB=[
+{name:'课代表A · 第1课 开启初中生活',qs:[
+["中学生活是一段新的人生旅程，而我们对新生活充满了期待。下列属于对新生活期待的有（　）",
+ "①各种问题和困难 ②更多的发展机会 ③丰富多样的课程",
+ "①各种问题和困难 ②更多的发展机会 ④各种各样的社会实践",
+ "①各种问题和困难 ③丰富多样的课程 ④各种各样的社会实践",
+ "②更多的发展机会 ③丰富多样的课程 ④各种各样的社会实践",3],
+["初中阶段，是人生美好的年华，也是规划未来之路的重要时期。因为初中阶段（　）",
+ "①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值",
+ "①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ④对我们一生的发展起着决定作用",
+ "①为我们的发展提供了新的机会 ③对我们的人生具有独特的价值 ④对我们一生的发展起着决定作用",
+ "②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值 ④对我们一生的发展起着决定作用",0],
+["袁隆平回忆中学时光时说：“博学中学是我最感亲切的母校，她给予我的培养和教育，对我的成长起了决定性的作用。”这蕴含的道理是（　）",
+ "初中生活重新塑造一个完美的“自我”","初中阶段为我们的成长打下坚实基础",
+ "初中生活能彻底改变我们的人生目标","只要努力学习，就一定能成为科学家",1],
+["“千里之行，始于足下。”面对各种可能与挑战，我们要（　）",
+ "把握机遇，不懈努力","珍视当下，放弃学业","顺其自然，得过且过","不择手段，发展自我",0],
+["习近平总书记强调，广大青年要争做有理想、敢担当、能吃苦、肯奋斗的新时代好青年。这要求刚升入初中的我们（　）",
+ "志存高远求知识，脚踏实地勇前行","贪图安逸享生活，逃避责任怕困难",
+ "盲目跟风随大流，不思进取混日子","自私自利顾自己，不顾集体与国家",0],
+["在中学时代，我们应该（　）",
+ "①努力学习，勤于思考，拒绝参加任何活动 ②珍惜时光，挖掘潜能，随意发展自己个性",
+ "①努力学习，勤于思考，拒绝参加任何活动 ④珍视当下，把握机遇，做敢担当的中学生",
+ "②珍惜时光，挖掘潜能，随意发展自己个性 ③明确目标，挑战自我，做有理想的中学生",
+ "③明确目标，挑战自我，做有理想的中学生 ④珍视当下，把握机遇，做敢担当的中学生",3],
+["小亮的爷爷回忆初中生活时说：“中学时代，一群同龄人一起学习，一起成长……总是让我难以忘怀!”爷爷难忘的可能是（　）",
+ "①不断超越自我的成就感 ②学习知识时的不懈坚持 ③努力追梦与圆梦的经历",
+ "①不断超越自我的成就感 ②学习知识时的不懈坚持 ④展现自身才华的愉悦感",
+ "①不断超越自我的成就感 ③努力追梦与圆梦的经历 ④展现自身才华的愉悦感",
+ "②学习知识时的不懈坚持 ③努力追梦与圆梦的经历 ④展现自身才华的愉悦感",2],
+["进入初中意味着我们的人生将进入一个新的阶段，为抓住机遇、迎接挑战，我们应（　）",
+ "合理规划，设定合理的发展目标","勇于担当，梦想自会实现",
+ "享受生活，迎接时代变革与挑战","随遇而安，听从命运的安排",0],
+["凡事预则立，不预则废。如何做好初中生活规划，以下值得借鉴的是（　）",
+ "①结合自己的兴趣爱好、性格特点来设定目标 ②考虑自己的实际能力和社会发展需要 ③完全听从父母的安排，不需要自己思考",
+ "①结合自己的兴趣爱好、性格特点来设定目标 ②考虑自己的实际能力和社会发展需要 ④目标定得越高越好，不用考虑实际",
+ "①结合自己的兴趣爱好、性格特点来设定目标 ③完全听从父母的安排，不需要自己思考 ④目标定得越高越好，不用考虑实际",
+ "②考虑自己的实际能力和社会发展需要 ③完全听从父母的安排，不需要自己思考 ④目标定得越高越好，不用考虑实际",0],
+["进入初中后，富有挑战的课程和学习任务、丰富多彩的社团活动等，为我们的发展提供了新的机会。“新的机会”是指（　）",
+ "①提供了更多培养兴趣的平台 ②打开了认识社会的大门 ③对一生的发展起决定性作用",
+ "①提供了更多培养兴趣的平台 ②打开了认识社会的大门 ④带领我们探索新的知识领域",
+ "①提供了更多培养兴趣的平台 ③对一生的发展起决定性作用 ④带领我们探索新的知识领域",
+ "②打开了认识社会的大门 ③对一生的发展起决定性作用 ④带领我们探索新的知识领域",1],
+["下列属于初中阶段可以培养的兴趣的是（　）",
+ "①阅读课外书 ②利用休息时间彻夜玩网络游戏 ③学习剪纸，弘扬中华优秀传统文化",
+ "①阅读课外书 ②利用休息时间彻夜玩网络游戏 ④学习中国武术，增强体质",
+ "①阅读课外书 ③学习剪纸，弘扬中华优秀传统文化 ④学习中国武术，增强体质",
+ "②利用休息时间彻夜玩网络游戏 ③学习剪纸，弘扬中华优秀传统文化 ④学习中国武术，增强体质",2],
+["“人生的扣子从一开始就要扣好。”这句话对刚迈入初中生活的我们的启示是（　）",
+ "初中生的价值观初步形成，需要精心引导","要仪表端庄，树立良好的初中生形象",
+ "要珍惜新起点，把准人生方向","务必做到十全十美",2],
+["初中阶段对我们的成长提出了新的要求，激励我们变得（　）",
+ "①越来越坚强，有韧劲 ②越来越上进，敢表达 ③越来越有活力，能包容",
+ "①越来越坚强，有韧劲 ②越来越上进，敢表达 ④越来越孤单，能独立",
+ "①越来越坚强，有韧劲 ③越来越有活力，能包容 ④越来越孤单，能独立",
+ "②越来越上进，敢表达 ③越来越有活力，能包容 ④越来越孤单，能独立",0],
+["某校七年级(1)班召开“奏响中学序曲”主题班会，其中正确的是（　）",
+ "中学时代是人生一段新的旅程，但和小学生活没有什么不同",
+ "面对中学生活的各种可能与挑战，我们要珍惜当下，把握机遇",
+ "中学时代是人生最美好的年华，我们要尽情享受",
+ "中学时代见证着一个人一生的追求，我们要随遇而安",1],
+["金秋九月，我们带着好奇和梦想，步入了初中阶段。初中阶段（　）",
+ "①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值",
+ "①为我们的发展提供了新的机会 ②对我们的成长提出了新的要求 ④是我们世界观、人生观、价值观形成的最终时期",
+ "①为我们的发展提供了新的机会 ③对我们的人生具有独特的价值 ④是我们世界观、人生观、价值观形成的最终时期",
+ "②对我们的成长提出了新的要求 ③对我们的人生具有独特的价值 ④是我们世界观、人生观、价值观形成的最终时期",0]
+]},
+{name:'课代表B · 第2课 正确认识自我',qs:[
+["幼时因意外永失右臂的徐楚贻，几乎做到完全自理，还主动帮助同学、参加公益。她的人生经历激励我们要（　）",
+ "①学会接纳自己，做更好的自己 ②勇担责任，厚植家国情怀 ③呵护友谊，让友谊之树常青",
+ "①学会接纳自己，做更好的自己 ②勇担责任，厚植家国情怀 ④埋头劳动，积极面对学习",
+ "①学会接纳自己，做更好的自己 ③呵护友谊，让友谊之树常青 ④埋头劳动，积极面对学习",
+ "②勇担责任，厚植家国情怀 ③呵护友谊，让友谊之树常青 ④埋头劳动，积极面对学习",0],
+["“尺有所短，寸有所长；物有所不足，智有所不明。”这句名言启示我们做更好的自己要（　）",
+ "改正缺点，不断进步","正视自己，扬长避短","激发潜能，实现跨越","学会知足，得过且过",1],
+["升入初中，小浩决心做更好的自己。下列做法正确的是（　）",
+ "①积极参加社团活动，培养兴趣爱好 ②积极与同学交往，互帮互助 ③努力改掉做题马虎的毛病，并请同学监督",
+ "①积极参加社团活动，培养兴趣爱好 ②积极与同学交往，互帮互助 ④努力学习优势学科，放弃不擅长的学科",
+ "①积极参加社团活动，培养兴趣爱好 ③努力改掉做题马虎的毛病，并请同学监督 ④努力学习优势学科，放弃不擅长的学科",
+ "②积极与同学交往，互帮互助 ③努力改掉做题马虎的毛病，并请同学监督 ④努力学习优势学科，放弃不擅长的学科",0],
+["张雨霏说：“没有人可以一直站在第一的位置上，我们要接受自己是一个不完美的人。”这启示我们（　）",
+ "要学会接纳自己的全部","要善于发现自己的不足","要重视他人的态度和评价","要不断激发自己的潜能",0],
+["谢震业说：“要突破的，从来都是过去的自己。”他的经历启示我们（　）",
+ "不要全面接受别人的评价","不断激发潜能，成就更好的自己",
+ "真诚面对自我，知耻而后勇","培养兴趣爱好，注重合作",1],
+["通过他人能更好地认识自己。下列名言和谚语揭示的道理能印证这一观点的是（　）",
+ "①知人者智，自知者明 ②赠人玫瑰，手留余香","①知人者智，自知者明 ③当局者迷，旁观者清",
+ "②赠人玫瑰，手留余香 ④牛不知角弯，马不知脸长","③当局者迷，旁观者清 ④牛不知角弯，马不知脸长",3],
+["“认识自己，方能认识更多的朋友。”“若是看透了自己，便不会再小看别人。”以下理解最合理的是（　）",
+ "正确认识自己能准确把握自己的禀赋","朋友越多，认识自我的途径就越多",
+ "正确认识自己可以促进与他人的交往","认识自己的最终目的是改造外部世界",2],
+["正确认识自己对我们的成长有着重要作用。下列认识可以归为一类的是（　）",
+ "①我认为自己性格比较急躁 ②老师说我的学习很用功 ③妈妈说我很体贴和善良",
+ "②老师说我的学习很用功 ③妈妈说我很体贴和善良 ④班里有同学认为我性格内向",
+ "①我认为自己性格比较急躁 ③妈妈说我很体贴和善良 ④班里有同学认为我性格内向",
+ "①我认为自己性格比较急躁 ②老师说我的学习很用功 ④班里有同学认为我性格内向",1],
+["吴明在校演讲比赛初赛就被淘汰了，他静下心反思自己为什么没被选上，有哪些地方需要改进。吴明认识自己的途径是（　）",
+ "通过自我评价认识自己","通过他人评价认识自己","通过集体活动认识自己","通过社会比较认识自己",0],
+["下列属于正确认识自己的是（　）",
+ "我长得不好看，所以什么都做不好","我数学成绩好，但体育是短板，需要多锻炼",
+ "我什么都比不过别人，太没用了","我天下第一，谁都不如我",1],
+["做更好的自己，需要（　）",
+ "①扬长避短 ②主动改正缺点 ③不断激发自己的潜能","①扬长避短 ②主动改正缺点 ④完全模仿他人",
+ "①扬长避短 ③不断激发自己的潜能 ④完全模仿他人","②主动改正缺点 ③不断激发自己的潜能 ④完全模仿他人",0],
+["小明觉得自己性格内向，但他发现自己在绘画方面很有天赋，于是专心练习，最终在市级比赛中获奖。这启示我们（　）",
+ "内向的人更适合画画","要善于发现自己的优势，做更好的自己",
+ "只要画画就能获奖","不要在意自己的缺点",1],
+["对“金无足赤，人无完人”理解正确的是（　）",
+ "每个人都有缺点，不必在意","我们要接纳自己的不完美，并努力改进",
+ "完美的人不存在，所以可以放纵自己","只有完美的人才值得被尊重",1],
+["小丽经常通过写日记来反思自己的行为和想法，这种认识自己的方法是（　）",
+ "通过他人评价认识自己","通过自我评价认识自己","通过集体认识自己","通过比较认识自己",1],
+["面对他人的评价，我们应该（　）",
+ "完全接受","完全拒绝","冷静分析，既不盲从也不忽视","只接受表扬，拒绝批评",2]
+]},
+{name:'课代表C · 第3课 梦想始于当下',qs:[
+["郑钦文说：“远大的梦想，唯有坚持才能抵达。”这表明（　）",
+ "树立远大梦想比实践更重要","有了梦想就一定能成功",
+ "梦想能激发我们的热情和勇气","只要努力就一定能实现梦想",2],
+["关于“梦想如果不能实现，还有意义吗？”正确的回答是（　）",
+ "有意义，梦想让我们的生活更加充实、更有色彩","无意义，梦想能不断激发我们对生命的热情和勇气",
+ "有意义，梦想对我们至关重要，有梦想就能前进","无意义，但是只要我们努力，就能实现梦想",0],
+["王永志少年立志，一生追梦，将祖国的需要作为自己的前进方向。这启示我们（　）",
+ "①做有梦想的少年，应树立远大志向 ②做有梦想的少年，应紧扣时代脉搏",
+ "①做有梦想的少年，应树立远大志向 ③越早立志立大志，越容易实现梦想",
+ "②做有梦想的少年，应紧扣时代脉搏 ④立大志的人必然能取得更大的成就",
+ "③越早立志立大志，越容易实现梦想 ④立大志的人必然能取得更大的成就",0],
+["袁隆平童年时常见到饿殍，十分痛心，因此“让大家吃饱饭”成为他一生的志向。这启示我们（　）",
+ "①志向是人生的航标 ②梦想确定要标新立异","①志向是人生的航标 ③梦想要紧扣时代脉搏",
+ "②梦想确定要标新立异 ④立大志就能报效祖国","③梦想要紧扣时代脉搏 ④立大志就能报效祖国",1],
+["“梦想，不会轻轻松松变成收获被捏在你的手中，但执着的赶路人分明能真真切切聆听到它遥远的呼唤。”梦想的力量在于（　）",
+ "激发生命热情","提升道德品质","紧扣时代脉搏","憧憬美好未来",0],
+["对下图中焦虑的男孩，劝说合理的是（　）",
+ "个人的梦想是无足轻重的","只要有梦想，就一定能成功",
+ "梦想即使实现不了，也能让生活更有色彩","有梦想，就有希望，将梦想视为一种臆想",2],
+["“学习稍有懈怠，我们就会落伍；每个人的世界就像一个圆，学习是半径，半径越大，我们拥有的世界就越广阔。”这表明（　）",
+ "①学习是立身做人的永恒主题 ③学习使我们面前的世界更广阔",
+ "②学习是成就梦想的唯一路径 ③学习使我们面前的世界更广阔",
+ "①学习是立身做人的永恒主题 ④实现中国梦离不开我们的学习",
+ "②学习是成就梦想的唯一路径 ④实现中国梦离不开我们的学习",0],
+["“学习并不局限在学校，我们生活中的所看、所听、所尝、所触、所做都可以是学习。”这说明（　）",
+ "学习既有知识的获取，又有能力的提升","课堂学习与社会实践都有教育意义",
+ "学习并不局限在学校，生活处处是学习","实践活动仅仅是为了放松身心",2],
+["三位同学在学习省级行政区简称时采用了不同的方法，这说明（　）",
+ "良好的学习习惯很重要","学习方法因人而异，要掌握科学的学习方法",
+ "要参加社会实践活动","要保持学习兴趣",1],
+["“行走的思政课”让学生感受大自然风光、绿色发展及科技发展的魅力，这有利于（　）",
+ "培养学生亲社会行为，增强综合素养","提升创新能力，投身祖国建设",
+ "参与志愿服务","放松身心，不用学习",0],
+["某班班级日志记录了多种学习活动，这说明（　）",
+ "学习场所和形式可以多样化","科学的学习方法很重要",
+ "书本内容的学习也可以有趣快乐","课内活动和课外活动都有利于学生获取知识",0],
+["某校保安通过自学不断提升自身技能，实现了“人生逆袭”，说明（　）",
+ "学习让我们拥有实现梦想的持续力量","学习不仅表现为接受和掌握",
+ "书本知识和社会实践都有用","学习关乎着民族的未来和发展",0],
+["小铭学习上的变化体现的道理是（　）",
+ "要养成良好的学习习惯","要善于思考，虚心请教",
+ "要掌握科学的学习方法","要参加社会实践活动",1],
+["关于学习，下列说法正确的是（　）",
+ "①学习不仅局限在学校 ②学习表现为接受和掌握，也表现为探究、发现、感悟 ④参观游览不是学习",
+ "①学习不仅局限在学校 ②学习表现为接受和掌握，也表现为探究、发现、感悟 ③学习能给我们带来美妙感受",
+ "①学习不仅局限在学校 ③学习能给我们带来美妙感受 ④参观游览不是学习",
+ "②学习表现为接受和掌握，也表现为探究、发现、感悟 ③学习能给我们带来美妙感受 ④参观游览不是学习",1],
+["下列对学习的认识正确的是（　）",
+ "学习只是在学校里听课、写作业","学习是成就梦想的唯一路径",
+ "生活中的所看、所听、所做都可以是学习","学习只是为了考试取得好成绩",2]
+]}
 ];
 
-/* =========================================================
-   8. 课代表（临时占位点 —— 第三步将替换为出生点）
-   ========================================================= */
-const REP_DEFS = [
-  { key:0, name:"课代表A", pos:new THREE.Vector3(-20, 3 * FLOOR_H, -7) },
-  { key:1, name:"课代表B", pos:new THREE.Vector3(  8, 3 * FLOOR_H, -7) },
-  { key:2, name:"课代表C", pos:new THREE.Vector3( 20, 3 * FLOOR_H, -7) }
-];
+/* ==================== 课代表（随机生成） ==================== */
+/* 3 名课代表随机分布在不同楼层不同位置 */
+var REP_COLOR=[0x5fe8ff,0xa78bff,0x66ffb0];
+var REPS=[];
+var repTriggerCooldown=0;
 
-const REP_COLOR = [0x5fe8ff, 0xa78bff, 0x66ffb0];
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
-const REPS = [];
+function spawnReps(){
+  /* 从 4 层中挑 3 层（保证不同层，更难找） */
+  var floors=[0,1,2,3];
+  shuffle(floors);
+  var chosen=[floors[0],floors[1],floors[2]];
+  for(var i=0;i<3;i++){
+    var f=chosen[i];
+    /* x 在整个走廊范围随机，z 也随机 */
+    var x=-22+Math.random()*44;
+    var z=-9+Math.random()*3.5;
+    var y=f*FLOOR_H;
+    var g=new THREE.Group();
+    g.position.set(x,y,z);
+    scene.add(g);
+    var color=REP_COLOR[i];
+    /* 核心八面体 */
+    var core=new THREE.Mesh(new THREE.OctahedronGeometry(.42,0),
+      new THREE.MeshStandardMaterial({color:color,emissive:color,emissiveIntensity:1.5,
+        roughness:.25,metalness:.5,flatShading:true}));
+    core.position.y=1.05;g.add(core);
+    /* 线框外圈 */
+    var cage=new THREE.Mesh(new THREE.OctahedronGeometry(.66,0),
+      new THREE.MeshBasicMaterial({color:color,wireframe:true,transparent:true,opacity:.45,fog:false}));
+    cage.position.y=1.05;g.add(cage);
+    /* 光晕 */
+    var glow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:color,
+      transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+    glow.scale.set(3.4,3.4,1);glow.position.y=1.05;g.add(glow);
+    /* 点光源 */
+    var pl=new THREE.PointLight(color,1.1,8,2);
+    pl.position.y=1.05;g.add(pl);
+    /* 地面环 */
+    var ring=new THREE.Mesh(new THREE.RingGeometry(.72,.94,40),
+      new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:.5,
+        side:THREE.DoubleSide,depthWrite:false,fog:false}));
+    ring.rotation.x=-Math.PI/2;ring.position.y=.03;g.add(ring);
+    /* 头顶指示柱（给玩家一点视觉引导） */
+    var beam=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,6,8,1,true),
+      new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:.12,
+        side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));
+    beam.position.y=3;g.add(beam);
 
-REP_DEFS.forEach(function(def, idx){
-  const group = new THREE.Group();
-  group.position.copy(def.pos);
-  scene.add(group);
+    REPS.push({
+      idx:i, group:g, core:core, cage:cage, glow:glow, ring:ring,
+      def:{x:x,y:y,z:z}, done:false, phase:Math.random()*Math.PI*2
+    });
+  }
+}
+spawnReps();
 
-  const color = REP_COLOR[idx % REP_COLOR.length];
-
-  // 主体八面体
-  const core = new THREE.Mesh(
-    new THREE.OctahedronGeometry(0.42, 0),
-    new THREE.MeshStandardMaterial({
-      color: color,
-      emissive: color,
-      emissiveIntensity: 1.5,
-      roughness: 0.25,
-      metalness: 0.5,
-      flatShading: true
-    })
-  );
-  core.position.y = 1.05;
-  group.add(core);
-
-  // 外圈线框
-  const cage = new THREE.Mesh(
-    new THREE.OctahedronGeometry(0.66, 0),
-    new THREE.MeshBasicMaterial({
-      color: color,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.45,
-      fog: false
-    })
-  );
-  cage.position.y = 1.05;
-  group.add(cage);
-
-  // 光晕
-  const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: glowTex,
-    color: color,
-    transparent: true,
-    opacity: 0.85,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-    fog: false
-  }));
-  glow.scale.set(3.4, 3.4, 1);
-  glow.position.y = 1.05;
-  group.add(glow);
-
-  // 点光源
-  const pl = new THREE.PointLight(color, 1.1, 8, 2);
-  pl.position.y = 1.05;
-  group.add(pl);
-
-  // 地面光圈
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(0.72, 0.94, 40),
-    new THREE.MeshBasicMaterial({
-      color: color,
-      transparent: true,
-      opacity: 0.5,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-      fog: false
-    })
-  );
-  ring.rotation.x = -Math.PI / 2;
-  ring.position.y = 0.03;
-  group.add(ring);
-
-  REPS.push({
-    def   : def,
-    group : group,
-    core  : core,
-    cage  : cage,
-    glow  : glow,
-    ring  : ring,
-    done  : false,
-    phase : Math.random() * Math.PI * 2
-  });
-});
-
-/* =========================================================
-   9. 答题系统
-   ========================================================= */
-const quizEl   = document.getElementById('quiz');
-const qProgEl  = document.getElementById('qProg');
-const qTitleEl = document.getElementById('qTitle');
-const qTextEl  = document.getElementById('qText');
-const optLEl   = document.getElementById('optL');
-const optREl   = document.getElementById('optR');
-const optLTxtEl= document.getElementById('optLTxt');
-const optRTxtEl= document.getElementById('optRTxt');
-const qCursorEl= document.getElementById('qCursor');
-const toastEl  = document.getElementById('toast');
-
-const QUIZ = {
-  active        : false,
-  locked        : false,
-  setIndex      : 0,
-  qIndex        : 0,
-  cursorSide    : 'left',
-  leftIsCorrect : true,
-  correctCount  : 0
+/* ==================== 老师（追捕者） ==================== */
+var teacher={
+  group:null,pos:new THREE.Vector3(),speed:3.6,active:false,spawned:false,
+  yaw:0,armSwing:0
 };
+function createTeacher(){
+  var g=new THREE.Group();
+  /* 身体 */
+  var body=new THREE.Mesh(new THREE.BoxGeometry(.6,1.15,.32),M.darkCloth);
+  body.position.y=1.05;g.add(body);
+  /* 衬衫领口（点缀） */
+  var collar=new THREE.Mesh(new THREE.BoxGeometry(.35,.2,.34),M.white);
+  collar.position.y=1.55;g.add(collar);
+  /* 头 */
+  var head=new THREE.Mesh(new THREE.SphereGeometry(.22,16,12),M.skin);
+  head.position.y=1.85;g.add(head);
+  /* 头发（盖住头顶） */
+  var hair=new THREE.Mesh(new THREE.SphereGeometry(.225,16,12,0,Math.PI*2,0,Math.PI/2.2),
+    new THREE.MeshStandardMaterial({color:0x14100c,roughness:.9}));
+  hair.position.y=1.87;g.add(hair);
+  /* 左臂 */
+  var armL=new THREE.Group();armL.position.set(-.42,1.4,0);g.add(armL);
+  var armLm=new THREE.Mesh(new THREE.BoxGeometry(.18,.95,.18),M.darkCloth);
+  armLm.position.y=-.4;armL.add(armLm);
+  /* 右臂 */
+  var armR=new THREE.Group();armR.position.set(.42,1.4,0);g.add(armR);
+  var armRm=new THREE.Mesh(new THREE.BoxGeometry(.18,.95,.18),M.darkCloth);
+  armRm.position.y=-.4;armR.add(armRm);
+  /* 戒尺（右臂末端） */
+  var ruler=new THREE.Mesh(new THREE.BoxGeometry(.06,.7,.14),M.ruler);
+  ruler.position.set(0,-.95,0);armR.add(ruler);
+  /* 腿 */
+  var legL=new THREE.Mesh(new THREE.BoxGeometry(.2,1,.2),M.grayCloth);
+  legL.position.set(-.17,.5,0);g.add(legL);
+  var legR=new THREE.Mesh(new THREE.BoxGeometry(.2,1,.2),M.grayCloth);
+  legR.position.set(.17,.5,0);g.add(legR);
+  /* 红光（轮廓识别） */
+  var rl=new THREE.PointLight(0xff2020,1.5,7,1.6);
+  rl.position.y=1.7;g.add(rl);
+  /* 红光罩 */
+  var aura=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xff2020,
+    transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+  aura.scale.set(2.6,2.6,1);aura.position.y=1.4;g.add(aura);
 
-/* ---------- 提示条 ---------- */
-let toastTimer = null;
-function showToast(msg, ms){
-  toastEl.textContent = msg;
-  toastEl.classList.add('on');
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){
-    toastEl.classList.remove('on');
-  }, ms || 2200);
+  g.visible=false;
+  scene.add(g);
+  teacher.group=g;
+  teacher.armL=armL;
+  teacher.armR=armR;
+  teacher.legL=legL;
+  teacher.legR=legR;
+}
+createTeacher();
+
+function spawnTeacher(){
+  /* 在距离玩家 14-22m 的位置生成（同层或附近层） */
+  var ang=Math.random()*Math.PI*2;
+  var dist=14+Math.random()*8;
+  var tx=player.pos.x+Math.cos(ang)*dist;
+  var tz=player.pos.z+Math.sin(ang)*dist;
+  /* 约束到主楼走廊范围 */
+  tx=Math.max(BX1+2,Math.min(BX2-2,tx));
+  tz=Math.max(BZO+1,Math.min(BZS-1,tz));
+  teacher.pos.set(tx,player.groundY,tz);
+  teacher.group.position.copy(teacher.pos);
+  teacher.group.visible=true;
+  teacher.active=true;
+  teacher.spawned=true;
 }
 
-/* ---------- 光标定位 ---------- */
+/* ==================== 答题系统 ==================== */
+var quizEl=document.getElementById('quiz');
+var qProgEl=document.getElementById('qProg');
+var qTitleEl=document.getElementById('qTitle');
+var qTextEl=document.getElementById('qText');
+var optLEl=document.getElementById('optL');
+var optREl=document.getElementById('optR');
+var optLTxtEl=document.getElementById('optLTxt');
+var optRTxtEl=document.getElementById('optRTxt');
+var qCursorEl=document.getElementById('qCursor');
+var toastEl=document.getElementById('toast');
+
+var QUIZ={active:false,locked:false,repIdx:-1,qIndex:0,cursorSide:'left',
+  leftIsCorrect:true,correctCount:0};
+
+var toastTimer=null;
+function toast(msg,ms){
+  toastEl.textContent=msg;toastEl.classList.add('on');
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){toastEl.classList.remove('on');},ms||2200);
+}
+
 function positionCursor(){
-  if (!QUIZ.active) return;
-
-  const card = (QUIZ.cursorSide === 'left') ? optLEl : optREl;
-  const cr = card.getBoundingClientRect();
-  const qr = quizEl.getBoundingClientRect();
-
-  const cw = qCursorEl.offsetWidth  || 26;
-  const ch = qCursorEl.offsetHeight || 32;
-
-  let left = cr.left - qr.left + 12;
-  let top  = cr.top  - qr.top + (cr.height - ch) / 2;
-
-  // 越界保护
-  if (left < 4) left = 4;
-  if (top < 0) top = 0;
-
-  qCursorEl.style.left = left + 'px';
-  qCursorEl.style.top  = top  + 'px';
+  if(!QUIZ.active)return;
+  var card=(QUIZ.cursorSide==='left')?optLEl:optREl;
+  var cr=card.getBoundingClientRect(),qr=quizEl.getBoundingClientRect();
+  var ch=qCursorEl.offsetHeight||32;
+  var left=cr.left-qr.left+12;
+  var top=cr.top-qr.top+(cr.height-ch)/2;
+  if(left<4)left=4;if(top<0)top=0;
+  qCursorEl.style.left=left+'px';qCursorEl.style.top=top+'px';
+}
+function setCursorSide(s){
+  if(QUIZ.cursorSide===s)return;
+  QUIZ.cursorSide=s;positionCursor();
 }
 
-function setCursorSide(side){
-  if (QUIZ.cursorSide === side) return;
-  QUIZ.cursorSide = side;
-  positionCursor();
-}
-
-/* ---------- 渲染题目 ---------- */
 function renderQuestion(){
-  const set = QUESTION_BANK[QUIZ.setIndex];
-  const q   = set.questions[QUIZ.qIndex];
-
-  qProgEl.textContent  = '第 ' + (QUIZ.qIndex + 1) + ' / ' + set.questions.length + ' 题';
-  qTitleEl.textContent = set.name;
-  qTextEl.textContent  = q.q;
-  qTextEl.scrollTop    = 0;
-
-  /* 抽取正确项 + 一个干扰项 */
-  const correctText = q.o[q.a];
-
-  /* 【修复】干扰项按文本去重，避免左右显示相同内容 */
-  let wrongIdx = -1;
-  let guard = 0;
-  while (guard++ < 80){
-    const wi = Math.floor(Math.random() * q.o.length);
-    if (wi !== q.a && q.o[wi] && q.o[wi] !== correctText){
-      wrongIdx = wi;
-      break;
-    }
+  var set=QB[QUIZ.repIdx];
+  var q=set.qs[QUIZ.qIndex];
+  qProgEl.textContent='第 '+(QUIZ.qIndex+1)+' / '+set.qs.length+' 题';
+  qTitleEl.textContent=set.name;
+  qTextEl.textContent=q[0];
+  qTextEl.scrollTop=0;
+  /* 构建选项：正确 + 一个干扰 */
+  var opts=q.slice(1,5), ans=q[5];
+  var correctText=opts[ans];
+  var wrongIdx=-1,guard=0;
+  while(guard++<60){
+    var wi=Math.floor(Math.random()*4);
+    if(wi!==ans&&opts[wi]!==correctText){wrongIdx=wi;break;}
   }
-  const wrongText = (wrongIdx >= 0) ? q.o[wrongIdx] : '——';
-
-  /* 随机左右 */
-  const correctOnLeft = Math.random() < 0.5;
-  QUIZ.leftIsCorrect  = correctOnLeft;
-
-  optLTxtEl.textContent = correctOnLeft ? correctText : wrongText;
-  optRTxtEl.textContent = correctOnLeft ? wrongText  : correctText;
-
-  optLEl.classList.remove('ok', 'bad');
-  optREl.classList.remove('ok', 'bad');
-
-  /* 光标随机初始位置 */
-  QUIZ.cursorSide = Math.random() < 0.5 ? 'left' : 'right';
-
-  requestAnimationFrame(function(){
-    requestAnimationFrame(positionCursor);
-  });
+  var wrongText=(wrongIdx>=0)?opts[wrongIdx]:'——';
+  var correctOnLeft=Math.random()<.5;
+  QUIZ.leftIsCorrect=correctOnLeft;
+  optLTxtEl.textContent=correctOnLeft?correctText:wrongText;
+  optRTxtEl.textContent=correctOnLeft?wrongText:correctText;
+  optLEl.classList.remove('ok','bad');optREl.classList.remove('ok','bad');
+  QUIZ.cursorSide=Math.random()<.5?'left':'right';
+  requestAnimationFrame(function(){requestAnimationFrame(positionCursor);});
 }
 
-/* ---------- 开始答题 ---------- */
-function startQuiz(setIndex){
-  if (QUIZ.active) return;
-
-  QUIZ.active       = true;
-  QUIZ.locked       = false;
-  QUIZ.setIndex     = setIndex;
-  QUIZ.qIndex       = 0;
-  QUIZ.correctCount = 0;
-
-  // 清空输入
-  lookTouch = null;
-  moveTouch = null;
-  joy.x = 0; joy.y = 0; joy.active = false;
-  stickEl.style.opacity = '0';
-  knobEl.style.transform = 'translate(0px,0px)';
-
+function startQuiz(repIdx){
+  if(QUIZ.active)return;
+  QUIZ.active=true;QUIZ.locked=false;QUIZ.repIdx=repIdx;QUIZ.qIndex=0;QUIZ.correctCount=0;
+  lookTouch=null;moveTouch=null;joy.x=0;joy.y=0;joy.active=false;
+  stickEl.style.opacity='0';knobEl.style.transform='translate(0px,0px)';
   quizEl.classList.add('on');
   renderQuestion();
 }
 
-/* ---------- 提交答案 ---------- */
 function submitAnswer(side){
-  if (!QUIZ.active || QUIZ.locked) return;
-  QUIZ.locked = true;
-
-  const isCorrect = (side === 'left') ? QUIZ.leftIsCorrect : !QUIZ.leftIsCorrect;
-  const card = (side === 'left') ? optLEl : optREl;
-  const other = (side === 'left') ? optREl : optLEl;
-
-  if (isCorrect){
-    card.classList.add('ok');
-    QUIZ.correctCount++;
-  } else {
-    card.classList.add('bad');
-    // 同时把正确的那一项也标绿，便于学习
-    other.classList.add('ok');
-  }
-
+  if(!QUIZ.active||QUIZ.locked)return;
+  QUIZ.locked=true;
+  var correct=(side==='left')?QUIZ.leftIsCorrect:!QUIZ.leftIsCorrect;
+  var card=(side==='left')?optLEl:optREl;
+  var other=(side==='left')?optREl:optLEl;
+  if(correct){card.classList.add('ok');QUIZ.correctCount++;}
+  else{card.classList.add('bad');other.classList.add('ok');}
   setTimeout(function(){
-    card.classList.remove('ok', 'bad');
-    other.classList.remove('ok', 'bad');
+    card.classList.remove('ok','bad');other.classList.remove('ok','bad');
     nextQuestion();
-  }, isCorrect ? 380 : 780);
+  },correct?380:780);
 }
 
-/* ---------- 下一题 ---------- */
 function nextQuestion(){
   QUIZ.qIndex++;
-
-  const set = QUESTION_BANK[QUIZ.setIndex];
-
-  if (QUIZ.qIndex >= set.questions.length){
-    finishQuiz();
-    return;
-  }
-
-  renderQuestion();
-  QUIZ.locked = false;
+  var set=QB[QUIZ.repIdx];
+  if(QUIZ.qIndex>=set.qs.length){finishQuiz();return;}
+  renderQuestion();QUIZ.locked=false;
 }
 
-/* ---------- 结束本轮 ---------- */
+var TOTAL_REPS=3;
+var DARK_TRIGGER=2; /* 答完2名触发变黑 */
+var darkMode=false;
+var escapeReady=false; /* 3名都答完，大门可开 */
+
 function finishQuiz(){
-  QUIZ.locked = true;
-
-  const set = QUESTION_BANK[QUIZ.setIndex];
-  const total = set.questions.length;
-  const right = QUIZ.correctCount;
-
-  const rep = REPS[QUIZ.setIndex];
-  if (rep){
-    rep.done = true;
-    rep.group.visible = false;
-  }
-
-  const remain = REPS.filter(function(r){ return !r.done; }).length;
+  QUIZ.locked=true;
+  var set=QB[QUIZ.repIdx];
+  var right=QUIZ.correctCount;
+  var rep=REPS[QUIZ.repIdx];
+  if(rep){rep.done=true;rep.group.visible=false;}
+  var doneCount=REPS.filter(function(r){return r.done;}).length;
+  var remain=TOTAL_REPS-doneCount;
 
   setTimeout(function(){
-    QUIZ.active = false;
-    quizEl.classList.remove('on');
-
-    if (remain > 0){
-      showToast(set.name + ' 完成 · 答对 ' + right + '/' + total + ' · 剩余课代表 ' + remain, 2600);
+    QUIZ.active=false;quizEl.classList.remove('on');
+    if(remain>0){
+      toast(set.name+' 完成 · 答对 '+right+'/'+set.qs.length+' · 剩余课代表 '+remain,2600);
     } else {
-      showToast('三位课代表全部完成 · 前往一楼大门撤离', 3200);
+      toast('课代表全部答完 · 大门已开 · 快跑',3200);
+      escapeReady=true;
     }
-  }, 520);
-}
-
-/* =========================================================
-   10. 答题界面输入（滑动切换 + 点击确认）
-   ========================================================= */
-let qStartX = 0, qStartY = 0, qMoved = false, qDown = false;
-
-function quizTouchStart(e){
-  if (!QUIZ.active) return;
-  e.preventDefault();
-  const t = e.changedTouches[0];
-  qStartX = t.clientX;
-  qStartY = t.clientY;
-  qMoved  = false;
-  qDown   = true;
-}
-
-function quizTouchMove(e){
-  if (!QUIZ.active || !qDown) return;
-  e.preventDefault();
-
-  const t = e.changedTouches[0];
-  const dx = t.clientX - qStartX;
-  const dy = t.clientY - qStartY;
-
-  if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy)){
-    if (dx > 0){
-      setCursorSide('right');
-    } else {
-      setCursorSide('left');
+    /* 触发变黑 */
+    if(doneCount>=DARK_TRIGGER&&!darkMode){
+      triggerDark();
     }
-    // 允许连续切换
-    qStartX = t.clientX;
-    qStartY = t.clientY;
-    qMoved  = true;
-  }
+  },520);
 }
 
-function quizTouchEnd(e){
-  if (!QUIZ.active || !qDown) return;
-  e.preventDefault();
-  qDown = false;
+/* ==================== 变黑 & 老师出现 ==================== */
+var flashEl=document.getElementById('flash');
+var vignetteEl=document.getElementById('vignette');
+var huntEl=document.getElementById('hunt');
+var hudHintEl=document.getElementById('hudHint');
+var hudFloorEl=document.getElementById('hudFloor');
 
-  if (!qMoved){
-    submitAnswer(QUIZ.cursorSide);
-  }
+function triggerDark(){
+  darkMode=true;
+  flashEl.classList.add('on');
+  /* 变黑：关灯、浓雾、暗角加深 */
+  ambient.intensity=0.02;
+  moon.intensity=0;
+  for(var i=0;i<corridorLights.length;i++) corridorLights[i].intensity=0;
+  for(var j=0;j<tubeMeshes.length;j++) tubeMeshes[j].material.opacity=0;
+  scene.fog.density=0.055;
+  torch.intensity=7.5;
+  torchFill.intensity=1.6;
+  setTimeout(function(){
+    flashEl.classList.remove('on');
+    vignetteEl.classList.add('dark');
+    huntEl.classList.add('on');
+    toast('灯灭了……脚步声从身后传来',3000);
+    hudHintEl.textContent='按住摇杆推满 = 跑步';
+    hudHintEl.classList.add('warn');
+    spawnTeacher();
+  },1600);
 }
 
-quizEl.addEventListener('touchstart', quizTouchStart, { passive:false });
-quizEl.addEventListener('touchmove',  quizTouchMove,  { passive:false });
-quizEl.addEventListener('touchend',   quizTouchEnd,   { passive:false });
-quizEl.addEventListener('touchcancel',function(e){
-  e.preventDefault(); qDown = false; qMoved = false;
-}, { passive:false });
-
-/* 鼠标（桌面调试）：点击卡片直接选择 */
-optLEl.addEventListener('click', function(){
-  if (!QUIZ.active || QUIZ.locked) return;
-  setCursorSide('left');
-  submitAnswer('left');
+/* ==================== 答题界面输入 ==================== */
+var qStartX=0,qStartY=0,qMoved=false,qDown=false;
+quizEl.addEventListener('touchstart',function(e){
+  if(!QUIZ.active)return;e.preventDefault();
+  var t=e.changedTouches[0];
+  qStartX=t.clientX;qStartY=t.clientY;qMoved=false;qDown=true;
+},{passive:false});
+quizEl.addEventListener('touchmove',function(e){
+  if(!QUIZ.active||!qDown)return;e.preventDefault();
+  var t=e.changedTouches[0];
+  var dx=t.clientX-qStartX,dy=t.clientY-qStartY;
+  if(Math.abs(dx)>26&&Math.abs(dx)>Math.abs(dy)){
+    setCursorSide(dx>0?'right':'left');
+    qStartX=t.clientX;qStartY=t.clientY;qMoved=true;
+  }
+},{passive:false});
+quizEl.addEventListener('touchend',function(e){
+  if(!QUIZ.active||!qDown)return;e.preventDefault();
+  qDown=false;if(!qMoved)submitAnswer(QUIZ.cursorSide);
+},{passive:false});
+optLEl.addEventListener('click',function(){
+  if(!QUIZ.active||QUIZ.locked)return;setCursorSide('left');submitAnswer('left');
 });
-optREl.addEventListener('click', function(){
-  if (!QUIZ.active || QUIZ.locked) return;
-  setCursorSide('right');
-  submitAnswer('right');
+optREl.addEventListener('click',function(){
+  if(!QUIZ.active||QUIZ.locked)return;setCursorSide('right');submitAnswer('right');
 });
 
-/* =========================================================
-   11. 输入系统
-   ========================================================= */
-const stickEl = document.getElementById('stick');
-const knobEl  = document.getElementById('knob');
-const START   = document.getElementById('start');
-
-let lookTouch = null;
-let moveTouch = null;
-
-const STICK_R = 55;
+/* ==================== 输入系统 ==================== */
+var stickEl=document.getElementById('stick');
+var knobEl=document.getElementById('knob');
+var sprintTag=document.getElementById('sprintTag');
+var lookTouch=null,moveTouch=null;
+var STICK_R=58;
 
 function onTouchStart(e){
-  if (QUIZ.active) return;
-  e.preventDefault();
-
-  for (let i = 0; i < e.changedTouches.length; i++){
-    const t = e.changedTouches[i];
-    const x = t.clientX, y = t.clientY;
-
-    const isLeftBottom = (x < window.innerWidth * 0.42) &&
-                         (y > window.innerHeight * 0.40);
-
-    if (isLeftBottom && !moveTouch){
-      moveTouch = { id: t.identifier, ox: x, oy: y };
-      joy.active = true;
-      stickEl.style.left = (x - 60) + 'px';
-      stickEl.style.top  = (y - 60) + 'px';
-      stickEl.style.opacity = '1';
-      knobEl.style.transform = 'translate(0px,0px)';
-    } else if (!lookTouch){
-      lookTouch = { id: t.identifier, x: x, y: y };
+  if(QUIZ.active)return;e.preventDefault();
+  for(var i=0;i<e.changedTouches.length;i++){
+    var t=e.changedTouches[i];
+    var x=t.clientX,y=t.clientY;
+    var isLeftBottom=(x<innerWidth*0.42)&&(y>innerHeight*0.4);
+    if(isLeftBottom&&!moveTouch){
+      moveTouch={id:t.identifier,ox:x,oy:y};
+      joy.active=true;
+      stickEl.style.left=(x-65)+'px';
+      stickEl.style.top=(y-65)+'px';
+      stickEl.style.opacity='1';
+      knobEl.style.transform='translate(0px,0px)';
+    }else if(!lookTouch){
+      lookTouch={id:t.identifier,x:x,y:y};
     }
   }
 }
-
 function onTouchMove(e){
-  if (QUIZ.active) return;
-  e.preventDefault();
-
-  for (let i = 0; i < e.changedTouches.length; i++){
-    const t = e.changedTouches[i];
-    const x = t.clientX, y = t.clientY;
-
-    if (moveTouch && t.identifier === moveTouch.id){
-      let dx = x - moveTouch.ox;
-      let dy = y - moveTouch.oy;
-      const len = Math.hypot(dx, dy);
-      if (len > STICK_R){
-        dx = dx / len * STICK_R;
-        dy = dy / len * STICK_R;
+  if(QUIZ.active)return;e.preventDefault();
+  for(var i=0;i<e.changedTouches.length;i++){
+    var t=e.changedTouches[i],x=t.clientX,y=t.clientY;
+    if(moveTouch&&t.identifier===moveTouch.id){
+      var dx=x-moveTouch.ox,dy=y-moveTouch.oy;
+      var len=Math.hypot(dx,dy);
+      if(len>STICK_R){dx=dx/len*STICK_R;dy=dy/len*STICK_R;}
+      knobEl.style.transform='translate('+dx+'px,'+dy+'px)';
+      joy.x=dx/STICK_R;joy.y=-dy/STICK_R;
+      var mag=Math.hypot(joy.x,joy.y);
+      if(mag>0.85){
+        if(!player.sprinting){
+          player.sprinting=true;
+          stickEl.classList.add('sprint');
+          sprintTag.classList.add('on');
+        }
+      }else{
+        if(player.sprinting){
+          player.sprinting=false;
+          stickEl.classList.remove('sprint');
+          sprintTag.classList.remove('on');
+        }
       }
-      knobEl.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
-      joy.x = dx / STICK_R;
-      joy.y = -dy / STICK_R;
     }
-
-    if (lookTouch && t.identifier === lookTouch.id){
-      const dx = x - lookTouch.x;
-      const dy = y - lookTouch.y;
-      player.yaw   -= dx * LOOK_SENS;
-      player.pitch -= dy * LOOK_SENS;
-      player.pitch  = Math.max(-PITCH_LIM, Math.min(PITCH_LIM, player.pitch));
-      lookTouch.x = x;
-      lookTouch.y = y;
+    if(lookTouch&&t.identifier===lookTouch.id){
+      var ldx=x-lookTouch.x,ldy=y-lookTouch.y;
+      player.yaw-=ldx*SENS;
+      player.pitch-=ldy*SENS;
+      player.pitch=Math.max(-PITCH_LIM,Math.min(PITCH_LIM,player.pitch));
+      lookTouch.x=x;lookTouch.y=y;
     }
   }
 }
-
 function onTouchEnd(e){
-  if (QUIZ.active) return;
-  e.preventDefault();
-
-  for (let i = 0; i < e.changedTouches.length; i++){
-    const t = e.changedTouches[i];
-
-    if (moveTouch && t.identifier === moveTouch.id){
-      moveTouch = null;
-      joy.x = 0; joy.y = 0;
-      joy.active = false;
-      stickEl.style.opacity = '0';
-      knobEl.style.transform = 'translate(0px,0px)';
+  if(QUIZ.active)return;e.preventDefault();
+  for(var i=0;i<e.changedTouches.length;i++){
+    var t=e.changedTouches[i];
+    if(moveTouch&&t.identifier===moveTouch.id){
+      moveTouch=null;joy.x=0;joy.y=0;joy.active=false;
+      player.sprinting=false;
+      stickEl.style.opacity='0';
+      stickEl.classList.remove('sprint');
+      sprintTag.classList.remove('on');
+      knobEl.style.transform='translate(0px,0px)';
     }
-    if (lookTouch && t.identifier === lookTouch.id){
-      lookTouch = null;
-    }
+    if(lookTouch&&t.identifier===lookTouch.id)lookTouch=null;
   }
 }
+canvas.addEventListener('touchstart',onTouchStart,{passive:false});
+canvas.addEventListener('touchmove',onTouchMove,{passive:false});
+canvas.addEventListener('touchend',onTouchEnd,{passive:false});
+canvas.addEventListener('touchcancel',onTouchEnd,{passive:false});
 
-canvas.addEventListener('touchstart', onTouchStart, { passive: false });
-canvas.addEventListener('touchmove',  onTouchMove,  { passive: false });
-canvas.addEventListener('touchend',   onTouchEnd,   { passive: false });
-canvas.addEventListener('touchcancel',onTouchEnd,   { passive: false });
-
-/* ---------- 桌面调试 ---------- */
-let mouseDown = false;
-let lastMX = 0, lastMY = 0;
-const keys = {};
-
-canvas.addEventListener('mousedown', function(e){
-  if (QUIZ.active) return;
-  mouseDown = true; lastMX = e.clientX; lastMY = e.clientY;
+/* 桌面调试 */
+var mouseDown=false,lastMX=0,lastMY=0;
+canvas.addEventListener('mousedown',function(e){
+  if(QUIZ.active)return;mouseDown=true;lastMX=e.clientX;lastMY=e.clientY;
 });
-window.addEventListener('mouseup', function(){ mouseDown = false; });
-window.addEventListener('mousemove', function(e){
-  if (!mouseDown || QUIZ.active) return;
-  const dx = e.clientX - lastMX;
-  const dy = e.clientY - lastMY;
-  player.yaw   -= dx * LOOK_SENS;
-  player.pitch -= dy * LOOK_SENS;
-  player.pitch  = Math.max(-PITCH_LIM, Math.min(PITCH_LIM, player.pitch));
-  lastMX = e.clientX; lastMY = e.clientY;
+window.addEventListener('mouseup',function(){mouseDown=false;});
+window.addEventListener('mousemove',function(e){
+  if(!mouseDown||QUIZ.active)return;
+  var dx=e.clientX-lastMX,dy=e.clientY-lastMY;
+  player.yaw-=dx*SENS;player.pitch-=dy*SENS;
+  player.pitch=Math.max(-PITCH_LIM,Math.min(PITCH_LIM,player.pitch));
+  lastMX=e.clientX;lastMY=e.clientY;
 });
-window.addEventListener('keydown', function(e){
-  keys[e.code] = true;
-
-  if (!QUIZ.active) return;
-
-  if (e.code === 'ArrowLeft' || e.code === 'KeyA'){
-    setCursorSide('left');
-  } else if (e.code === 'ArrowRight' || e.code === 'KeyD'){
-    setCursorSide('right');
-  } else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowUp'){
-    submitAnswer(QUIZ.cursorSide);
-  }
-  if (e.code === 'Enter' || e.code === 'Space'){
-    e.preventDefault();
-  }
+window.addEventListener('keydown',function(e){
+  keys[e.code]=true;
+  if(!QUIZ.active)return;
+  if(e.code==='ArrowLeft'||e.code==='KeyA')setCursorSide('left');
+  else if(e.code==='ArrowRight'||e.code==='KeyD')setCursorSide('right');
+  else if(e.code==='Enter'||e.code==='Space'||e.code==='ArrowUp')submitAnswer(QUIZ.cursorSide);
+  if(e.code==='Enter'||e.code==='Space')e.preventDefault();
 });
-window.addEventListener('keyup', function(e){
-  keys[e.code] = false;
-});
+window.addEventListener('keyup',function(e){keys[e.code]=false;});
+document.addEventListener('gesturestart',function(e){e.preventDefault();});
+document.addEventListener('contextmenu',function(e){e.preventDefault();});
 
-/* ---------- 禁止缩放 / 长按 ---------- */
-document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
-document.addEventListener('contextmenu',  function(e){ e.preventDefault(); });
-document.addEventListener('dblclick',     function(e){ e.preventDefault(); });
-
-/* =========================================================
-   12. 地面高度查询
-   ========================================================= */
-function groundAt(x, z, currentY){
-  let best = null;
-  let bestD = 1.4;
-
-  for (let i = 0; i < AREAS.length; i++){
-    const a = AREAS[i];
-    if (x < a.x1 || x > a.x2 || z < a.z1 || z > a.z2) continue;
-
-    let y = a.y;
-    if (a.ramp) y = a.ramp(x, z);
-
-    const d = Math.abs(y - currentY);
-    if (d < bestD){
-      bestD = d;
-      best = y;
-    }
+/* ==================== 地面高度查询 ==================== */
+function groundAt(x,z,curY){
+  var best=null,bestD=1.4;
+  for(var i=0;i<AREAS.length;i++){
+    var a=AREAS[i];
+    if(x<a.x1||x>a.x2||z<a.z1||z>a.z2)continue;
+    var y=a.y;
+    var d=Math.abs(y-curY);
+    if(d<bestD){bestD=d;best=y;}
   }
   return best;
 }
 
-/* =========================================================
-   12.1 【新增】楼梯检测
-   ---------------------------------------------------------
-   玩家进入楼梯触发区后，把 groundY 切换到目标楼层，
-   同时水平位移到 exitX，离开触发区。
-   相机 y 由 updatePlayer 的插值平滑过渡，视觉上像走楼梯。
-   ========================================================= */
+/* ==================== 楼梯检测 ==================== */
 function checkStairs(dt){
-  if (stairCooldown > 0) stairCooldown -= dt;
-  if (QUIZ.active || stairCooldown > 0) return;
-
-  for (let i = 0; i < STAIRS.length; i++){
-    const s = STAIRS[i];
-
-    if (Math.abs(player.groundY - s.y) > 0.4) continue;
-    if (player.pos.x < s.x1 || player.pos.x > s.x2) continue;
-    if (player.pos.z < s.z1 || player.pos.z > s.z2) continue;
-
-    player.groundY = s.to;
-    player.pos.x   = s.exitX;
-    stairCooldown  = 0.9;
-
-    const nf = Math.round(s.to / FLOOR_H) + 1;
-    showToast('已到达 ' + nf + ' 楼', 1200);
+  if(stairCooldown>0)stairCooldown-=dt;
+  if(QUIZ.active||stairCooldown>0)return;
+  for(var i=0;i<STAIRS.length;i++){
+    var s=STAIRS[i];
+    if(Math.abs(player.groundY-s.y)>0.4)continue;
+    if(player.pos.x<s.x1||player.pos.x>s.x2)continue;
+    if(player.pos.z<s.z1||player.pos.z>s.z2)continue;
+    player.groundY=s.to;player.pos.x=s.exitX;stairCooldown=0.9;
+    var nf=Math.round(s.to/FLOOR_H)+1;
+    toast('已到达 '+nf+' 楼',1200);
     return;
   }
 }
 
-/* =========================================================
-   12.2 【新增】一楼撤离判定
-   ========================================================= */
-let ESCAPED = false;
-const winEl     = document.getElementById('win');
-const winStatEl = document.getElementById('winStat');
-
-function checkEscape(){
-  if (ESCAPED || QUIZ.active) return;
-  if (REPS.some(function(r){ return !r.done; })) return;
-  if (Math.abs(player.groundY) > 0.6) return;
-  if (player.pos.z > -10.5) return;
-  if (player.pos.x < -6.5 || player.pos.x > 6.5) return;
-
-  ESCAPED = true;
-  winStatEl.textContent = '三份答卷 · 全部提交';
-  winEl.classList.add('on');
+/* ==================== 老师更新 ==================== */
+var caught=false;
+function updateTeacher(dt){
+  if(!teacher.active||caught)return;
+  var dx=player.pos.x-teacher.pos.x;
+  var dz=player.pos.z-teacher.pos.z;
+  var dist=Math.hypot(dx,dz);
+  if(dist<0.001)return;
+  var nx=dx/dist,nz=dz/dist;
+  /* 靠近玩家时减速（给玩家一点喘息） */
+  var spd=teacher.speed*(dist<6?0.75:1);
+  teacher.pos.x+=nx*spd*dt;
+  teacher.pos.z+=nz*spd*dt;
+  /* y 跟随玩家地面高度 */
+  teacher.pos.y+=((player.groundY)-teacher.pos.y)*Math.min(1,dt*3);
+  teacher.group.position.copy(teacher.pos);
+  /* 面向玩家 */
+  var targetYaw=Math.atan2(nx,nz);
+  var diff=targetYaw-teacher.yaw;
+  while(diff>Math.PI)diff-=Math.PI*2;
+  while(diff<-Math.PI)diff+=Math.PI*2;
+  teacher.yaw+=diff*Math.min(1,dt*4);
+  teacher.group.rotation.y=teacher.yaw;
+  /* 手臂摆动 */
+  teacher.armSwing+=dt*8;
+  if(teacher.armL)teacher.armL.rotation.x=Math.sin(teacher.armSwing)*0.5;
+  if(teacher.armR)teacher.armR.rotation.x=Math.sin(teacher.armSwing+Math.PI)*0.5;
+  /* 距离越近，红色滤镜越重 */
+  if(dist<10){
+    huntEl.style.opacity=String(0.4+(1-dist/10)*0.6);
+  }
+  /* 抓到 */
+  if(dist<1.3){
+    caught=true;
+    document.getElementById('dead').classList.add('on');
+  }
 }
 
-document.getElementById('againBtn').addEventListener('click', function(){
-  window.location.reload();
-});
+/* ==================== 大门打开 & 逃出判定 ==================== */
+var GATE_OPEN=false, gateOpenT=0;
+function checkEscape(){
+  /* 三名课代表都答完，大门可开 */
+  if(escapeReady&&!GATE_OPEN){
+    GATE_OPEN=true;
+    toast('大门缓缓打开了……',2400);
+  }
+  /* 大门开启动画 */
+  if(GATE_OPEN&&gateOpenT<1){
+    gateOpenT=Math.min(1,gateOpenT+0.01);
+    if(gateLeftPivot)gateLeftPivot.rotation.y=gateOpenT*Math.PI*0.55;
+    if(gateRightPivot)gateRightPivot.rotation.y=-gateOpenT*Math.PI*0.55;
+  }
+  /* 玩家跑到大门外 */
+  if(GATE_OPEN&&player.pos.z<GATE_Z+1&&Math.abs(player.pos.x)<8){
+    document.getElementById('end').classList.add('on');
+    document.getElementById('endStat').textContent='三份答卷 · 全部提交';
+    /* 停住玩家 */
+    caught=true;
+  }
+}
 
-/* =========================================================
-   13. 主循环
-   ========================================================= */
-const clock = new THREE.Clock();
-let torchFlicker = 1;
-let flickerTimer = 0;
+/* ==================== 主循环 ==================== */
+var clock=new THREE.Clock();
+var torchFlicker=1,flickerTimer=0;
 
 function updateTorch(dt){
-  flickerTimer -= dt;
-  if (flickerTimer <= 0){
-    flickerTimer = 0.06 + Math.random() * 0.18;
-    torchFlicker = 0.86 + Math.random() * 0.22;
+  flickerTimer-=dt;
+  if(flickerTimer<=0){
+    flickerTimer=0.06+Math.random()*0.18;
+    torchFlicker=0.86+Math.random()*0.22;
   }
-
-  const breathe = 1 + Math.sin(performance.now() * 0.0016) * 0.035;
-  torch.intensity     = 5.2  * breathe * torchFlicker;
-  torchFill.intensity = 1.15 * breathe * torchFlicker;
-
-  torch.position.x = 0.22 + Math.sin(performance.now() * 0.0022) * 0.02;
-  torch.position.y = -0.18 + Math.cos(performance.now() * 0.0019) * 0.018;
+  var breathe=1+Math.sin(performance.now()*0.0016)*0.035;
+  var base=darkMode?7.5:5.2;
+  torch.intensity=base*breathe*torchFlicker;
+  torchFill.intensity=(darkMode?1.6:1.15)*breathe*torchFlicker;
+  torch.position.x=0.22+Math.sin(performance.now()*0.0022)*0.02;
+  torch.position.y=-0.18+Math.cos(performance.now()*0.0019)*0.018;
 }
 
-/* ---------- 玩家更新 ---------- */
 function updatePlayer(dt){
-  if (QUIZ.active){
-    camera.position.set(player.pos.x, player.pos.y + player.bobY, player.pos.z);
-    camera.rotation.set(player.pitch, player.yaw, 0);
+  if(QUIZ.active||caught){
+    camera.position.set(player.pos.x,player.pos.y+player.bobY,player.pos.z);
+    camera.rotation.set(player.pitch,player.yaw,0);
     return;
   }
+  var ix=joy.x,iy=joy.y;
+  if(keys['KeyW']||keys['ArrowUp'])iy+=1;
+  if(keys['KeyS']||keys['ArrowDown'])iy-=1;
+  if(keys['KeyA']||keys['ArrowLeft'])ix-=1;
+  if(keys['KeyD']||keys['ArrowRight'])ix+=1;
+  if(keys['ShiftLeft']||keys['ShiftRight'])player.sprinting=true;
+  var mag=Math.hypot(ix,iy);
+  if(mag>1){ix/=mag;iy/=mag;}
+  var moving=(Math.abs(ix)>0.02||Math.abs(iy)>0.02);
+  var speed=player.sprinting?RUN:WALK;
 
-  let ix = joy.x;
-  let iy = joy.y;
-
-  if (keys['KeyW'] || keys['ArrowUp'])    iy += 1;
-  if (keys['KeyS'] || keys['ArrowDown'])  iy -= 1;
-  if (keys['KeyA'] || keys['ArrowLeft'])  ix -= 1;
-  if (keys['KeyD'] || keys['ArrowRight']) ix += 1;
-
-  const mag = Math.hypot(ix, iy);
-  if (mag > 1){
-    ix /= mag; iy /= mag;
-  }
-
-  const moving = (Math.abs(ix) > 0.02 || Math.abs(iy) > 0.02);
-
-  if (moving){
-    const sinY = Math.sin(player.yaw);
-    const cosY = Math.cos(player.yaw);
-
-    const fx = -sinY, fz = -cosY;
-    const rx =  cosY, rz = -sinY;
-
-    const vx = (fx * iy + rx * ix) * MOVE_SPEED * dt;
-    const vz = (fz * iy + rz * ix) * MOVE_SPEED * dt;
-
-    const nx = player.pos.x + vx;
-    const nz = player.pos.z + vz;
-
-    let g = groundAt(nx, nz, player.groundY);
-
-    if (g !== null){
-      player.pos.x = nx;
-      player.pos.z = nz;
-      player.groundY = g;
-    } else {
-      g = groundAt(nx, player.pos.z, player.groundY);
-      if (g !== null){
-        player.pos.x = nx;
-        player.groundY = g;
-      } else {
-        g = groundAt(player.pos.x, nz, player.groundY);
-        if (g !== null){
-          player.pos.z = nz;
-          player.groundY = g;
-        }
+  if(moving){
+    var sinY=Math.sin(player.yaw),cosY=Math.cos(player.yaw);
+    var fx=-sinY,fz=-cosY;
+    var rx=cosY,rz=-sinY;
+    var vx=(fx*iy+rx*ix)*speed*dt;
+    var vz=(fz*iy+rz*ix)*speed*dt;
+    var nx=player.pos.x+vx,nz=player.pos.z+vz;
+    var g=groundAt(nx,nz,player.groundY);
+    if(g!==null){player.pos.x=nx;player.pos.z=nz;player.groundY=g;}
+    else{
+      g=groundAt(nx,player.pos.z,player.groundY);
+      if(g!==null){player.pos.x=nx;player.groundY=g;}
+      else{
+        g=groundAt(player.pos.x,nz,player.groundY);
+        if(g!==null){player.pos.z=nz;player.groundY=g;}
       }
     }
-
-    player.bobT += dt * 9.5;
-    player.bobY = Math.sin(player.bobT) * 0.045;
-  } else {
-    player.bobT = 0;
-    player.bobY += (0 - player.bobY) * Math.min(1, dt * 8);
+    player.bobT+=dt*(player.sprinting?13:9.5);
+    player.bobY=Math.sin(player.bobT)*(player.sprinting?0.06:0.045);
+  }else{
+    player.bobT=0;
+    player.bobY+=(0-player.bobY)*Math.min(1,dt*8);
   }
+  var targetY=player.groundY+EYE_H;
+  player.pos.y+=(targetY-player.pos.y)*Math.min(1,dt*14);
 
-  const targetY = player.groundY + EYE_H;
-  player.pos.y += (targetY - player.pos.y) * Math.min(1, dt * 14);
+  camera.position.set(player.pos.x,player.pos.y+player.bobY,player.pos.z);
+  camera.rotation.set(player.pitch,player.yaw,0);
 
-  camera.position.set(
-    player.pos.x,
-    player.pos.y + player.bobY,
-    player.pos.z
-  );
-  camera.rotation.set(player.pitch, player.yaw, 0);
-
-  const f = Math.round(player.groundY / FLOOR_H);
-  const names = ['一楼走廊', '二楼走廊', '三楼走廊', '四楼走廊'];
-  const el = document.getElementById('hudFloor');
-  const label = names[f] || '';
-  if (el && el.textContent !== label) el.textContent = label;
+  /* HUD */
+  var f=Math.round(player.groundY/FLOOR_H);
+  var label;
+  if(player.groundY<-0.3||player.pos.z<BZO-1){
+    label=player.pos.z<GATE_Z+8?'校门口':'操场';
+  }else{
+    var names=['一楼走廊','二楼走廊','三楼走廊','四楼走廊'];
+    label=names[f]||'';
+  }
+  if(hudFloorEl&&hudFloorEl.textContent!==label)hudFloorEl.textContent=label;
 }
 
-/* ---------- 课代表动画 & 触发 ---------- */
-function updateReps(dt, t){
-  for (let i = 0; i < REPS.length; i++){
-    const r = REPS[i];
-    if (r.done) continue;
-
-    const ph = t * 1.6 + r.phase;
-
-    r.core.position.y = 1.05 + Math.sin(ph) * 0.14;
-    r.core.rotation.y += dt * 1.1;
-    r.core.rotation.x += dt * 0.45;
-
-    r.cage.position.y = r.core.position.y;
-    r.cage.rotation.y -= dt * 0.7;
-    r.cage.rotation.z += dt * 0.35;
-
-    r.glow.position.y = r.core.position.y;
-    const sc = 3.2 + Math.sin(ph * 1.3) * 0.45;
-    r.glow.scale.set(sc, sc, 1);
-
-    const pulse = 0.4 + Math.abs(Math.sin(ph * 0.9)) * 0.35;
-    r.ring.material.opacity = pulse;
-    r.ring.scale.setScalar(1 + Math.sin(ph * 1.7) * 0.06);
+function updateReps(dt,t){
+  for(var i=0;i<REPS.length;i++){
+    var r=REPS[i];
+    if(r.done)continue;
+    var ph=t*1.6+r.phase;
+    r.core.position.y=1.05+Math.sin(ph)*0.14;
+    r.core.rotation.y+=dt*1.1;
+    r.core.rotation.x+=dt*0.45;
+    r.cage.position.y=r.core.position.y;
+    r.cage.rotation.y-=dt*0.7;
+    r.cage.rotation.z+=dt*0.35;
+    r.glow.position.y=r.core.position.y;
+    var sc=3.2+Math.sin(ph*1.3)*0.45;
+    r.glow.scale.set(sc,sc,1);
+    r.ring.material.opacity=0.4+Math.abs(Math.sin(ph*0.9))*0.35;
+    r.ring.scale.setScalar(1+Math.sin(ph*1.7)*0.06);
   }
 }
 
-function checkTriggers(){
-  if (QUIZ.active || ESCAPED) return;
-
-  for (let i = 0; i < REPS.length; i++){
-    const r = REPS[i];
-    if (r.done) continue;
-
-    const dx = player.pos.x - r.def.pos.x;
-    const dz = player.pos.z - r.def.pos.z;
-    const dy = player.groundY - r.def.pos.y;
-
-    if (dx * dx + dz * dz < 2.7 * 2.7 && Math.abs(dy) < 1.2){
+function checkTriggers(dt){
+  if(repTriggerCooldown>0)repTriggerCooldown-=dt;
+  if(QUIZ.active||caught||repTriggerCooldown>0)return;
+  for(var i=0;i<REPS.length;i++){
+    var r=REPS[i];
+    if(r.done)continue;
+    var dx=player.pos.x-r.def.x;
+    var dz=player.pos.z-r.def.z;
+    var dy=player.groundY-r.def.y;
+    if(dx*dx+dz*dz<2.7*2.7&&Math.abs(dy)<1.2){
       startQuiz(i);
+      repTriggerCooldown=1.5;
       return;
     }
   }
 }
 
-/* ---------- 主循环 ---------- */
 function animate(){
   requestAnimationFrame(animate);
-
-  const dt = Math.min(clock.getDelta(), 0.05);
-  const t  = performance.now() * 0.001;
-
+  var dt=Math.min(clock.getDelta(),0.05);
+  var t=performance.now()*0.001;
   updatePlayer(dt);
   updateTorch(dt);
-  updateReps(dt, t);
-  checkTriggers();
+  updateReps(dt,t);
+  checkTriggers(dt);
   checkStairs(dt);
+  if(darkMode)updateTeacher(dt);
   checkEscape();
-
-  renderer.render(scene, camera);
+  renderer.render(scene,camera);
 }
 animate();
 
-/* =========================================================
-   14. 窗口尺寸
-   ========================================================= */
+/* ==================== 尺寸 ==================== */
 function onResize(){
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(w, h, false);
-
-  if (QUIZ.active){
-    requestAnimationFrame(positionCursor);
-  }
+  var w=innerWidth,h=innerHeight;
+  camera.aspect=w/h;camera.updateProjectionMatrix();
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.setSize(w,h,false);
+  if(QUIZ.active)requestAnimationFrame(positionCursor);
 }
-window.addEventListener('resize', onResize);
-window.addEventListener('orientationchange', function(){
-  setTimeout(onResize, 260);
-});
+window.addEventListener('resize',onResize);
+window.addEventListener('orientationchange',function(){setTimeout(onResize,260);});
 onResize();
 
-/* =========================================================
-   15. 开始遮罩
-   ========================================================= */
-document.getElementById('startBtn').addEventListener('click', function(){
-  START.style.opacity = '0';
-  setTimeout(function(){
-    START.style.display = 'none';
-  }, 520);
-
-  const el = document.documentElement;
-  if (el.requestFullscreen) {
-    el.requestFullscreen().catch(function(){});
-  } else if (el.webkitRequestFullscreen) {
-    try { el.webkitRequestFullscreen(); } catch(err){}
-  }
-
-  setTimeout(function(){
-    showToast('找到 3 位课代表并完成答题', 2600);
-  }, 900);
-});
+/* 开场提示 */
+setTimeout(function(){
+  if(typeof toast==='function')toast('3 名课代表躲在主楼各层 · 找找看',2800);
+},900);
 
 })();
 </script>
