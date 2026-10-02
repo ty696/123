@@ -41,19 +41,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
   border-radius:4px;padding:4px 10px;}
 #hud .tag.warn{color:#ffb0b0;border-color:rgba(255,90,90,.7);text-shadow:0 0 12px rgba(255,90,90,.9);animation:bl 1s infinite;}
 @keyframes bl{0%,100%{opacity:1;}50%{opacity:.4;}}
-#start,#end,#dead{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;
+#start,#end,#dead{position:fixed;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:18px;transition:opacity .5s;}
-#start{background:radial-gradient(ellipse at center,#0a1018 0%,#000 80%);color:#9fc4e0;}
-#end,#dead{display:none;}
+#start{z-index:60;background:radial-gradient(ellipse at center,#0a1018 0%,#000 80%);color:#9fc4e0;}
+#end{z-index:66;display:none;background:radial-gradient(ellipse at center,#04140c 0%,#000 82%);color:#9fe0c0;}
+#dead{z-index:68;display:none;background:radial-gradient(ellipse at center,#200000 0%,#000 82%);color:#ffb0b0;}
 #end.on,#dead.on{display:flex;}
-#end{background:radial-gradient(ellipse at center,#04140c 0%,#000 82%);color:#9fe0c0;z-index:66;}
-#dead{background:radial-gradient(ellipse at center,#200000 0%,#000 82%);color:#ffb0b0;z-index:68;}
 #start h1{font-size:30px;letter-spacing:8px;color:#d8ecff;text-shadow:0 0 20px rgba(90,170,255,.8),0 0 44px rgba(60,120,200,.5);}
 #start .sub{font-size:12px;letter-spacing:3px;color:#5b7f9c;}
 #start .hint{font-size:12px;letter-spacing:2px;color:#486a86;line-height:2;text-align:center;max-width:80%;}
 #start .err{font-size:13px;color:#ff9aa6;line-height:1.7;text-align:center;max-width:80%;}
 #start .btn,#end .btn,#dead .btn{margin-top:12px;padding:12px 40px;border-radius:6px;
-  font-size:15px;letter-spacing:6px;cursor:pointer;}
+  font-size:15px;letter-spacing:6px;cursor:pointer;user-select:none;-webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 #start .btn{border:1px solid rgba(110,180,255,.55);color:#cfe8ff;background:rgba(30,70,120,.28);
   box-shadow:0 0 24px rgba(60,140,220,.35);}
 #end h1{font-size:34px;letter-spacing:12px;color:#c9ffe4;text-shadow:0 0 22px rgba(90,255,180,.85),0 0 48px rgba(40,180,120,.5);}
@@ -110,7 +110,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
   padding:10px 22px;border:1px solid rgba(110,180,255,.45);border-radius:6px;
   background:rgba(8,20,34,.92);color:#cfe8ff;font-size:clamp(11px,1.9vh,15px);letter-spacing:2px;
   box-shadow:0 0 28px rgba(40,120,200,.45);opacity:0;pointer-events:none;
-  transition:opacity .3s,transform .3s;white-space:nowrap;}
+  transition:opacity .3s,transform .3s;white-space:nowrap;max-width:80vw;text-align:center;}
 #toast.on{opacity:1;transform:translate(-50%,0);}
 </style>
 </head>
@@ -122,7 +122,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
 <div id="stick"><div id="knob"></div></div>
 <div id="sprintTag">跑 起 来</div>
 <div id="hud">
-  <div class="tag" id="hudFloor">四楼走廊</div>
+  <div class="tag" id="hudFloor">操场</div>
   <div class="tag" id="hudHint">左下摇杆移动 · 滑屏转视角</div>
 </div>
 <div id="toast"></div>
@@ -146,17 +146,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
   <h1>逃离政治老师</h1>
   <div class="sub">YIN XING LOU · BUILDING 2</div>
   <div class="hint">
-    3 名课代表随机躲在主楼各层<br>
-    找到 2 名答完题 · 灯会全灭 · 老师持戒尺现身<br>
-    在黑暗里找到最后 1 名 · 完成答题<br>
-    跑到校门口就能逃出去<br>
-    <span style="color:#ffb070">摇杆推满 = 跑步</span>
+    你站在操场上 · 前方是银杏楼二栋<br>
+    3 名课代表随机躲在这栋楼的不同楼层<br>
+    <span style="color:#ff8888">老师从一开始就在校园里游荡</span><br>
+    答完 2 名 · 灯会全灭 · 他开始狂奔<br>
+    找齐 3 名 · 校园南墙的<span style="color:#66ffaa">安全出口</span>打开<br>
+    <span style="color:#ffb070">摇杆推满 = 跑步 · 答题时老师静止</span>
   </div>
   <div class="btn" id="startBtn">点 击 进 入</div>
 </div>
 <div id="end">
   <h1>逃 出 去 了</h1>
-  <div class="sub">大门在你身后缓缓合上</div>
+  <div class="sub">你从安全出口离开了校园</div>
   <div class="stat" id="endStat"></div>
   <div class="btn" id="againBtn">再 来 一 次</div>
 </div>
@@ -171,12 +172,144 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
 <script>if(typeof THREE==='undefined')document.write('<script src="https://unpkg.com/three@0.149.0/build/three.min.js"><\/script>');</script>
 <script>if(typeof THREE==='undefined')document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r149/three.min.js"><\/script>');</script>
 
+<!-- 音频系统 -->
 <script>
 (function(){
-var START=document.getElementById('start'),BTN=document.getElementById('startBtn');
+'use strict';
+var AudioSys = (function(){
+  var ctx=null,noiseBuf=null,bgGain=null,bgStarted=false;
+  function init(){
+    if(ctx)return ctx;
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return null;
+    try{ctx=new AC();}catch(e){return null;}
+    if(ctx.state==='suspended')ctx.resume();
+    return ctx;
+  }
+  function getNoise(){
+    if(!ctx)return null;
+    if(noiseBuf)return noiseBuf;
+    var len=Math.floor(ctx.sampleRate*1.5);
+    var buf=ctx.createBuffer(1,len,ctx.sampleRate);
+    var d=buf.getChannelData(0);
+    for(var i=0;i<len;i++)d[i]=Math.random()*2-1;
+    noiseBuf=buf;return buf;
+  }
+  function startBg(){
+    if(!ctx||bgStarted)return;
+    bgStarted=true;
+    var t=ctx.currentTime;
+    bgGain=ctx.createGain();bgGain.gain.value=0;bgGain.connect(ctx.destination);
+    bgGain.gain.linearRampToValueAtTime(0.16,t+5);
+    var o1=ctx.createOscillator();o1.type='sine';o1.frequency.value=52;
+    var g1=ctx.createGain();g1.gain.value=0.6;
+    o1.connect(g1);g1.connect(bgGain);o1.start(t);
+    var o2=ctx.createOscillator();o2.type='sine';o2.frequency.value=78.5;
+    var g2=ctx.createGain();g2.gain.value=0.28;
+    o2.connect(g2);g2.connect(bgGain);o2.start(t);
+    var o3=ctx.createOscillator();o3.type='triangle';o3.frequency.value=52.7;
+    var g3=ctx.createGain();g3.gain.value=0.13;
+    o3.connect(g3);g3.connect(bgGain);o3.start(t);
+    var n=ctx.createBufferSource();n.buffer=getNoise();n.loop=true;
+    var nf=ctx.createBiquadFilter();nf.type='lowpass';nf.frequency.value=180;
+    var ng=ctx.createGain();ng.gain.value=0.10;
+    n.connect(nf);nf.connect(ng);ng.connect(bgGain);n.start(t);
+    function pulse(){
+      if(!ctx||!bgStarted)return;
+      var pt=ctx.currentTime;
+      var osc=ctx.createOscillator();osc.type='sine';
+      osc.frequency.setValueAtTime(120,pt);
+      osc.frequency.exponentialRampToValueAtTime(38,pt+0.6);
+      var pg=ctx.createGain();
+      pg.gain.setValueAtTime(0,pt);
+      pg.gain.linearRampToValueAtTime(0.42,pt+0.05);
+      pg.gain.exponentialRampToValueAtTime(0.001,pt+0.85);
+      osc.connect(pg);pg.connect(bgGain);
+      osc.start(pt);osc.stop(pt+0.9);
+      setTimeout(pulse,3200+Math.random()*2200);
+    }
+    setTimeout(pulse,1800);
+  }
+  function step(running){
+    if(!ctx)return;
+    var t=ctx.currentTime;
+    var vol=running?0.30:0.18;
+    var src=ctx.createBufferSource();src.buffer=getNoise();
+    var offset=Math.random()*(src.buffer.duration-0.25);
+    var f=ctx.createBiquadFilter();f.type='bandpass';
+    f.frequency.value=(running?320:250)+Math.random()*130;f.Q.value=1.8;
+    var f2=ctx.createBiquadFilter();f2.type='lowpass';
+    f2.frequency.value=running?1600:1000;
+    var g=ctx.createGain();
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.005);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.13);
+    src.connect(f);f.connect(f2);f2.connect(g);g.connect(ctx.destination);
+    src.start(t,offset,0.2);
+    var thump=ctx.createOscillator();thump.type='sine';
+    thump.frequency.setValueAtTime(running?110:80,t);
+    thump.frequency.exponentialRampToValueAtTime(38,t+0.09);
+    var tg=ctx.createGain();
+    tg.gain.setValueAtTime(0,t);
+    tg.gain.linearRampToValueAtTime(vol*0.9,t+0.004);
+    tg.gain.exponentialRampToValueAtTime(0.001,t+0.11);
+    thump.connect(tg);tg.connect(ctx.destination);
+    thump.start(t);thump.stop(t+0.12);
+  }
+  function setDark(){
+    if(!ctx||!bgGain)return;
+    bgGain.gain.linearRampToValueAtTime(0.28,ctx.currentTime+2.2);
+  }
+  function shriek(){
+    if(!ctx)return;
+    var t=ctx.currentTime;
+    var osc=ctx.createOscillator();osc.type='sawtooth';
+    osc.frequency.setValueAtTime(720,t);
+    osc.frequency.exponentialRampToValueAtTime(110,t+0.5);
+    var g=ctx.createGain();
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(0.42,t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.65);
+    osc.connect(g);g.connect(ctx.destination);
+    osc.start(t);osc.stop(t+0.7);
+  }
+  function winFanfare(){
+    if(!ctx)return;
+    var t=ctx.currentTime;
+    var notes=[523.25,659.25,783.99,1046.5];
+    for(var i=0;i<notes.length;i++){
+      (function(idx){
+        var osc=ctx.createOscillator();osc.type='sine';
+        var st=t+idx*0.16;
+        osc.frequency.setValueAtTime(notes[idx],st);
+        var g=ctx.createGain();
+        g.gain.setValueAtTime(0,st);
+        g.gain.linearRampToValueAtTime(0.28,st+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001,st+1.1);
+        osc.connect(g);g.connect(ctx.destination);
+        osc.start(st);osc.stop(st+1.2);
+      })(i);
+    }
+  }
+  return {init:init,startBg:startBg,step:step,setDark:setDark,shriek:shriek,winFanfare:winFanfare};
+})();
+window.__AudioSys = AudioSys;
+})();
+</script>
+
+<!-- 开始/重开按钮 -->
+<script>
+(function(){
+'use strict';
+window.__gameStarted = false;
+var START=document.getElementById('start');
+var BTN=document.getElementById('startBtn');
 function enter(){
+  if(window.__gameStarted)return;
+  window.__gameStarted=true;
   START.style.opacity='0';
   setTimeout(function(){START.style.display='none';},520);
+  if(window.__AudioSys){window.__AudioSys.init();window.__AudioSys.startBg();}
   try{var e=document.documentElement;
     if(e.requestFullscreen)e.requestFullscreen().catch(function(){});
     else if(e.webkitRequestFullscreen)e.webkitRequestFullscreen();
@@ -185,35 +318,38 @@ function enter(){
     setTimeout(function(){
       START.style.display='flex';START.style.opacity='1';
       START.innerHTML='<h1 style="color:#ff9aa6">加载失败</h1>'+
-        '<div class="err">3D 引擎未能加载。<br>请检查网络后刷新。<br>（微信内请点右上角“在浏览器中打开”）</div>';
+        '<div class="err">3D 引擎未能加载。<br>请检查网络后刷新页面。<br>（微信内请点右上角“在浏览器中打开”）</div>';
     },600);
   }
 }
-BTN.addEventListener('click',enter);
-BTN.addEventListener('touchend',function(e){e.preventDefault();enter();},{passive:false});
-document.getElementById('againBtn').addEventListener('click',function(){location.reload();});
-document.getElementById('retryBtn').addEventListener('click',function(){location.reload();});
+function bindTap(el,fn){
+  if(!el)return;
+  el.addEventListener('click',function(e){e.preventDefault();fn();});
+  el.addEventListener('touchend',function(e){e.preventDefault();fn();},{passive:false});
+}
+bindTap(BTN,enter);
+bindTap(document.getElementById('againBtn'),function(){location.reload();});
+bindTap(document.getElementById('retryBtn'),function(){location.reload();});
 })();
 </script>
 
+<!-- 主游戏脚本 -->
 <script>
 (function(){
 'use strict';
 if(typeof THREE==='undefined')return;
+var AudioSys=window.__AudioSys;
 
-/* ==================== 常量 ==================== */
-var EYE_H=1.65, WALK=3.4, RUN=6.6, SENS=0.0042, PITCH_LIM=1.15;
-var FLOOR_H=4, FLOORS=4;
+var EYE_H=1.65,WALK=3.4,RUN=6.6,SENS=0.0042,PITCH_LIM=1.15;
+var FLOOR_H=4,FLOORS=4;
 var BX1=-28,BX2=28,BZO=-10,BZS=-4,BZB=10,BW=56;
-/* 操场范围 */
 var PLAY={x1:-44,x2:44,z1:-80,z2:-17};
-/* 大门 */
 var GATE_Z=-92;
-/* 保安亭 */
-var GUARD={x:16,z:-88};
+var GUARD={x:22,z:-88};
+/* 安全出口：南墙左侧独立小门 */
+var SAFE={x:-16,z:-92,w:5};
 
-/* ==================== 渲染器 ==================== */
-var canvas=document.getElementById('c'), renderer;
+var canvas=document.getElementById('c'),renderer;
 try{renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,powerPreference:'high-performance'});}
 catch(e){
   document.getElementById('start').innerHTML='<h1 style="color:#ff9aa6">设备不支持</h1><div class="err">无法创建 WebGL。</div>';
@@ -232,7 +368,6 @@ var camera=new THREE.PerspectiveCamera(76,innerWidth/innerHeight,0.06,400);
 camera.rotation.order='YXZ';
 scene.add(camera);
 
-/* ==================== 纹理 ==================== */
 function mkC(w,h){var c=document.createElement('canvas');c.width=w;c.height=h;return c;}
 function tFloor(){
   var c=mkC(256,256),g=c.getContext('2d');
@@ -347,12 +482,21 @@ function tGate(){
   for(var j=1;j<16;j++){g.beginPath();g.moveTo(j*32,0);g.lineTo(j*32,256);g.stroke();}
   var t=new THREE.CanvasTexture(c);if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;
 }
+function tSafeDoor(){
+  var c=mkC(256,256),g=c.getContext('2d');
+  g.fillStyle='#0d4a22';g.fillRect(0,0,256,256);
+  g.strokeStyle='#1a7a3a';g.lineWidth=8;
+  g.strokeRect(8,8,240,240);
+  g.strokeStyle='#0a3418';g.lineWidth=4;
+  for(var i=1;i<8;i++){g.beginPath();g.moveTo(0,i*32);g.lineTo(256,i*32);g.stroke();}
+  var t=new THREE.CanvasTexture(c);if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;
+}
 
 var floorTex=tFloor(),wallTex=tWall(),signTex=tSign('银杏楼二栋');
 var exitTex=tExit(),plateTex=tPlate(),glowTex=tGlow();
 var trackTex=tTrack(),grassTex=tGrass(),courtTex=tCourt(),gateTex=tGate();
+var safeDoorTex=tSafeDoor();
 
-/* ==================== 材质 ==================== */
 var M={
   floor:new THREE.MeshStandardMaterial({map:floorTex,roughness:.9,metalness:.06}),
   wall:new THREE.MeshStandardMaterial({map:wallTex,roughness:.96,metalness:.02}),
@@ -376,10 +520,12 @@ var M={
   ruler:new THREE.MeshStandardMaterial({color:0x8a6a3a,roughness:.6,metalness:.15}),
   signPost:new THREE.MeshStandardMaterial({color:0x9098a0,roughness:.6,metalness:.5}),
   gate:new THREE.MeshStandardMaterial({map:gateTex,roughness:.85,metalness:.2}),
-  gatePost:new THREE.MeshStandardMaterial({color:0xc8b878,roughness:.7})
+  gatePost:new THREE.MeshStandardMaterial({color:0xc8b878,roughness:.7}),
+  safeDoor:new THREE.MeshStandardMaterial({map:safeDoorTex,roughness:.7,metalness:.3}),
+  safePost:new THREE.MeshStandardMaterial({color:0x2a3a30,roughness:.85}),
+  wallMat:new THREE.MeshStandardMaterial({color:0x3a4048,roughness:.9})
 };
 
-/* ==================== 灯光 ==================== */
 var ambient=new THREE.AmbientLight(0x18202c,.55);scene.add(ambient);
 var moon=new THREE.DirectionalLight(0x3a5a8a,.22);moon.position.set(-40,60,-50);scene.add(moon);
 
@@ -389,7 +535,6 @@ torch.target.position.set(0,0,-1);
 camera.add(torch);camera.add(torch.target);
 var torchFill=new THREE.PointLight(0xffe9c4,1.15,6,1.7);
 torchFill.position.set(.1,-.1,-.3);camera.add(torchFill);
-
 (function(){
   var cg=new THREE.ConeGeometry(2.6,11,24,1,true);
   var cm=new THREE.MeshBasicMaterial({color:0xfff0cc,transparent:true,opacity:.022,
@@ -398,7 +543,6 @@ torchFill.position.set(.1,-.1,-.3);camera.add(torchFill);
   camera.add(cn);
 })();
 
-/* 主楼里的走廊应急灯 */
 var corridorLights=[];
 for(var lf=0;lf<FLOORS;lf++){
   for(var lx=-16;lx<=16;lx+=16){
@@ -407,7 +551,6 @@ for(var lf=0;lf<FLOORS;lf++){
     scene.add(cl);corridorLights.push(cl);
   }
 }
-/* 走廊顶灯管（视觉） */
 var tubeMeshes=[];
 for(var tf=0;tf<FLOORS;tf++){
   for(var ti=0;ti<5;ti++){
@@ -419,7 +562,7 @@ for(var tf=0;tf<FLOORS;tf++){
   }
 }
 
-/* ==================== 主楼 ==================== */
+/* ==================== 银杏楼二栋（教学楼） ==================== */
 var building=new THREE.Group();scene.add(building);
 
 for(var f=0;f<FLOORS;f++){
@@ -428,8 +571,8 @@ for(var f=0;f<FLOORS;f++){
   fl.position.set(0,y0-.1,(BZO+BZS)/2);building.add(fl);
   var ce=new THREE.Mesh(new THREE.BoxGeometry(BW,.2,BZS-BZO),M.ceil);
   ce.position.set(0,y0+FLOOR_H-.1,(BZO+BZS)/2);building.add(ce);
-  var cl=new THREE.Mesh(new THREE.BoxGeometry(BW,FLOOR_H,BZB-BZS),M.class);
-  cl.position.set(0,y0+FLOOR_H/2,(BZS+BZB)/2);building.add(cl);
+  var cl2=new THREE.Mesh(new THREE.BoxGeometry(BW,FLOOR_H,BZB-BZS),M.class);
+  cl2.position.set(0,y0+FLOOR_H/2,(BZS+BZB)/2);building.add(cl2);
 
   for(var di=0;di<7;di++){
     var dx=-24+di*8;
@@ -441,10 +584,8 @@ for(var f=0;f<FLOORS;f++){
       new THREE.MeshBasicMaterial({map:plateTex}));
     pl.position.set(dx+.62,y0+2.45,BZS-.18);building.add(pl);
   }
-  /* 走廊外侧墙 */
   var ow=new THREE.Mesh(new THREE.BoxGeometry(BW,FLOOR_H,.3),M.wall);
   ow.position.set(0,y0+FLOOR_H/2,BZO-.15);building.add(ow);
-  /* 走廊窗 */
   for(var wi=0;wi<11;wi++){
     var wx=-25+wi*5;
     var lit=Math.random()<.2;
@@ -454,7 +595,6 @@ for(var f=0;f<FLOORS;f++){
     fh.position.set(wx,y0+3.16,BZO-.30);building.add(fh);
     var fh2=fh.clone();fh2.position.y=y0+1.04;building.add(fh2);
   }
-  /* 柱子 */
   for(var pi=0;pi<=7;pi++){
     var px=-28+pi*8;
     var pil=new THREE.Mesh(new THREE.BoxGeometry(.5,FLOOR_H,.5),M.wall);
@@ -467,39 +607,34 @@ for(var f=0;f<FLOORS;f++){
   sd.position.set(x+(x<0?-.2:.2),FLOOR_H*FLOORS/2,(BZO+BZB)/2);building.add(sd);
 });
 
-/* 楼梯视觉模型（简化版：一段斜坡+台阶） */
+/* 楼梯视觉 */
 (function(){
-  var stairMat=new THREE.MeshStandardMaterial({color:0x3a3f48,roughness:.9});
-  var railMat=new THREE.MeshStandardMaterial({color:0x707880,roughness:.6,metalness:.5});
+  var sM=new THREE.MeshStandardMaterial({color:0x3a3f48,roughness:.9});
+  var rM=new THREE.MeshStandardMaterial({color:0x707880,roughness:.6,metalness:.5});
   for(var sf=0;sf<FLOORS;sf++){
     if(sf<FLOORS-1){
-      /* 右侧上行楼梯：5级台阶沿 x 方向 */
       for(var st=0;st<8;st++){
-        var step=new THREE.Mesh(new THREE.BoxGeometry(.8,.2,3.5),stairMat);
-        step.position.set(26+st*0.3, sf*FLOOR_H+st*0.5+.1, -7);
-        building.add(step);
+        var s1=new THREE.Mesh(new THREE.BoxGeometry(.8,.2,3.5),sM);
+        s1.position.set(26+st*0.3, sf*FLOOR_H+st*0.5+.1, -7);
+        building.add(s1);
       }
-      var rail1=new THREE.Mesh(new THREE.BoxGeometry(2.8,.08,.08),railMat);
-      rail1.position.set(27, sf*FLOOR_H+2.2, -5.3);
-      rail1.rotation.z=-Math.PI/6;building.add(rail1);
-      var rail2=rail1.clone();rail2.position.z=-8.7;building.add(rail2);
+      var r1=new THREE.Mesh(new THREE.BoxGeometry(2.8,.08,.08),rM);
+      r1.position.set(27,sf*FLOOR_H+2.2,-5.3);r1.rotation.z=-Math.PI/6;building.add(r1);
+      var r2=r1.clone();r2.position.z=-8.7;building.add(r2);
     }
     if(sf>0){
-      /* 左侧下行楼梯 */
       for(var st2=0;st2<8;st2++){
-        var step2=new THREE.Mesh(new THREE.BoxGeometry(.8,.2,3.5),stairMat);
-        step2.position.set(-26-st2*0.3, sf*FLOOR_H-st2*0.5+.1, -7);
-        building.add(step2);
+        var s2=new THREE.Mesh(new THREE.BoxGeometry(.8,.2,3.5),sM);
+        s2.position.set(-26-st2*0.3, sf*FLOOR_H-st2*0.5+.1, -7);
+        building.add(s2);
       }
-      var rail3=new THREE.Mesh(new THREE.BoxGeometry(2.8,.08,.08),railMat);
-      rail3.position.set(-27, sf*FLOOR_H-1.2, -5.3);
-      rail3.rotation.z=Math.PI/6;building.add(rail3);
-      var rail4=rail3.clone();rail4.position.z=-8.7;building.add(rail4);
+      var r3=new THREE.Mesh(new THREE.BoxGeometry(2.8,.08,.08),rM);
+      r3.position.set(-27,sf*FLOOR_H-1.2,-5.3);r3.rotation.z=Math.PI/6;building.add(r3);
+      var r4=r3.clone();r4.position.z=-8.7;building.add(r4);
     }
   }
 })();
 
-/* 楼梯指示牌 */
 (function(){
   var upT=tStair('↑ 上楼','#5fe8ff');
   var dnT=tStair('↓ 下楼','#ffd166');
@@ -520,7 +655,7 @@ for(var f=0;f<FLOORS;f++){
   }
 })();
 
-/* 楼顶 */
+/* 楼顶 + 招牌 */
 (function(){
   var rf=new THREE.Mesh(new THREE.BoxGeometry(BW+1.6,.5,(BZB-BZO)+1.6),M.roof);
   rf.position.set(0,FLOOR_H*FLOORS+.25,(BZO+BZB)/2);building.add(rf);
@@ -532,7 +667,6 @@ for(var f=0;f<FLOORS;f++){
   var c=new THREE.Mesh(new THREE.BoxGeometry(.3,h,BZB-BZO+1.6),M.wall);
   c.position.set(-BX2-.8,y,(BZO+BZB)/2);building.add(c);
   var d=c.clone();d.position.x=BX2+.8;building.add(d);
-  /* 招牌 */
   var sw=22,sh=5.5;
   var sm=new THREE.MeshBasicMaterial({map:signTex,transparent:true,depthWrite:false,
     blending:THREE.AdditiveBlending,fog:false,side:THREE.DoubleSide});
@@ -543,7 +677,7 @@ for(var f=0;f<FLOORS;f++){
   bk.position.set(0,FLOOR_H*FLOORS+3.6,BZO-.85);building.add(bk);
 })();
 
-/* 一楼大门 + 门廊 */
+/* 银杏楼一楼入口（只是入口，不是安全出口） */
 (function(){
   var dw=new THREE.Mesh(new THREE.BoxGeometry(6.4,3.9,.5),
     new THREE.MeshStandardMaterial({color:0x05070a,roughness:1}));
@@ -557,41 +691,33 @@ for(var f=0;f<FLOORS;f++){
   var df2=new THREE.Mesh(new THREE.BoxGeometry(.3,3.9,.4),M.metal);
   df2.position.set(-3.4,1.95,BZO-.3);building.add(df2);
   var df3=df2.clone();df3.position.x=3.4;building.add(df3);
-  var es=new THREE.Mesh(new THREE.PlaneGeometry(1.6,.8),
-    new THREE.MeshBasicMaterial({map:exitTex,fog:false}));
-  es.position.set(0,4.5,BZO-.5);es.rotation.y=Math.PI;building.add(es);
+  var entT=tStair('入口','#8ab4d6');
+  var entSign=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.2),
+    new THREE.MeshBasicMaterial({map:entT,transparent:true,depthWrite:false,
+      blending:THREE.AdditiveBlending,fog:false,side:THREE.DoubleSide}));
+  entSign.position.set(0,4.55,BZO-.55);entSign.rotation.y=Math.PI;building.add(entSign);
   var pr=new THREE.Mesh(new THREE.BoxGeometry(14,.3,8),M.floor);
   pr.position.set(0,-.15,BZO-4);building.add(pr);
 })();
 
 /* ==================== 操场 ==================== */
 (function(){
-  /* 地面 */
   var gr=new THREE.Mesh(new THREE.PlaneGeometry(320,320),
     new THREE.MeshStandardMaterial({color:0x060a0e,roughness:1}));
   gr.rotation.x=-Math.PI/2;gr.position.y=-.55;scene.add(gr);
-
-  /* 草坪底 */
   var lawn=new THREE.Mesh(new THREE.PlaneGeometry(PLAY.x2-PLAY.x1,PLAY.z2-PLAY.z1),M.grass);
   lawn.rotation.x=-Math.PI/2;
   lawn.position.set((PLAY.x1+PLAY.x2)/2,-.5,(PLAY.z1+PLAY.z2)/2);
   scene.add(lawn);
-
-  /* 跑道（红环） */
   var track=new THREE.Mesh(new THREE.RingGeometry(17,23,64),M.track);
   track.rotation.x=-Math.PI/2;track.position.set(0,-.48,-50);scene.add(track);
-  /* 跑道白线 */
   var ln=new THREE.Mesh(new THREE.RingGeometry(19.8,20,.1,64),
     new THREE.MeshBasicMaterial({color:0xdde4ea,side:THREE.DoubleSide}));
   ln.rotation.x=-Math.PI/2;ln.position.set(0,-.47,-50);scene.add(ln);
-  /* 内场草地 */
   var inner=new THREE.Mesh(new THREE.CircleGeometry(17,48),M.grass);
   inner.rotation.x=-Math.PI/2;inner.position.set(0,-.48,-50);scene.add(inner);
-
-  /* 篮球场（东侧） */
   var ct=new THREE.Mesh(new THREE.PlaneGeometry(14,26),M.court);
   ct.rotation.x=-Math.PI/2;ct.position.set(32,-.48,-50);scene.add(ct);
-  /* 篮球架 */
   [40,24].forEach(function(z){
     var pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,8),M.metal);
     pole.position.set(38,1.5,z);scene.add(pole);
@@ -603,19 +729,14 @@ for(var f=0;f<FLOORS;f++){
       new THREE.MeshStandardMaterial({color:0xff8800,roughness:.5,metalness:.4}));
     rim.position.set(36.2,3.05,z);rim.rotation.x=Math.PI/2;scene.add(rim);
   });
-
-  /* 足球门（跑道西侧） */
   [0,1].forEach(function(side){
     var gx=side?20:-20;
-    var postMat=M.white;
-    var p1=new THREE.Mesh(new THREE.BoxGeometry(.12,2.4,.12),postMat);
+    var p1=new THREE.Mesh(new THREE.BoxGeometry(.12,2.4,.12),M.white);
     p1.position.set(gx,1.2,-57);scene.add(p1);
     var p2=p1.clone();p2.position.z=-43;scene.add(p2);
-    var bar=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,14.12),postMat);
+    var bar=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,14.12),M.white);
     bar.position.set(gx,2.4,-50);scene.add(bar);
   });
-
-  /* 路灯 */
   for(var li=0;li<6;li++){
     var lx=-40+li*16;
     var pole=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,7,8),M.metal);
@@ -628,7 +749,7 @@ for(var f=0;f<FLOORS;f++){
   }
 })();
 
-/* ==================== 第二教学楼 ==================== */
+/* ==================== 第二教学楼（装饰建筑） ==================== */
 (function(){
   var g=new THREE.Group();scene.add(g);
   var bx=-62, bz=-40, bw=32, bd=36, floors=3, fh=4;
@@ -636,14 +757,12 @@ for(var f=0;f<FLOORS;f++){
     var y0=f3*fh;
     var box=new THREE.Mesh(new THREE.BoxGeometry(bw,fh,bd),M.class);
     box.position.set(bx,y0+fh/2,bz);g.add(box);
-    /* 窗户 */
     for(var wi=0;wi<5;wi++){
       var wx=bx-bw/2+3+wi*6;
       var wn=new THREE.Mesh(new THREE.PlaneGeometry(2,1.6),M.glass);
       wn.position.set(wx,y0+2.5,bz+bd/2+.01);g.add(wn);
       var wn2=wn.clone();wn2.rotation.y=Math.PI;wn2.position.z=bz-bd/2-.01;g.add(wn2);
     }
-    /* 侧窗 */
     for(var si=0;si<4;si++){
       var sz=bz-bd/2+5+si*8;
       var sn=new THREE.Mesh(new THREE.PlaneGeometry(2,1.6),M.glass);
@@ -651,48 +770,53 @@ for(var f=0;f<FLOORS;f++){
       var sn2=sn.clone();sn2.rotation.y=-Math.PI/2;sn2.position.x=bx-bw/2-.01;g.add(sn2);
     }
   }
-  /* 楼顶 */
   var rf=new THREE.Mesh(new THREE.BoxGeometry(bw+1,.4,bd+1),M.roof);
   rf.position.set(bx,floors*fh+.2,bz);g.add(rf);
-  /* 入口 */
-  var ent=new THREE.Mesh(new THREE.BoxGeometry(4,3,.3),
-    new THREE.MeshStandardMaterial({color:0x05070a,roughness:1}));
-  ent.position.set(bx,1.5,bz+bd/2+.1);g.add(ent);
-  var entF=new THREE.Mesh(new THREE.BoxGeometry(5,.3,.4),M.metal);
-  entF.position.set(bx,3.2,bz+bd/2+.2);g.add(entF);
-  /* 牌子 */
-  var sgT=tSign('教学楼');
-  var sg=new THREE.Mesh(new THREE.PlaneGeometry(8,2),
-    new THREE.MeshBasicMaterial({map:sgT,transparent:true,depthWrite:false,
-      blending:THREE.AdditiveBlending,fog:false,side:THREE.DoubleSide}));
-  sg.position.set(bx,floors*fh+3,bz+bd/2+.2);g.add(sg);
 })();
 
-/* ==================== 大门 + 保安亭 ==================== */
+/* ==================== 校园南墙 + 校门 + 安全出口 ==================== */
 var gateGroup=new THREE.Group();scene.add(gateGroup);
-var gateLeftPivot, gateRightPivot;
+var gateLeftPivot,gateRightPivot;
+var safeLeftPivot,safeRightPivot;
 
 (function(){
-  /* 大门位置：z=-92, 宽度14 */
-  var gx=0, gz=-92, gw=14;
-  /* 两侧立柱 */
+  var gz=-92;
+  var wallH=3;
+
+  /* 围墙分段（避开安全出口缺口和校门缺口） */
+  /* 安全出口: x∈[-18.5, -13.5], 校门: x∈[-7, 7] */
+  /* 左段墙: x∈[-50, -18.5] */
+  var wL=new THREE.Mesh(new THREE.BoxGeometry(31.5,wallH,.6),M.wallMat);
+  wL.position.set(-34.25,1.5,gz);scene.add(wL);
+  /* 中段墙: x∈[-13.5, -7] */
+  var wM=new THREE.Mesh(new THREE.BoxGeometry(6.5,wallH,.6),M.wallMat);
+  wM.position.set(-10.25,1.5,gz);scene.add(wM);
+  /* 右段墙: x∈[7, 50] */
+  var wR=new THREE.Mesh(new THREE.BoxGeometry(43,wallH,.6),M.wallMat);
+  wR.position.set(28.5,1.5,gz);scene.add(wR);
+  /* 墙顶压条 */
+  [wL,wM,wR].forEach(function(w){
+    var cap=new THREE.Mesh(new THREE.BoxGeometry(w.geometry.parameters.width,.2,.8),M.wallMat);
+    cap.position.set(w.position.x, 3.1, gz);scene.add(cap);
+  });
+
+  /* ---------- 校门（正门，装饰性，不可通过）---------- */
+  var gw=14;
   [-1,1].forEach(function(side){
     var post=new THREE.Mesh(new THREE.BoxGeometry(1.2,6,1.2),M.gatePost);
     post.position.set(side*(gw/2+.5),3,gz);gateGroup.add(post);
     var cap=new THREE.Mesh(new THREE.BoxGeometry(1.6,.4,1.6),M.gatePost);
     cap.position.set(side*(gw/2+.5),6.2,gz);gateGroup.add(cap);
   });
-  /* 横梁 */
   var beam=new THREE.Mesh(new THREE.BoxGeometry(gw+2,.6,1.2),M.gatePost);
   beam.position.set(0,5.4,gz);gateGroup.add(beam);
-  /* 牌子 */
-  var gsT=tSign('银杏楼二栋');
+  var gsT=tSign('校园正门');
   var gs=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),
     new THREE.MeshBasicMaterial({map:gsT,transparent:true,depthWrite:false,
       blending:THREE.AdditiveBlending,fog:false,side:THREE.DoubleSide}));
   gs.position.set(0,5.4,gz+.7);gateGroup.add(gs);
 
-  /* 两扇铁门（Pivot 分别位于两侧立柱内侧） */
+  /* 校门门扇（只是装饰，永远关着） */
   function makeGate(side){
     var pivot=new THREE.Group();
     pivot.position.set(side*(gw/2-.05),0,gz);
@@ -700,7 +824,6 @@ var gateLeftPivot, gateRightPivot;
     var panel=new THREE.Mesh(new THREE.BoxGeometry(gw/2,.3,3.2),M.gate);
     panel.position.set(-side*gw/4, 2.5, 0);
     pivot.add(panel);
-    /* 竖条 */
     for(var i=0;i<6;i++){
       var bar=new THREE.Mesh(new THREE.BoxGeometry(.12,2.4,.12),M.gatePost);
       bar.position.set(-side*(0.4+i*0.95), 2.5, 0);
@@ -711,7 +834,7 @@ var gateLeftPivot, gateRightPivot;
   gateLeftPivot=makeGate(-1);
   gateRightPivot=makeGate(1);
 
-  /* 保安亭 */
+  /* ---------- 保安亭（校门旁）---------- */
   var gd=new THREE.Group();
   gd.position.set(GUARD.x,0,GUARD.z);scene.add(gd);
   var base=new THREE.Mesh(new THREE.BoxGeometry(3.2,2.8,3.2),
@@ -722,12 +845,48 @@ var gateLeftPivot, gateRightPivot;
   var roof=new THREE.Mesh(new THREE.BoxGeometry(3.8,.3,3.8),
     new THREE.MeshStandardMaterial({color:0x3a4048,roughness:.9}));
   roof.position.y=2.95;gd.add(roof);
-  /* 灯 */
   var gl=new THREE.PointLight(0xffddaa,1.2,10,1.8);
   gl.position.set(GUARD.x,2.4,GUARD.z);scene.add(gl);
   var gb=new THREE.Mesh(new THREE.SphereGeometry(.15,8,8),
     new THREE.MeshBasicMaterial({color:0xffddaa}));
   gb.position.set(GUARD.x,2.4,GUARD.z);scene.add(gb);
+
+  /* ---------- 安全出口（独立于教学楼，位于南围墙左侧） ---------- */
+  var sx=SAFE.x, sw2=SAFE.w;
+  /* 两侧门柱 */
+  [-1,1].forEach(function(side){
+    var post=new THREE.Mesh(new THREE.BoxGeometry(.7,4,.7),M.safePost);
+    post.position.set(sx+side*(sw2/2+.35),2,gz);scene.add(post);
+    var cap=new THREE.Mesh(new THREE.BoxGeometry(1,.3,1),M.safePost);
+    cap.position.set(sx+side*(sw2/2+.35),4.15,gz);scene.add(cap);
+  });
+  /* 顶部横梁 */
+  var sBeam=new THREE.Mesh(new THREE.BoxGeometry(sw2+1,.3,.7),M.safePost);
+  sBeam.position.set(sx,3.9,gz);scene.add(sBeam);
+  /* 门扇（两扇，答完题后向外旋转打开） */
+  function makeSafeGate(side){
+    var pivot=new THREE.Group();
+    pivot.position.set(sx+side*(sw2/2-.05),0,gz);
+    gateGroup.add(pivot);
+    var panel=new THREE.Mesh(new THREE.BoxGeometry(sw2/2,2.6,.15),M.safeDoor);
+    panel.position.set(-side*sw2/4,1.4,0);
+    pivot.add(panel);
+    /* 门上绿色发光条 */
+    var strip=new THREE.Mesh(new THREE.BoxGeometry(sw2/2-.2,.12,.18),
+      new THREE.MeshBasicMaterial({color:0x33ff99,fog:false}));
+    strip.position.set(-side*sw2/4,2.55,.02);
+    pivot.add(strip);
+    return pivot;
+  }
+  safeLeftPivot=makeSafeGate(-1);
+  safeRightPivot=makeSafeGate(1);
+  /* 安全出口上方的"安全出口"标牌 */
+  var es=new THREE.Mesh(new THREE.PlaneGeometry(2.8,1.4),
+    new THREE.MeshBasicMaterial({map:exitTex,fog:false,transparent:true}));
+  es.position.set(sx,4.6,gz+.4);scene.add(es);
+  /* 安全出口处的绿色光晕 */
+  var exitLight=new THREE.PointLight(0x33ff99,1.2,10,1.8);
+  exitLight.position.set(sx,3.2,gz+1.5);scene.add(exitLight);
 })();
 
 /* ==================== 可行走区域 ==================== */
@@ -735,16 +894,17 @@ var AREAS=[];
 for(var af=0;af<FLOORS;af++){
   AREAS.push({x1:BX1+.5,x2:BX2-.5,z1:BZO+.5,z2:BZS-.5,y:af*FLOOR_H});
 }
-/* 一楼门廊 → 操场（连通走廊） */
+/* 银杏楼入口门廊 → 操场 */
 AREAS.push({x1:-6.5,x2:6.5,z1:-17,z2:BZO+.5,y:0});
 /* 操场整体 */
 AREAS.push({x1:PLAY.x1,x2:PLAY.x2,z1:PLAY.z1,z2:PLAY.z2,y:0});
-/* 大门口区域 */
-AREAS.push({x1:-16,x2:16,z1:GATE_Z-2,z2:PLAY.z1+.5,y:0});
-/* 通向第二教学楼的小路（西侧） */
+/* 通向安全出口的通道（从操场南边到南墙前） */
+AREAS.push({x1:-20,x2:-12,z1:GATE_Z-1,z2:PLAY.z1+.5,y:0});
+/* 通向校门前的通道 */
+AREAS.push({x1:-9,x2:9,z1:GATE_Z-1,z2:PLAY.z1+.5,y:0});
+/* 第二教学楼前空地 */
 AREAS.push({x1:PLAY.x1-.5,x2:-44,z1:-58,z2:-22,y:0});
 
-/* 楼梯触发区 */
 var STAIRS=[];
 for(var stf=0;stf<FLOORS;stf++){
   if(stf<FLOORS-1){
@@ -756,19 +916,19 @@ for(var stf=0;stf<FLOORS;stf++){
 }
 var stairCooldown=0;
 
-/* ==================== 玩家 ==================== */
+/* ==================== 玩家 —— 出生在操场 ==================== */
 var player={
-  pos:new THREE.Vector3(0,FLOOR_H*3+EYE_H,-7),
-  groundY:FLOOR_H*3,
-  yaw:0,pitch:0,bobT:0,bobY:0,
-  sprinting:false,
-  sprintFactor:0
+  pos:new THREE.Vector3(0, EYE_H, -50),
+  groundY:0,
+  yaw:Math.PI,
+  pitch:0, bobT:0, bobY:0,
+  sprinting:false
 };
 var joy={x:0,y:0,active:false};
 var keys={};
+var stepTimer=0;
 
 /* ==================== 题库 ==================== */
-/* 格式：[题干, 选项1, 选项2, 选项3, 选项4, 正确索引] */
 var QB=[
 {name:'课代表A · 第1课 开启初中生活',qs:[
 ["中学生活是一段新的人生旅程，而我们对新生活充满了期待。下列属于对新生活期待的有（　）",
@@ -938,8 +1098,7 @@ var QB=[
 ]}
 ];
 
-/* ==================== 课代表（随机生成） ==================== */
-/* 3 名课代表随机分布在不同楼层不同位置 */
+/* ==================== 课代表（随机分布） ==================== */
 var REP_COLOR=[0x5fe8ff,0xa78bff,0x66ffb0];
 var REPS=[];
 var repTriggerCooldown=0;
@@ -947,13 +1106,11 @@ var repTriggerCooldown=0;
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
 function spawnReps(){
-  /* 从 4 层中挑 3 层（保证不同层，更难找） */
   var floors=[0,1,2,3];
   shuffle(floors);
   var chosen=[floors[0],floors[1],floors[2]];
   for(var i=0;i<3;i++){
     var f=chosen[i];
-    /* x 在整个走廊范围随机，z 也随机 */
     var x=-22+Math.random()*44;
     var z=-9+Math.random()*3.5;
     var y=f*FLOOR_H;
@@ -961,28 +1118,22 @@ function spawnReps(){
     g.position.set(x,y,z);
     scene.add(g);
     var color=REP_COLOR[i];
-    /* 核心八面体 */
     var core=new THREE.Mesh(new THREE.OctahedronGeometry(.42,0),
       new THREE.MeshStandardMaterial({color:color,emissive:color,emissiveIntensity:1.5,
         roughness:.25,metalness:.5,flatShading:true}));
     core.position.y=1.05;g.add(core);
-    /* 线框外圈 */
     var cage=new THREE.Mesh(new THREE.OctahedronGeometry(.66,0),
       new THREE.MeshBasicMaterial({color:color,wireframe:true,transparent:true,opacity:.45,fog:false}));
     cage.position.y=1.05;g.add(cage);
-    /* 光晕 */
     var glow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:color,
       transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
     glow.scale.set(3.4,3.4,1);glow.position.y=1.05;g.add(glow);
-    /* 点光源 */
     var pl=new THREE.PointLight(color,1.1,8,2);
     pl.position.y=1.05;g.add(pl);
-    /* 地面环 */
     var ring=new THREE.Mesh(new THREE.RingGeometry(.72,.94,40),
       new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:.5,
         side:THREE.DoubleSide,depthWrite:false,fog:false}));
     ring.rotation.x=-Math.PI/2;ring.position.y=.03;g.add(ring);
-    /* 头顶指示柱（给玩家一点视觉引导） */
     var beam=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,6,8,1,true),
       new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:.12,
         side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));
@@ -998,72 +1149,78 @@ spawnReps();
 
 /* ==================== 老师（追捕者） ==================== */
 var teacher={
-  group:null,pos:new THREE.Vector3(),speed:3.6,active:false,spawned:false,
-  yaw:0,armSwing:0
+  group:null,
+  pos:new THREE.Vector3(),
+  groundY:0,
+  speed:2.8,
+  active:false,
+  yaw:0,armSwing:0,
+  armL:null,armR:null,
+  climbing:false,
+  climbFrom:0,
+  climbTo:0,
+  climbT:0
 };
 function createTeacher(){
   var g=new THREE.Group();
-  /* 身体 */
   var body=new THREE.Mesh(new THREE.BoxGeometry(.6,1.15,.32),M.darkCloth);
   body.position.y=1.05;g.add(body);
-  /* 衬衫领口（点缀） */
   var collar=new THREE.Mesh(new THREE.BoxGeometry(.35,.2,.34),M.white);
   collar.position.y=1.55;g.add(collar);
-  /* 头 */
   var head=new THREE.Mesh(new THREE.SphereGeometry(.22,16,12),M.skin);
   head.position.y=1.85;g.add(head);
-  /* 头发（盖住头顶） */
   var hair=new THREE.Mesh(new THREE.SphereGeometry(.225,16,12,0,Math.PI*2,0,Math.PI/2.2),
     new THREE.MeshStandardMaterial({color:0x14100c,roughness:.9}));
   hair.position.y=1.87;g.add(hair);
-  /* 左臂 */
   var armL=new THREE.Group();armL.position.set(-.42,1.4,0);g.add(armL);
   var armLm=new THREE.Mesh(new THREE.BoxGeometry(.18,.95,.18),M.darkCloth);
   armLm.position.y=-.4;armL.add(armLm);
-  /* 右臂 */
   var armR=new THREE.Group();armR.position.set(.42,1.4,0);g.add(armR);
   var armRm=new THREE.Mesh(new THREE.BoxGeometry(.18,.95,.18),M.darkCloth);
   armRm.position.y=-.4;armR.add(armRm);
-  /* 戒尺（右臂末端） */
   var ruler=new THREE.Mesh(new THREE.BoxGeometry(.06,.7,.14),M.ruler);
   ruler.position.set(0,-.95,0);armR.add(ruler);
-  /* 腿 */
   var legL=new THREE.Mesh(new THREE.BoxGeometry(.2,1,.2),M.grayCloth);
   legL.position.set(-.17,.5,0);g.add(legL);
   var legR=new THREE.Mesh(new THREE.BoxGeometry(.2,1,.2),M.grayCloth);
   legR.position.set(.17,.5,0);g.add(legR);
-  /* 红光（轮廓识别） */
   var rl=new THREE.PointLight(0xff2020,1.5,7,1.6);
   rl.position.y=1.7;g.add(rl);
-  /* 红光罩 */
   var aura=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xff2020,
     transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
   aura.scale.set(2.6,2.6,1);aura.position.y=1.4;g.add(aura);
 
-  g.visible=false;
   scene.add(g);
   teacher.group=g;
   teacher.armL=armL;
   teacher.armR=armR;
-  teacher.legL=legL;
-  teacher.legR=legR;
 }
 createTeacher();
 
-function spawnTeacher(){
-  /* 在距离玩家 14-22m 的位置生成（同层或附近层） */
-  var ang=Math.random()*Math.PI*2;
-  var dist=14+Math.random()*8;
-  var tx=player.pos.x+Math.cos(ang)*dist;
-  var tz=player.pos.z+Math.sin(ang)*dist;
-  /* 约束到主楼走廊范围 */
-  tx=Math.max(BX1+2,Math.min(BX2-2,tx));
-  tz=Math.max(BZO+1,Math.min(BZS-1,tz));
-  teacher.pos.set(tx,player.groundY,tz);
+function spawnTeacherInitial(){
+  teacher.pos.set(-30, 0, -28);
+  teacher.groundY = 0;
   teacher.group.position.copy(teacher.pos);
   teacher.group.visible=true;
   teacher.active=true;
-  teacher.spawned=true;
+}
+
+function spawnTeacherDark(){
+  var ang=Math.random()*Math.PI*2;
+  var dist=16+Math.random()*8;
+  var tx=player.pos.x+Math.cos(ang)*dist;
+  var tz=player.pos.z+Math.sin(ang)*dist;
+  if (Math.abs(player.groundY) < 0.5) {
+    tx=Math.max(-40,Math.min(40,tx));
+    tz=Math.max(-80,Math.min(-20,tz));
+  } else {
+    tx=Math.max(BX1+2,Math.min(BX2-2,tx));
+    tz=Math.max(BZO+1,Math.min(BZS-1,tz));
+  }
+  teacher.pos.set(tx,player.groundY,tz);
+  teacher.groundY = player.groundY;
+  teacher.climbing = false;
+  teacher.group.position.copy(teacher.pos);
 }
 
 /* ==================== 答题系统 ==================== */
@@ -1110,7 +1267,6 @@ function renderQuestion(){
   qTitleEl.textContent=set.name;
   qTextEl.textContent=q[0];
   qTextEl.scrollTop=0;
-  /* 构建选项：正确 + 一个干扰 */
   var opts=q.slice(1,5), ans=q[5];
   var correctText=opts[ans];
   var wrongIdx=-1,guard=0;
@@ -1159,9 +1315,9 @@ function nextQuestion(){
 }
 
 var TOTAL_REPS=3;
-var DARK_TRIGGER=2; /* 答完2名触发变黑 */
+var DARK_TRIGGER=2;
 var darkMode=false;
-var escapeReady=false; /* 3名都答完，大门可开 */
+var escapeReady=false;
 
 function finishQuiz(){
   QUIZ.locked=true;
@@ -1174,30 +1330,28 @@ function finishQuiz(){
 
   setTimeout(function(){
     QUIZ.active=false;quizEl.classList.remove('on');
+    graceTimer=2.0;   /* 答题后 2 秒老师不动 */
     if(remain>0){
       toast(set.name+' 完成 · 答对 '+right+'/'+set.qs.length+' · 剩余课代表 '+remain,2600);
     } else {
-      toast('课代表全部答完 · 大门已开 · 快跑',3200);
+      toast('课代表全部答完 · 前往南墙安全出口撤离',3400);
       escapeReady=true;
     }
-    /* 触发变黑 */
     if(doneCount>=DARK_TRIGGER&&!darkMode){
       triggerDark();
     }
   },520);
 }
 
-/* ==================== 变黑 & 老师出现 ==================== */
+/* ==================== 变黑 & 老师加速 ==================== */
 var flashEl=document.getElementById('flash');
 var vignetteEl=document.getElementById('vignette');
 var huntEl=document.getElementById('hunt');
 var hudHintEl=document.getElementById('hudHint');
-var hudFloorEl=document.getElementById('hudFloor');
 
 function triggerDark(){
   darkMode=true;
   flashEl.classList.add('on');
-  /* 变黑：关灯、浓雾、暗角加深 */
   ambient.intensity=0.02;
   moon.intensity=0;
   for(var i=0;i<corridorLights.length;i++) corridorLights[i].intensity=0;
@@ -1205,14 +1359,16 @@ function triggerDark(){
   scene.fog.density=0.055;
   torch.intensity=7.5;
   torchFill.intensity=1.6;
+  if (AudioSys) AudioSys.setDark();
   setTimeout(function(){
     flashEl.classList.remove('on');
     vignetteEl.classList.add('dark');
     huntEl.classList.add('on');
-    toast('灯灭了……脚步声从身后传来',3000);
+    toast('灯灭了……他跑得更快了',3000);
     hudHintEl.textContent='按住摇杆推满 = 跑步';
     hudHintEl.classList.add('warn');
-    spawnTeacher();
+    teacher.speed=4.2;
+    spawnTeacherDark();
   },1600);
 }
 
@@ -1322,7 +1478,6 @@ canvas.addEventListener('touchmove',onTouchMove,{passive:false});
 canvas.addEventListener('touchend',onTouchEnd,{passive:false});
 canvas.addEventListener('touchcancel',onTouchEnd,{passive:false});
 
-/* 桌面调试 */
 var mouseDown=false,lastMX=0,lastMY=0;
 canvas.addEventListener('mousedown',function(e){
   if(QUIZ.active)return;mouseDown=true;lastMX=e.clientX;lastMY=e.clientY;
@@ -1360,7 +1515,6 @@ function groundAt(x,z,curY){
   return best;
 }
 
-/* ==================== 楼梯检测 ==================== */
 function checkStairs(dt){
   if(stairCooldown>0)stairCooldown-=dt;
   if(QUIZ.active||stairCooldown>0)return;
@@ -1376,64 +1530,146 @@ function checkStairs(dt){
   }
 }
 
-/* ==================== 老师更新 ==================== */
+/* ==================== 老师更新（走楼梯版） ==================== */
 var caught=false;
+var graceTimer=0;
+
 function updateTeacher(dt){
   if(!teacher.active||caught)return;
-  var dx=player.pos.x-teacher.pos.x;
-  var dz=player.pos.z-teacher.pos.z;
-  var dist=Math.hypot(dx,dz);
-  if(dist<0.001)return;
-  var nx=dx/dist,nz=dz/dist;
-  /* 靠近玩家时减速（给玩家一点喘息） */
-  var spd=teacher.speed*(dist<6?0.75:1);
-  teacher.pos.x+=nx*spd*dt;
-  teacher.pos.z+=nz*spd*dt;
-  /* y 跟随玩家地面高度 */
-  teacher.pos.y+=((player.groundY)-teacher.pos.y)*Math.min(1,dt*3);
-  teacher.group.position.copy(teacher.pos);
-  /* 面向玩家 */
-  var targetYaw=Math.atan2(nx,nz);
-  var diff=targetYaw-teacher.yaw;
-  while(diff>Math.PI)diff-=Math.PI*2;
-  while(diff<-Math.PI)diff+=Math.PI*2;
-  teacher.yaw+=diff*Math.min(1,dt*4);
-  teacher.group.rotation.y=teacher.yaw;
-  /* 手臂摆动 */
-  teacher.armSwing+=dt*8;
-  if(teacher.armL)teacher.armL.rotation.x=Math.sin(teacher.armSwing)*0.5;
-  if(teacher.armR)teacher.armR.rotation.x=Math.sin(teacher.armSwing+Math.PI)*0.5;
-  /* 距离越近，红色滤镜越重 */
-  if(dist<10){
-    huntEl.style.opacity=String(0.4+(1-dist/10)*0.6);
+  if(QUIZ.active) return;
+  if(graceTimer>0){ graceTimer-=dt; return; }
+
+  /* ---------- 正在爬楼梯：只做高度过渡 ---------- */
+  if (teacher.climbing) {
+    teacher.climbT += dt / 1.0;
+    if (teacher.climbT >= 1) {
+      teacher.climbT = 1;
+      teacher.climbing = false;
+      teacher.groundY = teacher.climbTo;
+    }
+    var e = teacher.climbT < 0.5
+      ? 2*teacher.climbT*teacher.climbT
+      : 1 - Math.pow(-2*teacher.climbT + 2, 2)/2;
+    teacher.pos.y = teacher.climbFrom + (teacher.climbTo - teacher.climbFrom) * e;
+    teacher.group.position.copy(teacher.pos);
+    teacher.armSwing += dt * 12;
+    if(teacher.armL)teacher.armL.rotation.x = Math.sin(teacher.armSwing) * 0.7;
+    if(teacher.armR)teacher.armR.rotation.x = Math.sin(teacher.armSwing+Math.PI) * 0.7;
+    return;
   }
-  /* 抓到 */
-  if(dist<1.3){
-    caught=true;
+
+  var dx = player.pos.x - teacher.pos.x;
+  var dz = player.pos.z - teacher.pos.z;
+  var distXZ = Math.hypot(dx, dz);
+  var sameFloor = Math.abs(player.groundY - teacher.groundY) < 1.0;
+
+  var nx = 0, nz = 0;
+
+  if (sameFloor) {
+    if (distXZ > 0.001) {
+      nx = dx/distXZ; nz = dz/distXZ;
+      var spd = teacher.speed * (distXZ < 6 ? 0.85 : 1);
+      teacher.pos.x += nx * spd * dt;
+      teacher.pos.z += nz * spd * dt;
+    }
+  } else {
+    var needUp = player.groundY > teacher.groundY;
+    var stairX = needUp ? 26.85 : -26.85;
+    var stairZ = -7;
+    var sdx = stairX - teacher.pos.x;
+    var sdz = stairZ - teacher.pos.z;
+    var sdist = Math.hypot(sdx, sdz);
+
+    if (sdist > 0.6) {
+      nx = sdx/sdist; nz = sdz/sdist;
+      teacher.pos.x += nx * teacher.speed * dt;
+      teacher.pos.z += nz * teacher.speed * dt;
+    } else {
+      teacher.climbing = true;
+      teacher.climbT = 0;
+      teacher.climbFrom = teacher.pos.y;
+      teacher.climbTo = needUp
+        ? teacher.groundY + FLOOR_H
+        : teacher.groundY - FLOOR_H;
+      teacher.pos.x = needUp ? 24 : -24;
+      return;
+    }
+  }
+
+  var targetY = teacher.groundY;
+  teacher.pos.y += (targetY - teacher.pos.y) * Math.min(1, dt * 3);
+  teacher.group.position.copy(teacher.pos);
+
+  var faceX = (Math.abs(nx) > 0.001) ? nx : dx;
+  var faceZ = (Math.abs(nz) > 0.001) ? nz : dz;
+  if (Math.abs(faceX) > 0.001 || Math.abs(faceZ) > 0.001) {
+    var targetYaw = Math.atan2(faceX, faceZ);
+    var diff = targetYaw - teacher.yaw;
+    while(diff > Math.PI) diff -= Math.PI*2;
+    while(diff < -Math.PI) diff += Math.PI*2;
+    teacher.yaw += diff * Math.min(1, dt*4);
+    teacher.group.rotation.y = teacher.yaw;
+  }
+
+  teacher.armSwing += dt * 9;
+  if(teacher.armL)teacher.armL.rotation.x = Math.sin(teacher.armSwing) * 0.5;
+  if(teacher.armR)teacher.armR.rotation.x = Math.sin(teacher.armSwing+Math.PI) * 0.5;
+
+  if(distXZ < 10 && sameFloor){
+    huntEl.style.opacity = String(0.4 + (1-distXZ/10)*0.6);
+  } else {
+    huntEl.style.opacity = '';
+  }
+
+  if(distXZ < 1.3 && sameFloor){
+    caught = true;
+    if (AudioSys) AudioSys.shriek();
     document.getElementById('dead').classList.add('on');
   }
 }
 
-/* ==================== 大门打开 & 逃出判定 ==================== */
-var GATE_OPEN=false, gateOpenT=0;
+/* ==================== 撤离判定（南墙安全出口） ==================== */
+var escapeWarned = false;
+var SAFE_OPEN = false, safeOpenT = 0;
+
 function checkEscape(){
-  /* 三名课代表都答完，大门可开 */
-  if(escapeReady&&!GATE_OPEN){
-    GATE_OPEN=true;
-    toast('大门缓缓打开了……',2400);
+  if (caught || QUIZ.active) return;
+
+  /* 安全出口开门动画 */
+  if (escapeReady && !SAFE_OPEN) {
+    SAFE_OPEN = true;
+    toast('南墙的安全出口开了……快跑！', 2600);
   }
-  /* 大门开启动画 */
-  if(GATE_OPEN&&gateOpenT<1){
-    gateOpenT=Math.min(1,gateOpenT+0.01);
-    if(gateLeftPivot)gateLeftPivot.rotation.y=gateOpenT*Math.PI*0.55;
-    if(gateRightPivot)gateRightPivot.rotation.y=-gateOpenT*Math.PI*0.55;
+  if (SAFE_OPEN && safeOpenT < 1) {
+    safeOpenT = Math.min(1, safeOpenT + 0.012);
+    if (safeLeftPivot) safeLeftPivot.rotation.y = safeOpenT * Math.PI * 0.6;
+    if (safeRightPivot) safeRightPivot.rotation.y = -safeOpenT * Math.PI * 0.6;
   }
-  /* 玩家跑到大门外 */
-  if(GATE_OPEN&&player.pos.z<GATE_Z+1&&Math.abs(player.pos.x)<8){
+
+  /* 玩家是否在安全出口触发区（南墙门洞内） */
+  var atSafeExit = (
+    player.pos.x > SAFE.x - SAFE.w/2 - 0.5 &&
+    player.pos.x < SAFE.x + SAFE.w/2 + 0.5 &&
+    player.pos.z > GATE_Z - 1.5 && player.pos.z < GATE_Z + 1.5 &&
+    Math.abs(player.groundY) < 0.5
+  );
+
+  if (!atSafeExit) {
+    escapeWarned = false;
+    return;
+  }
+
+  if (escapeReady) {
     document.getElementById('end').classList.add('on');
-    document.getElementById('endStat').textContent='三份答卷 · 全部提交';
-    /* 停住玩家 */
-    caught=true;
+    document.getElementById('endStat').textContent = '三份答卷 · 全部提交';
+    if (AudioSys) AudioSys.winFanfare();
+    caught = true;
+  } else {
+    if (!escapeWarned) {
+      var remain = REPS.filter(function(r){return !r.done;}).length;
+      toast('未达到条件 · 还有 ' + remain + ' 名课代表没找到', 2600);
+      escapeWarned = true;
+    }
   }
 }
 
@@ -1491,9 +1727,17 @@ function updatePlayer(dt){
     }
     player.bobT+=dt*(player.sprinting?13:9.5);
     player.bobY=Math.sin(player.bobT)*(player.sprinting?0.06:0.045);
+
+    var stepInterval=player.sprinting?0.30:0.52;
+    stepTimer-=dt;
+    if(stepTimer<=0){
+      if (AudioSys) AudioSys.step(player.sprinting);
+      stepTimer=stepInterval;
+    }
   }else{
     player.bobT=0;
     player.bobY+=(0-player.bobY)*Math.min(1,dt*8);
+    stepTimer=0;
   }
   var targetY=player.groundY+EYE_H;
   player.pos.y+=(targetY-player.pos.y)*Math.min(1,dt*14);
@@ -1501,15 +1745,16 @@ function updatePlayer(dt){
   camera.position.set(player.pos.x,player.pos.y+player.bobY,player.pos.z);
   camera.rotation.set(player.pitch,player.yaw,0);
 
-  /* HUD */
   var f=Math.round(player.groundY/FLOOR_H);
   var label;
   if(player.groundY<-0.3||player.pos.z<BZO-1){
-    label=player.pos.z<GATE_Z+8?'校门口':'操场';
+    if(player.pos.z<GATE_Z+6) label='校园南墙·安全出口';
+    else label='操场';
   }else{
-    var names=['一楼走廊','二楼走廊','三楼走廊','四楼走廊'];
+    var names=['银杏楼·一楼走廊','银杏楼·二楼走廊','银杏楼·三楼走廊','银杏楼·四楼走廊'];
     label=names[f]||'';
   }
+  var hudFloorEl=document.getElementById('hudFloor');
   if(hudFloorEl&&hudFloorEl.textContent!==label)hudFloorEl.textContent=label;
 }
 
@@ -1553,18 +1798,32 @@ function animate(){
   requestAnimationFrame(animate);
   var dt=Math.min(clock.getDelta(),0.05);
   var t=performance.now()*0.001;
-  updatePlayer(dt);
-  updateTorch(dt);
-  updateReps(dt,t);
-  checkTriggers(dt);
-  checkStairs(dt);
-  if(darkMode)updateTeacher(dt);
-  checkEscape();
+
+  /* 【关键】只有点击开始后才运行游戏逻辑 */
+  if (window.__gameStarted) {
+    /* 答题时：世界完全冻结，只保留相机位置 */
+    if (QUIZ.active) {
+      camera.position.set(player.pos.x, player.pos.y + player.bobY, player.pos.z);
+      camera.rotation.set(player.pitch, player.yaw, 0);
+      renderer.render(scene, camera);
+      return;
+    }
+    updatePlayer(dt);
+    updateTorch(dt);
+    updateReps(dt,t);
+    checkTriggers(dt);
+    checkStairs(dt);
+    updateTeacher(dt);
+    checkEscape();
+  }
+
   renderer.render(scene,camera);
 }
+
+/* 老师初始就位 */
+spawnTeacherInitial();
 animate();
 
-/* ==================== 尺寸 ==================== */
 function onResize(){
   var w=innerWidth,h=innerHeight;
   camera.aspect=w/h;camera.updateProjectionMatrix();
@@ -1576,10 +1835,11 @@ window.addEventListener('resize',onResize);
 window.addEventListener('orientationchange',function(){setTimeout(onResize,260);});
 onResize();
 
-/* 开场提示 */
 setTimeout(function(){
-  if(typeof toast==='function')toast('3 名课代表躲在主楼各层 · 找找看',2800);
-},900);
+  if (window.__gameStarted) {
+    toast('3 名课代表躲在银杏楼二栋 · 老师在校园里游荡',3200);
+  }
+},1500);
 
 })();
 </script>
