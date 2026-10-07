@@ -84,6 +84,15 @@ window.pendingGame = null;
 
 <div id="p-home" class="page on">
   <h1>游戏站 <button class="sound-toggle" id="soundBtn" onclick="toggleSound()">音效开</button></h1>
+
+  <!-- ✅ 日用品专区（已移到最上面，首页最显眼位置） -->
+  <div style="background: linear-gradient(135deg, #0056b3, #007bff); color: white; padding: 14px 18px; border-radius: 10px; margin: 8px 0 20px; text-align: center; box-shadow: 0 3px 12px rgba(0,86,179,0.28);">
+    <a href="https://ty696.github.io/dao_ru/" target="_blank" style="color: white; text-decoration: none; font-size: 18px; font-weight: bold; letter-spacing: 3px; display: block; text-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+      🛒 日 用 品 专 区 →
+    </a>
+    <div style="font-size: 12px; opacity: 0.9; margin-top: 6px; letter-spacing: 1px;">点击进入日用品选购页面</div>
+  </div>
+
   <ul class="games">
     <li><a href="#" onclick="go('snake');return false;">贪吃蛇</a><div class="desc">滑动屏幕或点方向键控制，撞墙或撞自己结束。</div></li>
     <li><a href="#" onclick="go('breakout');return false;">打砖块</a><div class="desc">手指拖动底部挡板，把球弹回去打光砖块。</div></li>
@@ -153,7 +162,6 @@ function switchPage(name) {
   window.scrollTo(0, 0);
   if (name !== 'snake') sStop(); if (name !== 'breakout') bStop(); if (name !== 'space') spStop();
   if (name === 'snake') sReset(); else if (name === 'breakout') bReset(); else if (name === 'space') spReset();
-  // ✅ 赞助按钮只在首页显示
   var spBtn = document.getElementById('sponsor-btn');
   if (spBtn) spBtn.style.display = (name === 'home') ? '' : 'none';
   var spModal = document.getElementById('sponsor-modal');
@@ -212,7 +220,6 @@ function renderCustomMedias() {
 function playCustomGame(name) {
     if (document.getElementById('game-loading')) return;
     document.body.style.overflow = 'hidden';
-    // 隐藏赞助按钮
     var spBtn = document.getElementById('sponsor-btn');
     if (spBtn) spBtn.style.display = 'none';
 
@@ -231,7 +238,6 @@ function playCustomGame(name) {
         setTimeout(function() { loading.remove(); }, 300);
     };
     document.body.appendChild(iframe);
-    // 用浏览器返回键退出，不再添加“返回主站”按钮
 }
 
 function deleteMedia(index) {
@@ -691,11 +697,14 @@ setTimeout(function() {
 }, 1200);
 </script>
 
-<footer style="margin-top: 60px; padding: 20px; text-align: right; font-size: 13px; color: #888; border-top: 1px dashed #ccc; font-family: SimSun, serif;">
-    <p style="margin: 0 0 5px 0;">本站由 <a href="https://space.bilibili.com/1732077032" target="_blank" style="color: #0056b3; text-decoration: none; font-weight: bold;">老鼠昊铭</a> 独立开发</p>
+<!-- ✅ 页脚：作者 + 联系邮箱 -->
+<footer style="margin-top: 60px; padding: 20px; text-align: right; font-size: 13px; color: #888; border-top: 1px dashed #ccc; font-family: SimSun, serif; line-height: 1.9;">
+    <p style="margin: 0 0 6px 0;">本站由 <a href="https://space.bilibili.com/1732077032" target="_blank" style="color: #0056b3; text-decoration: none; font-weight: bold;">老鼠昊铭</a> 独立开发</p>
+    <p style="margin: 0 0 6px 0; font-size: 12px; color: #aaa;">联系邮箱：<a href="mailto:x109206727@outlook.com" style="color: #0056b3; text-decoration: none;">x109206727@outlook.com</a></p>
+    <p style="margin: 0 0 6px 0; font-size: 12px; color: #aaa;">备用邮箱：<a href="mailto:laoshu1939@outlook.com" style="color: #0056b3; text-decoration: none;">laoshu1939@outlook.com</a></p>
     <p style="margin: 0; font-size: 12px; color: #aaa;"><em>Powered by HTML5 Canvas</em> | © 2026</p>
-    <p style="margin: 0 0 5px 0;"> <a href="https://ty696.github.io/dao_ru/" target="_blank" style="color: #0056b3; text-decoration: none; font-weight: bold;">日用品专区</a> 
 </footer>
+
 <div class="admin-entry">
     <button onclick="openTerminal()" style="font-size: 12px; padding: 8px 16px; background: #000; color: #fff; border: 1px solid #333; cursor: pointer; border-radius: 4px;">
         管理员入口
@@ -730,14 +739,16 @@ setTimeout(function() {
         async>
 </script>
 
-<!-- 赞助作者按钮（只在首页显示） -->
+<!-- 赞助作者按钮（放在图片与视频区里） -->
 <script>
 (function() {
   var QR_IMAGE = 'qr.jpg';
+
   var btn = document.createElement('button');
   btn.id = 'sponsor-btn';
   btn.textContent = '☕ 赞助作者';
-  btn.style.cssText = 'position:fixed;top:12px;right:12px;z-index:99998;padding:8px 16px;background:#007bff;color:#fff;border:2px solid #000;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;box-shadow:3px 3px 0 #000;font-family:SimSun,serif;-webkit-tap-highlight-color:transparent;';
+  // 去掉了 position:fixed，改成页面内联按钮
+  btn.style.cssText = 'display:inline-block;margin:16px auto 0;padding:10px 24px;background:#007bff;color:#fff;border:2px solid #000;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;box-shadow:3px 3px 0 #000;font-family:SimSun,serif;-webkit-tap-highlight-color:transparent;';
 
   var modal = document.createElement('div');
   modal.id = 'sponsor-modal';
@@ -746,7 +757,13 @@ setTimeout(function() {
                   + '<img src="' + QR_IMAGE + '" style="max-width:80vw;max-height:70vh;background:#fff;border:4px solid #fff;border-radius:12px;box-shadow:0 0 30px rgba(0,150,255,0.5);" onerror="this.src=\'https://via.placeholder.com/300x300?text=qr.jpg\';" alt="收款二维码">'
                   + '<div style="color:#aaa;font-size:13px;font-family:SimSun,serif;">长按二维码保存 · 点击空白处关闭</div>';
 
-  document.body.appendChild(btn);
+  // 把按钮插到「图片与视频区」里面，而不是 body
+  var mediaSection = document.getElementById('media-section');
+  if (mediaSection) {
+    mediaSection.appendChild(btn);
+  } else {
+    document.body.appendChild(btn);
+  }
   document.body.appendChild(modal);
 
   btn.onclick = function(e) { e.stopPropagation(); modal.style.display = 'flex'; };
