@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -8,169 +9,148 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Playfair+Display:wght@400;700&display=swap">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --primary:#2c5530;--secondary:#8a9a5b;--accent:#d4a96a;
-  --bg:#f8f5f0;--card:#ffffff;--text:#222222;
-  --text-sub:#6b7280;--text-light:#8a94a6;--border:#e8e5dc;
-}
-html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);
-  font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;
-  -webkit-font-smoothing:antialiased;line-height:1.6}
+:root{--primary:#2c5530;--secondary:#8a9a5b;--accent:#d4a96a;--bg:#f8f5f0;--card:#fff;--text:#222;--text-sub:#6b7280;--text-light:#8a94a6;--border:#e8e5dc}
+html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 
-/* 头部 */
-.header{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,0.05);position:sticky;top:0;z-index:100}
+.header{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.05);position:sticky;top:0;z-index:100}
 .header-top{max-width:1100px;margin:0 auto;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px}
 .logo-wrap{cursor:pointer;user-select:none}
 .logo{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.75rem;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:9px;line-height:1}
 .logo i{color:var(--secondary);font-size:1.45rem}
 .logo span{color:var(--accent);font-weight:400}
 .header-sub{font-size:11.5px;color:var(--secondary);letter-spacing:3px;margin-top:5px}
-.phone-btn{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;text-decoration:none;padding:11px 20px;border-radius:26px;font-size:14px;font-weight:600;box-shadow:0 4px 14px rgba(44,85,48,0.32);white-space:nowrap;display:flex;align-items:center;gap:8px}
-.phone-btn:active{transform:scale(0.97)}
+.phone-btn{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;text-decoration:none;padding:11px 20px;border-radius:26px;font-size:14px;font-weight:600;box-shadow:0 4px 14px rgba(44,85,48,.32);white-space:nowrap;display:flex;align-items:center;gap:8px}
+.phone-btn:active{transform:scale(.97)}
 .header-nav{background:var(--primary);text-align:center;font-size:12.5px;color:#d4d9c0;padding:9px 16px;letter-spacing:1.5px}
 .header-nav b{color:var(--accent);font-weight:600}
 
 .container{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
 .banner{background:#fff8e1;color:#8a6d00;padding:11px 16px;border-radius:10px;font-size:12.5px;line-height:1.7;text-align:center;margin-bottom:18px;border:1px solid #f5e0a8}
 
-/* Tab 导航 */
-.main-tabs{display:flex;gap:6px;margin-bottom:18px;background:#fff;padding:6px;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,0.04);overflow-x:auto}
+.main-tabs{display:flex;gap:6px;margin-bottom:18px;background:#fff;padding:6px;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.04);overflow-x:auto}
 .main-tabs::-webkit-scrollbar{display:none}
-.main-tab{padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;color:var(--text-sub);cursor:pointer;transition:0.2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.main-tab{padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;color:var(--text-sub);cursor:pointer;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
 .main-tab:hover{background:#f8f5f0;color:var(--primary)}
-.main-tab.active{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(44,85,48,0.25)}
+.main-tab.active{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(44,85,48,.25)}
 
 .page{display:none}
-.page.active{display:block;animation:fadeUp 0.25s ease}
+.page.active{display:block;animation:fadeUp .25s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* 首页模块 */
 .home-module{margin-bottom:20px}
 .module-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:8px;padding-left:10px;border-left:3px solid var(--accent)}
 .module-title small{font-weight:400;font-size:11.5px;color:var(--text-light);letter-spacing:1px;margin-left:auto}
 
-.shop-entry{background:linear-gradient(135deg,#8b6f3a 0%,#c9a05c 50%,#e0bb7c 100%);color:#fff;border-radius:20px;padding:28px 26px;cursor:pointer;transition:0.25s;box-shadow:0 8px 28px rgba(212,169,106,0.4);position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:20px}
-.shop-entry:active{transform:scale(0.99)}
-.shop-entry:hover{box-shadow:0 12px 36px rgba(212,169,106,0.55)}
+.shop-entry{background:linear-gradient(135deg,#8b6f3a 0%,#c9a05c 50%,#e0bb7c 100%);color:#fff;border-radius:20px;padding:28px 26px;cursor:pointer;transition:.25s;box-shadow:0 8px 28px rgba(212,169,106,.4);position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.shop-entry:active{transform:scale(.99)}
+.shop-entry:hover{box-shadow:0 12px 36px rgba(212,169,106,.55)}
 .shop-entry-left h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.5rem;letter-spacing:3px;font-weight:700;margin-bottom:6px}
-.shop-entry-left p{font-size:12.5px;opacity:0.92;letter-spacing:1px}
-.shop-entry .arrow{font-size:1.6rem;opacity:0.9;flex-shrink:0}
-.shop-entry .icon-bg{position:absolute;right:-10px;bottom:-30px;font-size:140px;opacity:0.1;color:#fff;transform:rotate(8deg)}
+.shop-entry-left p{font-size:12.5px;opacity:.92;letter-spacing:1px}
+.shop-entry .arrow{font-size:1.6rem;opacity:.9;flex-shrink:0}
+.shop-entry .icon-bg{position:absolute;right:-10px;bottom:-30px;font-size:140px;opacity:.1;color:#fff;transform:rotate(8deg)}
 
-.game-entry{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#3b82f6 100%);color:#fff;border-radius:20px;padding:28px 26px;cursor:pointer;transition:0.25s;box-shadow:0 8px 28px rgba(59,130,246,0.35);position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:20px}
-.game-entry:active{transform:scale(0.99)}
-.game-entry:hover{box-shadow:0 12px 36px rgba(59,130,246,0.5)}
+.game-entry{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#3b82f6 100%);color:#fff;border-radius:20px;padding:28px 26px;cursor:pointer;transition:.25s;box-shadow:0 8px 28px rgba(59,130,246,.35);position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.game-entry:active{transform:scale(.99)}
+.game-entry:hover{box-shadow:0 12px 36px rgba(59,130,246,.5)}
 .game-entry-left h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.5rem;letter-spacing:3px;font-weight:700;margin-bottom:6px}
-.game-entry-left p{font-size:12.5px;opacity:0.92;letter-spacing:1px}
-.game-entry .arrow{font-size:1.6rem;opacity:0.9;flex-shrink:0}
-.game-entry .icon-bg{position:absolute;right:-10px;bottom:-30px;font-size:140px;opacity:0.1;color:#fff;transform:rotate(-8deg)}
+.game-entry-left p{font-size:12.5px;opacity:.92;letter-spacing:1px}
+.game-entry .arrow{font-size:1.6rem;opacity:.9;flex-shrink:0}
+.game-entry .icon-bg{position:absolute;right:-10px;bottom:-30px;font-size:140px;opacity:.1;color:#fff;transform:rotate(-8deg)}
 
-.ai-module{background:linear-gradient(135deg,#1e1b4b 0%,#4c1d95 50%,#8b5cf6 100%);color:#fff;border-radius:20px;padding:26px 24px;position:relative;overflow:hidden;box-shadow:0 8px 28px rgba(139,92,246,0.35);cursor:pointer;transition:0.25s}
-.ai-module:active{transform:scale(0.99)}
-.ai-module:hover{box-shadow:0 12px 36px rgba(139,92,246,0.5)}
-.ai-module .icon-bg{position:absolute;right:-20px;bottom:-30px;font-size:140px;opacity:0.08;color:#fff;transform:rotate(8deg)}
+.ai-module{background:linear-gradient(135deg,#1e1b4b 0%,#4c1d95 50%,#8b5cf6 100%);color:#fff;border-radius:20px;padding:26px 24px;position:relative;overflow:hidden;box-shadow:0 8px 28px rgba(139,92,246,.35);cursor:pointer;transition:.25s}
+.ai-module:active{transform:scale(.99)}
+.ai-module:hover{box-shadow:0 12px 36px rgba(139,92,246,.5)}
+.ai-module .icon-bg{position:absolute;right:-20px;bottom:-30px;font-size:140px;opacity:.08;color:#fff;transform:rotate(8deg)}
 .ai-header{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2;gap:14px;margin-bottom:18px}
 .ai-header-left h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.45rem;margin-bottom:5px;letter-spacing:3px;font-weight:700}
-.ai-header-left .en{font-size:10px;letter-spacing:4px;opacity:0.6;font-family:'Playfair Display',serif}
-.ai-header .arrow{font-size:1.5rem;opacity:0.85}
+.ai-header-left .en{font-size:10px;letter-spacing:4px;opacity:.6;font-family:'Playfair Display',serif}
+.ai-header .arrow{font-size:1.5rem;opacity:.85}
 .ai-tags{display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:2}
-.ai-tag{background:rgba(255,255,255,0.14);color:#fff;font-size:11.5px;padding:6px 14px;border-radius:14px;letter-spacing:1px;font-weight:500;border:1px solid rgba(255,255,255,0.18);transition:0.2s;display:flex;align-items:center;gap:5px}
-.ai-tag:hover{background:rgba(255,255,255,0.26);transform:translateY(-1px)}
-.ai-tag i{font-size:10px;opacity:0.8}
+.ai-tag{background:rgba(255,255,255,.14);color:#fff;font-size:11.5px;padding:6px 14px;border-radius:14px;letter-spacing:1px;font-weight:500;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;gap:5px}
+.ai-tag i{font-size:10px;opacity:.8}
 
 .brand-entries{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
 @media(max-width:600px){.brand-entries{grid-template-columns:1fr}}
-.brand-entry{border-radius:20px;padding:28px 24px;cursor:pointer;position:relative;overflow:hidden;color:#fff;transition:0.25s;box-shadow:0 8px 28px rgba(0,0,0,0.12)}
-.brand-entry:active{transform:scale(0.98)}
+.brand-entry{border-radius:20px;padding:28px 24px;cursor:pointer;position:relative;overflow:hidden;color:#fff;transition:.25s;box-shadow:0 8px 28px rgba(0,0,0,.12)}
+.brand-entry:active{transform:scale(.98)}
 .brand-entry.dinian{background:linear-gradient(135deg,#1a3a1f 0%,#2c5530 55%,#3d6b43 100%)}
 .brand-entry.diancaoyuan{background:linear-gradient(135deg,#4e6337 0%,#7a8f4d 55%,#9dad6e 100%)}
 .brand-entry .tag{position:absolute;top:16px;right:16px;background:var(--accent);color:#fff;font-size:11px;padding:4px 11px;border-radius:11px;letter-spacing:1px;font-weight:600}
 .brand-entry h2{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.7rem;margin-bottom:6px;color:#fff;letter-spacing:3px;font-weight:700}
-.brand-entry .en{font-size:10.5px;letter-spacing:5px;opacity:0.65;margin-bottom:16px;font-family:'Playfair Display',serif}
-.brand-entry .desc{font-size:13px;line-height:1.75;opacity:0.9;margin-bottom:20px}
-.brand-entry .enter{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,0.18);padding:10px 20px;border-radius:22px;font-size:13px;font-weight:600;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.28);transition:0.25s}
-.brand-entry:hover .enter{background:rgba(255,255,255,0.3);gap:13px}
-.brand-entry .icon-bg{position:absolute;right:-20px;bottom:-24px;font-size:120px;opacity:0.07;color:#fff;transform:rotate(-8deg)}
+.brand-entry .en{font-size:10.5px;letter-spacing:5px;opacity:.65;margin-bottom:16px;font-family:'Playfair Display',serif}
+.brand-entry .desc{font-size:13px;line-height:1.75;opacity:.9;margin-bottom:20px}
+.brand-entry .enter{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.18);padding:10px 20px;border-radius:22px;font-size:13px;font-weight:600;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.28);transition:.25s}
+.brand-entry:hover .enter{background:rgba(255,255,255,.3);gap:13px}
+.brand-entry .icon-bg{position:absolute;right:-20px;bottom:-24px;font-size:120px;opacity:.07;color:#fff;transform:rotate(-8deg)}
 
-.culture-entry{background:linear-gradient(135deg,#8b6f3a 0%,#c9a05c 50%,#e0bb7c 100%);color:#fff;border-radius:16px;padding:22px 24px;cursor:pointer;transition:0.25s;box-shadow:0 8px 24px rgba(212,169,106,0.35);position:relative;overflow:hidden}
-.culture-entry:active{transform:scale(0.99)}
+.culture-entry{background:linear-gradient(135deg,#8b6f3a 0%,#c9a05c 50%,#e0bb7c 100%);color:#fff;border-radius:16px;padding:22px 24px;cursor:pointer;transition:.25s;box-shadow:0 8px 24px rgba(212,169,106,.35);position:relative;overflow:hidden}
+.culture-entry:active{transform:scale(.99)}
 .culture-entry-inner{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:2;gap:14px}
 .culture-entry h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.35rem;margin-bottom:6px;letter-spacing:3px;font-weight:700}
-.culture-entry p{font-size:12.5px;opacity:0.92;letter-spacing:1px}
-.culture-entry .arrow{font-size:1.5rem;opacity:0.9}
-.culture-entry .icon-bg{position:absolute;right:-16px;bottom:-24px;font-size:110px;opacity:0.1;color:#fff;transform:rotate(8deg)}
+.culture-entry p{font-size:12.5px;opacity:.92;letter-spacing:1px}
+.culture-entry .arrow{font-size:1.5rem;opacity:.9}
+.culture-entry .icon-bg{position:absolute;right:-16px;bottom:-24px;font-size:110px;opacity:.1;color:#fff;transform:rotate(8deg)}
 
 .search-box{display:flex;gap:10px;margin-bottom:16px}
-.search{flex:1;padding:15px 18px;border:1.5px solid var(--border);border-radius:14px;font-size:15px;outline:none;background:#fff;color:var(--text);transition:0.2s}
-.search:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(44,85,48,0.08)}
+.search{flex:1;padding:15px 18px;border:1.5px solid var(--border);border-radius:14px;font-size:15px;outline:none;background:#fff;color:var(--text);transition:.2s}
+.search:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(44,85,48,.08)}
 .search::placeholder{color:#b8bcc4}
 .cate-list{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:20px}
-.cate-btn{padding:9px 16px;background:#fff;border:1.5px solid var(--border);border-radius:22px;font-size:13.5px;white-space:nowrap;cursor:pointer;transition:0.18s;color:var(--primary);font-weight:500}
-.cate-btn:hover{border-color:var(--secondary);color:var(--secondary)}
-.cate-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 12px rgba(44,85,48,0.25)}
+.cate-btn{padding:9px 16px;background:#fff;border:1.5px solid var(--border);border-radius:22px;font-size:13.5px;white-space:nowrap;cursor:pointer;transition:.18s;color:var(--primary);font-weight:500}
+.cate-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 12px rgba(44,85,48,.25)}
 
 .brand-title{font-size:15px;font-weight:700;color:var(--primary);margin:26px 0 14px;padding-left:12px;border-left:3px solid var(--accent);letter-spacing:2px;font-family:'Playfair Display','Noto Serif SC',serif}
 .brand-title:first-child{margin-top:0}
 .product-list{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(min-width:640px){.product-list{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:960px){.product-list{grid-template-columns:repeat(4,1fr)}}
-.product-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);cursor:pointer;transition:0.2s;border:1px solid #f0ede4}
-.product-card:hover{box-shadow:0 10px 28px rgba(44,85,48,0.12);transform:translateY(-3px);border-color:#e0dcd0}
-.product-card:active{transform:scale(0.99)}
+.product-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);cursor:pointer;transition:.2s;border:1px solid #f0ede4}
+.product-card:hover{box-shadow:0 10px 28px rgba(44,85,48,.12);transform:translateY(-3px);border-color:#e0dcd0}
+.product-card:active{transform:scale(.99)}
 .product-img{width:100%;padding-bottom:100%;position:relative;background:#fafaf7;overflow:hidden}
 .product-img .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#c8cdd6;font-size:12px;flex-direction:column;gap:6px}
-.product-img .ph i{font-size:22px;opacity:0.4}
-.product-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:0.3s}
+.product-img .ph i{font-size:22px;opacity:.4}
+.product-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:.3s}
 .product-card:hover .product-img img{transform:scale(1.04)}
-.nav-btn{position:absolute;top:50%;transform:translateY(-50%);width:28px;height:28px;background:rgba(0,0,0,0.38);color:#fff;border:none;border-radius:50%;font-size:15px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:3;padding:0}
-.nav-btn.prev{left:7px}
-.nav-btn.next{right:7px}
-.product-img.multi .nav-btn{display:flex}
-.dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:none;gap:4px;z-index:3}
-.product-img.multi .dots{display:flex}
-.dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.55);transition:0.18s}
-.dots span.on{background:#fff;width:15px;border-radius:3px}
 .product-info{padding:13px 14px 15px}
 .p-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:39px}
 .p-sub{font-size:12px;color:var(--text-light);margin-bottom:9px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:36px}
 .p-price{font-size:15px;color:var(--primary);font-weight:700}
 .empty{text-align:center;padding:70px 20px;color:var(--text-light);font-size:15px;grid-column:1/-1}
-.empty i{font-size:42px;opacity:0.3;display:block;margin-bottom:14px}
+.empty i{font-size:42px;opacity:.3;display:block;margin-bottom:14px}
 
-.brand-page-head{display:none;align-items:center;gap:14px;margin-bottom:22px;padding:18px 22px;border-radius:16px;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,0.1)}
+.brand-page-head{display:none;align-items:center;gap:14px;margin-bottom:22px;padding:18px 22px;border-radius:16px;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.1)}
 .brand-page-head.dinian{background:linear-gradient(135deg,#1a3a1f,#2c5530)}
 .brand-page-head.diancaoyuan{background:linear-gradient(135deg,#4e6337,#7a8f4d)}
 .brand-page-head.culture{background:linear-gradient(135deg,#8b6f3a,#c9a05c)}
 .brand-page-head.show{display:flex}
-.back-btn{background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.32);padding:9px 16px;border-radius:22px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;font-family:inherit;transition:0.2s}
-.back-btn:hover{background:rgba(255,255,255,0.32)}
+.back-btn{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.32);padding:9px 16px;border-radius:22px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;font-family:inherit;transition:.2s}
+.back-btn:hover{background:rgba(255,255,255,.32)}
 .brand-page-head h2{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.4rem;letter-spacing:3px;font-weight:700}
-.brand-page-head .count{font-size:12.5px;opacity:0.85;margin-left:auto;letter-spacing:1px}
+.brand-page-head .count{font-size:12.5px;opacity:.85;margin-left:auto;letter-spacing:1px}
 
 .article-list{display:grid;grid-template-columns:1fr;gap:14px}
 @media(min-width:640px){.article-list{grid-template-columns:1fr 1fr}}
-.article-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);cursor:pointer;transition:0.2s;display:flex;align-items:center;gap:15px;padding:18px;text-decoration:none;color:inherit;border:1px solid #f0ede4}
-.article-card:hover{box-shadow:0 10px 26px rgba(212,169,106,0.22);transform:translateY(-2px);border-color:#e8dcc0}
+.article-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);cursor:pointer;transition:.2s;display:flex;align-items:center;gap:15px;padding:18px;text-decoration:none;color:inherit;border:1px solid #f0ede4}
+.article-card:hover{box-shadow:0 10px 26px rgba(212,169,106,.22);transform:translateY(-2px);border-color:#e8dcc0}
 .article-icon{flex-shrink:0;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
 .article-body{flex:1;min-width:0}
 .article-title{font-size:15px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .article-meta{font-size:12px;color:var(--text-light);display:flex;align-items:center;gap:7px}
 .article-meta i{color:var(--accent);font-size:11px}
-.article-go{flex-shrink:0;color:var(--accent);font-size:1.1rem;opacity:0.6}
+.article-go{flex-shrink:0;color:var(--accent);font-size:1.1rem;opacity:.6}
 
-/* 游戏区 */
 .game-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .game-title-row .module-title{margin-bottom:0}
-.sound-toggle{display:flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:600;color:var(--primary);cursor:pointer;transition:0.2s;white-space:nowrap}
+.sound-toggle{display:flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:600;color:var(--primary);cursor:pointer;transition:.2s;white-space:nowrap}
 .sound-toggle:hover{border-color:var(--primary);background:#f8f5f0}
 .sound-toggle.muted{color:var(--text-light);border-color:var(--border)}
-.sound-toggle.muted:hover{color:var(--text-sub)}
 
 .game-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:20px}
-.game-item{background:#fff;border-radius:14px;padding:18px 20px;border:1px solid var(--border);cursor:pointer;transition:0.2s;box-shadow:0 2px 10px rgba(0,0,0,0.04);display:flex;align-items:center;gap:14px}
-.game-item:hover{border-color:var(--primary);box-shadow:0 8px 22px rgba(44,85,48,0.12);transform:translateY(-2px)}
+.game-item{background:#fff;border-radius:14px;padding:18px 20px;border:1px solid var(--border);cursor:pointer;transition:.2s;box-shadow:0 2px 10px rgba(0,0,0,.04);display:flex;align-items:center;gap:14px}
+.game-item:hover{border-color:var(--primary);box-shadow:0 8px 22px rgba(44,85,48,.12);transform:translateY(-2px)}
 .game-item-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px}
 .game-item-body{flex:1;min-width:0}
 .game-item-name{font-size:15px;font-weight:700;margin-bottom:4px}
@@ -179,43 +159,29 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .game-stage{background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border);margin-bottom:16px}
 .game-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
 .game-head h2{font-size:16px;font-weight:700;letter-spacing:1px}
-.game-back{background:#f1f5f9;color:var(--text);padding:8px 16px;border-radius:10px;font-size:13px;font-weight:600;transition:0.2s}
+.game-back{background:#f1f5f9;color:var(--text);padding:8px 16px;border-radius:10px;font-size:13px;font-weight:600;transition:.2s}
 .game-back:hover{background:var(--primary);color:#fff}
 .game-hud{display:flex;gap:20px;justify-content:center;margin:10px 0;font-size:14px;font-weight:600;color:var(--text-sub)}
 .game-hud b{color:var(--primary);font-size:16px}
 .game-wrap{position:relative}
 canvas.game-canvas{background:#000;border-radius:12px;display:block;margin:0 auto;width:100%;max-width:480px;height:auto;touch-action:none}
-.shake{animation:shakeIt 0.3s}
-@keyframes shakeIt{
-  0%,100%{transform:translate(0,0)}
-  20%{transform:translate(-5px,3px)}
-  40%{transform:translate(5px,-3px)}
-  60%{transform:translate(-4px,-2px)}
-  80%{transform:translate(4px,2px)}
-}
+.shake{animation:shakeIt .3s}
+@keyframes shakeIt{0%,100%{transform:translate(0,0)}20%{transform:translate(-5px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(4px,2px)}}
 .flash-overlay{position:absolute;inset:0;background:#fff;border-radius:12px;opacity:0;pointer-events:none}
-.flash-overlay.fire{animation:flashFire 0.3s}
-@keyframes flashFire{
-  0%{opacity:0}
-  30%{opacity:0.35}
-  100%{opacity:0}
-}
+.flash-overlay.fire{animation:flashFire .3s}
+@keyframes flashFire{0%{opacity:0}30%{opacity:.35}100%{opacity:0}}
 .pad{display:inline-grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,64px);gap:6px;margin:14px auto;user-select:none}
 .pad button{font-size:22px;background:#f1f5f9;border:1px solid var(--border);border-radius:10px;color:var(--text);font-weight:700}
 .pad button:active{background:var(--primary);color:#fff}
-.pad .up{grid-column:2;grid-row:1}
-.pad .left{grid-column:1;grid-row:2}
-.pad .down{grid-column:2;grid-row:2}
-.pad .right{grid-column:3;grid-row:2}
-.btn{display:inline-block;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:11px 26px;border-radius:12px;font-size:14px;font-weight:600;transition:0.2s;box-shadow:0 4px 14px rgba(44,85,48,0.3)}
-.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(44,85,48,0.4)}
+.pad .up{grid-column:2;grid-row:1}.pad .left{grid-column:1;grid-row:2}.pad .down{grid-column:2;grid-row:2}.pad .right{grid-column:3;grid-row:2}
+.btn{display:inline-block;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:11px 26px;border-radius:12px;font-size:14px;font-weight:600;transition:.2s;box-shadow:0 4px 14px rgba(44,85,48,.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(44,85,48,.4)}
 .btn.ghost{background:#f1f5f9;color:var(--text);box-shadow:none}
 .btn.ghost:hover{background:#e2e8f0;transform:none;box-shadow:none}
 
-/* AI 实验室 */
 .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:760px){.ai-grid{grid-template-columns:1fr}}
-.ai-card{background:#fff;border-radius:16px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,0.04)}
+.ai-card{background:#fff;border-radius:16px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04)}
 .ai-card h3{font-size:15px;font-weight:700;margin-bottom:14px;letter-spacing:1px;display:flex;align-items:center;gap:8px}
 .ai-card h3 i{color:var(--primary)}
 .nn-viz{width:100%;height:320px;background:#0f172a;border-radius:12px;display:block}
@@ -236,16 +202,14 @@ canvas.game-canvas{background:#000;border-radius:12px;display:block;margin:0 aut
 .xor-table td.bad{color:#ef4444}
 .ai-note{background:#f8fafc;border-left:3px solid var(--primary);padding:12px 14px;border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-sub);line-height:1.7;margin-top:16px}
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:999;padding:16px;backdrop-filter:blur(4px)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:999;padding:16px;backdrop-filter:blur(4px)}
 .modal.show{display:flex}
 .modal-box{width:100%;max-width:540px;max-height:88vh;background:#fff;border-radius:22px;overflow:auto;position:relative;padding:22px}
 .close{position:absolute;right:16px;top:16px;width:40px;height:40px;background:#f3f1ec;color:#666;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:none;z-index:5}
 .close:hover{background:#e8e5dc}
-.modal-main{width:100%;aspect-ratio:1;background:#fafaf7;border-radius:14px;overflow:hidden;margin-bottom:12px;position:relative;display:flex;align-items:center;justify-content:center;color:var(--text-light);font-size:13px}
-.modal-main img{width:100%;height:100%;object-fit:cover}
-.thumbs{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:5px}
-.thumbs img{width:58px;height:58px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid transparent;flex-shrink:0;background:#fafaf7}
-.thumbs img.on{border-color:var(--primary)}
+.modal-main{width:100%;aspect-ratio:1;background:#fafaf7;border-radius:14px;overflow:hidden;margin-bottom:12px;position:relative;display:flex;align-items:center;justify-content:center;color:var(--text-light);font-size:13px;cursor:zoom-in}
+.modal-main img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.modal-main::after{content:'\f00e';font-family:'Font Awesome 6 Free';font-weight:900;position:absolute;right:12px;bottom:12px;width:34px;height:34px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;pointer-events:none}
 .modal-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.4}
 .modal-sub{font-size:14px;color:var(--text-sub);line-height:1.65;margin-bottom:16px}
 .modal-price{font-size:22px;color:var(--primary);font-weight:700;margin-bottom:18px}
@@ -253,25 +217,31 @@ canvas.game-canvas{background:#000;border-radius:12px;display:block;margin:0 aut
 .contact-box{background:#f0f4ee;border-radius:14px;padding:16px 18px;font-size:14px;line-height:1.9;color:var(--text)}
 .contact-box b{color:var(--primary);font-weight:700}
 
-/* 页脚 */
+/* 全屏图片查看 */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.96);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;cursor:zoom-out}
+.lightbox.show{display:flex}
+.lightbox img{max-width:100%;max-height:100%;object-fit:contain;user-select:none}
+.lightbox .lb-close{position:absolute;right:20px;top:20px;width:46px;height:46px;background:rgba(255,255,255,.15);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;border:none}
+.lightbox .lb-close:hover{background:rgba(255,255,255,.3)}
+
 footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50px}
 .footer-content{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;margin-bottom:40px}
 .footer-section h3{color:var(--accent);font-size:1.15rem;font-family:'Playfair Display','Noto Serif SC',serif;margin-bottom:18px;font-weight:700;letter-spacing:1px}
-.footer-section p,.footer-section li{opacity:0.85;margin-bottom:10px;font-size:13px;line-height:1.8}
+.footer-section p,.footer-section li{opacity:.85;margin-bottom:10px;font-size:13px;line-height:1.8}
 .footer-section ul{list-style:none;padding:0}
-.footer-section a{color:#fff;text-decoration:none;transition:0.2s;cursor:pointer}
+.footer-section a{color:#fff;text-decoration:none;transition:.2s;cursor:pointer}
 .footer-section a:hover{color:var(--accent)}
 .social-icons{display:flex;gap:11px;margin-top:16px}
-.social-icons a{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;background:rgba(255,255,255,0.1);border-radius:50%;transition:0.25s}
+.social-icons a{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;background:rgba(255,255,255,.1);border-radius:50%;transition:.25s}
 .social-icons a:hover{background:var(--accent);transform:translateY(-4px)}
-.footer-bottom{max-width:1100px;margin:0 auto;text-align:center;padding-top:26px;border-top:1px solid rgba(255,255,255,0.1);opacity:0.85;font-size:12px;line-height:2.2}
+.footer-bottom{max-width:1100px;margin:0 auto;text-align:center;padding-top:26px;border-top:1px solid rgba(255,255,255,.1);opacity:.85;font-size:12px;line-height:2.2}
 .footer-bottom b{color:var(--accent)}
-.footer-bottom a{color:#fff;text-decoration:none;transition:0.2s}
+.footer-bottom a{color:#fff;text-decoration:none;transition:.2s}
 .footer-bottom a:hover{color:var(--accent)}
 .footer-author{color:#fff;font-size:13px;margin:4px 0}
 .footer-author b{color:var(--accent);font-size:14px}
-.footer-mail{color:rgba(255,255,255,0.85);font-size:12.5px;margin:2px 0}
-.footer-mail a{color:#fff;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.4);padding-bottom:1px}
+.footer-mail{color:rgba(255,255,255,.85);font-size:12.5px;margin:2px 0}
+.footer-mail a{color:#fff;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.4);padding-bottom:1px}
 .footer-mail a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 
 .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
@@ -305,10 +275,8 @@ footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50
     <div class="main-tab" data-tab="ai" onclick="switchTab('ai')"><i class="fas fa-brain"></i>AI 实验室</div>
   </div>
 
-  <!-- 首页 -->
   <div id="page-home" class="page active">
     <div class="banner">本店为线下实体店专供批发 · 咨询请拨打上方电话</div>
-
     <div class="stats-bar">
       <div class="stat-item"><div class="stat-value" id="statProducts">0</div><div class="stat-label">商品总数</div></div>
       <div class="stat-item"><div class="stat-value" id="statBrands">0</div><div class="stat-label">合作品牌</div></div>
@@ -318,57 +286,37 @@ footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50
 
     <div class="home-module">
       <div class="shop-entry" onclick="switchTab('shop')">
-        <div class="shop-entry-left">
-          <h3>美发用品</h3>
-          <p>帝辇 · 滇草源 · 云草舒 · 全系批发</p>
-        </div>
-        <i class="fas fa-arrow-right arrow"></i>
-        <i class="fas fa-store icon-bg"></i>
+        <div class="shop-entry-left"><h3>美发用品</h3><p>帝辇 · 滇草源 · 云草舒 · 全系批发</p></div>
+        <i class="fas fa-arrow-right arrow"></i><i class="fas fa-store icon-bg"></i>
       </div>
     </div>
-
     <div class="home-module">
       <div class="game-entry" onclick="switchTab('games')">
-        <div class="game-entry-left">
-          <h3>游戏</h3>
-          <p>贪吃蛇 · 打砖块 · 星际守卫</p>
-        </div>
-        <i class="fas fa-arrow-right arrow"></i>
-        <i class="fas fa-gamepad icon-bg"></i>
+        <div class="game-entry-left"><h3>游戏</h3><p>贪吃蛇 · 打砖块 · 星际守卫</p></div>
+        <i class="fas fa-arrow-right arrow"></i><i class="fas fa-gamepad icon-bg"></i>
       </div>
     </div>
-
     <div class="home-module">
       <div class="ai-module" onclick="switchTab('ai')">
         <i class="fas fa-robot icon-bg"></i>
         <div class="ai-header">
-          <div class="ai-header-left">
-            <h3>AI 实验室</h3>
-            <div class="en">ARTIFICIAL INTELLIGENCE LAB</div>
-          </div>
+          <div class="ai-header-left"><h3>AI 实验室</h3><div class="en">ARTIFICIAL INTELLIGENCE LAB</div></div>
           <i class="fas fa-arrow-right arrow"></i>
         </div>
-        <div class="ai-tags">
-          <div class="ai-tag"><i class="fas fa-network-wired"></i>AI模型训练</div>
-        </div>
+        <div class="ai-tags"><div class="ai-tag"><i class="fas fa-network-wired"></i>AI模型训练</div></div>
       </div>
     </div>
-
     <div class="home-module">
       <div class="module-title"><i class="fas fa-crown" style="color:var(--accent)"></i>品牌专区 <small>主推品牌</small></div>
       <div class="brand-entries">
         <div class="brand-entry dinian" onclick="switchTab('shop');setTimeout(()=>enterBrand('帝辇'),100)">
-          <span class="tag">主推</span>
-          <h2>帝辇</h2>
-          <div class="en">DINIAN</div>
+          <span class="tag">主推</span><h2>帝辇</h2><div class="en">DINIAN</div>
           <div class="desc">氨基酸精华 · 中药防断 · 草本去屑<br>沙龙级头皮护理配方</div>
           <div class="enter">进入系列单品 <i class="fas fa-arrow-right"></i></div>
           <i class="fas fa-crown icon-bg"></i>
         </div>
         <div class="brand-entry diancaoyuan" onclick="switchTab('shop');setTimeout(()=>enterBrand('滇草源'),100)">
-          <span class="tag">第二主推</span>
-          <h2>滇草源</h2>
-          <div class="en">DIANCAOYUAN</div>
+          <span class="tag">第二主推</span><h2>滇草源</h2><div class="en">DIANCAOYUAN</div>
           <div class="desc">云南高原植萃 · 去屑控油 · 修护滋养<br>自然馈赠的高端洗护</div>
           <div class="enter">进入系列单品 <i class="fas fa-arrow-right"></i></div>
           <i class="fas fa-seedling icon-bg"></i>
@@ -384,45 +332,34 @@ footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50
     </div>
   </div>
 
-  <!-- 美发用品 -->
   <div id="page-shop" class="page">
     <div class="banner">本店为线下实体店专供批发 · 咨询请拨打上方电话</div>
     <div id="homeView">
       <div class="brand-page-head" id="brandPageHead">
         <button class="back-btn" onclick="goHome()"><i class="fas fa-arrow-left"></i> 返回</button>
-        <h2 id="brandPageTitle"></h2>
-        <span class="count" id="brandPageCount"></span>
+        <h2 id="brandPageTitle"></h2><span class="count" id="brandPageCount"></span>
       </div>
       <div class="brand-page-head culture" id="culturePageHead">
         <button class="back-btn" onclick="goHome()"><i class="fas fa-arrow-left"></i> 返回</button>
-        <h2>品牌文化</h2>
-        <span class="count" id="culturePageCount"></span>
+        <h2>品牌文化</h2><span class="count" id="culturePageCount"></span>
       </div>
-      <div class="search-box">
-        <input type="text" id="search" class="search" placeholder="🔍 搜索产品名称 / 品牌">
-      </div>
+      <div class="search-box"><input type="text" id="search" class="search" placeholder="🔍 搜索产品名称 / 品牌"></div>
       <div class="cate-list" id="cateList"></div>
     </div>
     <div id="content"></div>
   </div>
 
-  <!-- 游戏 -->
   <div id="page-games" class="page">
     <div id="game-list-view">
       <div class="game-title-row">
         <div class="module-title"><i class="fas fa-gamepad" style="color:var(--primary)"></i>经典小游戏 <small>点击进入</small></div>
-        <button class="sound-toggle" id="soundToggle" onclick="toggleSound()">
-          <i class="fas fa-volume-up"></i> 音效开
-        </button>
+        <button class="sound-toggle" id="soundToggle" onclick="toggleSound()"><i class="fas fa-volume-up"></i> 音效开</button>
       </div>
       <div class="game-list" id="gameList"></div>
     </div>
 
     <div id="game-snake" class="game-stage" style="display:none">
-      <div class="game-head">
-        <h2>🐍 贪吃蛇</h2>
-        <button class="game-back" onclick="backToGames()">返回</button>
-      </div>
+      <div class="game-head"><h2>🐍 贪吃蛇</h2><button class="game-back" onclick="backToGames()">返回</button></div>
       <div class="game-hud">分数 <b id="sScore">0</b> 最高 <b id="sBest">0</b></div>
       <div class="game-wrap">
         <canvas id="snakeC" class="game-canvas" width="400" height="400"></canvas>
@@ -440,10 +377,7 @@ footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50
     </div>
 
     <div id="game-breakout" class="game-stage" style="display:none">
-      <div class="game-head">
-        <h2>🧱 打砖块</h2>
-        <button class="game-back" onclick="backToGames()">返回</button>
-      </div>
+      <div class="game-head"><h2>🧱 打砖块</h2><button class="game-back" onclick="backToGames()">返回</button></div>
       <div class="game-hud">分数 <b id="bScore">0</b> 生命 <b id="bLives">3</b></div>
       <div class="game-wrap">
         <canvas id="brC" class="game-canvas" width="480" height="520"></canvas>
@@ -453,10 +387,7 @@ footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50
     </div>
 
     <div id="game-space" class="game-stage" style="display:none">
-      <div class="game-head">
-        <h2>🚀 星际守卫</h2>
-        <button class="game-back" onclick="backToGames()">返回</button>
-      </div>
+      <div class="game-head"><h2>🚀 星际守卫</h2><button class="game-back" onclick="backToGames()">返回</button></div>
       <div class="game-hud">分数 <b id="spScore">0</b> 生命 <b id="spLives">3</b></div>
       <div class="game-wrap">
         <canvas id="spC" class="game-canvas" width="400" height="560"></canvas>
@@ -466,7 +397,6 @@ footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50
     </div>
   </div>
 
-  <!-- AI 实验室 -->
   <div id="page-ai" class="page">
     <div class="module-title"><i class="fas fa-brain" style="color:#8b5cf6"></i>AI 模型训练 <small>浏览器内实时训练</small></div>
     <div class="ai-note">
@@ -515,8 +445,7 @@ footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50
 <div class="modal" id="modal">
   <div class="modal-box">
     <button class="close" onclick="closeModal()">×</button>
-    <div class="modal-main" id="modalMain"></div>
-    <div class="thumbs" id="modalThumbs"></div>
+    <div class="modal-main" id="modalMain" onclick="openLightbox()"></div>
     <div class="modal-title" id="modalTitle"></div>
     <div class="modal-sub" id="modalSub"></div>
     <div class="modal-price" id="modalPrice"></div>
@@ -525,6 +454,11 @@ footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50
       实体门店专供批发 · 请拨打上方电话或到店咨询
     </div>
   </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">×</button>
+  <img id="lightboxImg" src="" alt="" onclick="event.stopPropagation()">
 </div>
 
 <footer>
@@ -558,7 +492,6 @@ footer{background:var(--primary);color:#fff;padding:54px 22px 26px;margin-top:50
       <p>全线产品严禁网络上架、电商销售、私域倒卖、线上零售，违者追究侵权责任。</p>
     </div>
   </div>
-
   <div class="footer-bottom">
     <b>曲靖市麒麟区君子兰美容美发用品销售部</b><br>
     <div class="footer-author">本站由 <b>老鼠昊铭</b> 独立开发</div>
@@ -578,7 +511,7 @@ document.getElementById('footerPhone').textContent = PHONE;
 document.getElementById('phoneBtn').href = 'tel:' + PHONE.replace(/[^0-9+]/g, '');
 
 /* ============================================================
-   2. 音效系统（Web Audio API 程序化合成）
+   2. 音效系统
    ============================================================ */
 const Sound = (function(){
   let ctx = null;
@@ -628,24 +561,20 @@ const Sound = (function(){
   }
 
   return {
-    init,
-    isOn(){ return enabled; },
+    init, isOn(){ return enabled; },
     toggle(){
       enabled = !enabled;
       try { localStorage.setItem('game_sound_on', enabled ? '1' : '0'); } catch(e){}
       if(enabled){ init(); tone(880, 0.08, 'sine', 0.05); }
       return enabled;
     },
-    // 贪吃蛇
     snakeEat(){ tone(880, 0.08, 'square', 0.04, 1200); },
     snakeDie(){ tone(300, 0.4, 'sawtooth', 0.06, 80); noise(0.3, 0.1, 600); },
-    // 打砖块
     brick(){ tone(900, 0.06, 'square', 0.03, 1300); },
     paddle(){ tone(400, 0.06, 'square', 0.03, 500); },
     wall(){ tone(300, 0.04, 'square', 0.02); },
     loseLife(){ tone(220, 0.3, 'sawtooth', 0.06, 100); },
     win(){ tone(660, 0.1, 'sine', 0.05); setTimeout(()=>tone(880,0.1,'sine',0.05),100); setTimeout(()=>tone(1100,0.15,'sine',0.05),200); },
-    // 星际守卫
     shoot(){ tone(1200, 0.03, 'square', 0.012, 800); },
     hitEnemy(){ tone(500, 0.05, 'square', 0.025, 700); },
     explode(){ noise(0.25, 0.12, 1000); tone(200, 0.2, 'sawtooth', 0.04, 80); },
@@ -657,28 +586,17 @@ function toggleSound(){
   Sound.init();
   const on = Sound.toggle();
   const btn = document.getElementById('soundToggle');
-  if(on){
-    btn.classList.remove('muted');
-    btn.innerHTML = '<i class="fas fa-volume-up"></i> 音效开';
-  } else {
-    btn.classList.add('muted');
-    btn.innerHTML = '<i class="fas fa-volume-off"></i> 音效关';
-  }
+  if(on){ btn.classList.remove('muted'); btn.innerHTML = '<i class="fas fa-volume-up"></i> 音效开'; }
+  else { btn.classList.add('muted'); btn.innerHTML = '<i class="fas fa-volume-off"></i> 音效关'; }
 }
 
 function initSoundUI(){
   const btn = document.getElementById('soundToggle');
   if(!btn) return;
-  if(Sound.isOn()){
-    btn.classList.remove('muted');
-    btn.innerHTML = '<i class="fas fa-volume-up"></i> 音效开';
-  } else {
-    btn.classList.add('muted');
-    btn.innerHTML = '<i class="fas fa-volume-off"></i> 音效关';
-  }
+  if(Sound.isOn()){ btn.classList.remove('muted'); btn.innerHTML = '<i class="fas fa-volume-up"></i> 音效开'; }
+  else { btn.classList.add('muted'); btn.innerHTML = '<i class="fas fa-volume-off"></i> 音效关'; }
 }
 
-/* 首次交互时初始化音频上下文 */
 function initAudioOnce(){
   Sound.init();
   document.removeEventListener('touchstart', initAudioOnce);
@@ -689,9 +607,6 @@ document.addEventListener('touchstart', initAudioOnce);
 document.addEventListener('mousedown', initAudioOnce);
 document.addEventListener('click', initAudioOnce);
 
-/* ============================================================
-   3. 视觉反馈工具（屏幕震动 + 闪光）
-   ============================================================ */
 function shakeScreen(canvasId){
   const cv = document.getElementById(canvasId);
   if(!cv) return;
@@ -711,103 +626,104 @@ function flashScreen(flashId){
 }
 
 /* ============================================================
-   4. 分类与商品数据
+   3. 分类与商品数据 —— 每个产品只保留 1 张图
+   图片命名：upload/01.jpg 到 upload/97.jpg
    ============================================================ */
 const CATEGORIES = ["全部","帝辇","滇草源","云草舒","洗护","护肤","面贴","染发","烫发","造型","工具","大容量"];
 
 const PRODUCTS = [
-  {name:"帝辇氨基酸精华滋润修护洗发水", sub:"700g ｜ 氨基酸基底，修护干枯毛躁", brand:"帝辇", cate:"帝辇", images:["upload/01-1.jpg","upload/01-2.jpg"]},
-  {name:"帝辇氨基酸去屑蓬松洗发水", sub:"700g ｜ 温和去屑，发根持久蓬松", brand:"帝辇", cate:"帝辇", images:["upload/02-1.jpg","upload/02-2.jpg"]},
-  {name:"帝辇蛋白焕活霜", sub:"700ml ｜ 沙龙蛋白护理，柔顺锁水", brand:"帝辇", cate:"帝辇", images:["upload/03-1.jpg","upload/03-2.jpg"]},
-  {name:"帝辇抑菌膏", sub:"30g ｜ 头皮舒缓护理", brand:"帝辇", cate:"帝辇", images:["upload/04-1.jpg","upload/04-2.jpg"]},
-  {name:"帝辇中药防断健发洗发液", sub:"500g ｜ 减少断发，强韧发根", brand:"帝辇", cate:"帝辇", images:["upload/05-1.jpg","upload/05-2.jpg"]},
-  {name:"帝辇草本去屑止痒洗发液", sub:"500g ｜ 草本舒缓，改善头痒头屑", brand:"帝辇", cate:"帝辇", images:["upload/06-1.jpg","upload/06-2.jpg"]},
-  {name:"帝辇草本去屑控油洗发精华乳", sub:"350ml ｜ 含二硫化硒，强效控油去屑", brand:"帝辇", cate:"帝辇", images:["upload/07-1.jpg","upload/07-2.jpg"]},
-  {name:"帝辇灵润飘逸护发精油", sub:"60ml ｜ 免洗配方，抚平毛躁", brand:"帝辇", cate:"帝辇", images:["upload/08-1.jpg","upload/08-2.jpg"]},
-  {name:"帝辇氨基酸隐形发膜（弹力素）", sub:"300ml ｜ 卷发保湿，隐形质感不厚重", brand:"帝辇", cate:"帝辇", images:["upload/09-1.jpg","upload/09-2.jpg"]},
-  {name:"帝辇水润护卷弹力素", sub:"300ml ｜ 持久护卷，造型不僵硬", brand:"帝辇", cate:"帝辇", images:["upload/10-1.jpg","upload/10-2.jpg"]},
-  {name:"帝辇保湿定型啫喱膏", sub:"300ml ｜ 保湿定型，干爽不发白", brand:"帝辇", cate:"帝辇", images:["upload/11-1.jpg","upload/11-2.jpg"]},
-  {name:"帝辇香氛蓬松洗发乳", sub:"4.2L ｜ 发廊大桶装，香氛蓬松", brand:"帝辇", cate:"帝辇", images:["upload/12-1.jpg","upload/12-2.jpg"]},
-  {name:"帝辇香氛柔滑护发素", sub:"4.2L ｜ 发廊大桶护发，顺滑易梳", brand:"帝辇", cate:"帝辇", images:["upload/13-1.jpg","upload/13-2.jpg"]},
-  {name:"帝辇绿点黑油", sub:"发廊专业染黑", brand:"帝辇", cate:"帝辇", images:["upload/14-1.jpg","upload/14-2.jpg"]},
-  {name:"帝辇皂基奢舒沐浴乳", sub:"香氛沐浴，清洁清爽", brand:"帝辇", cate:"帝辇", images:["upload/15-1.jpg","upload/15-2.jpg"]},
-  {name:"帝辇绿瓶香氛沐浴露", sub:"", brand:"帝辇", cate:"帝辇", images:["upload/16-1.jpg","upload/16-2.jpg"]},
-  {name:"滇草源植萃精华柔顺修护洗发乳", sub:"750ml ｜ 植萃配方，修护烫染受损", brand:"滇草源", cate:"滇草源", images:["upload/17-1.jpg","upload/17-2.jpg"]},
-  {name:"滇草源植萃精华去屑控油洗发水", sub:"750ml ｜ 植萃净屑，平衡头皮油脂", brand:"滇草源", cate:"滇草源", images:["upload/18-1.jpg","upload/18-2.jpg"]},
-  {name:"滇草源植萃焕活果酸修复霜", sub:"700ml ｜ 果酸修护，改善干枯稻草发", brand:"滇草源", cate:"滇草源", images:["upload/19-1.jpg","upload/19-2.jpg"]},
-  {name:"滇草源去屑净油止痒洗发乳", sub:"300ml ｜ 含二硫化硒，针对顽固头屑头痒", brand:"滇草源", cate:"滇草源", images:["upload/20-1.jpg","upload/20-2.jpg"]},
-  {name:"滇草源植萃蛋白柔顺霜（发膜）", sub:"650ml ｜ 深层蛋白滋养，柔顺亮泽", brand:"滇草源", cate:"滇草源", images:["upload/21-1.jpg","upload/21-2.jpg"]},
-  {name:"滇草源植萃香氛护发精油（经典款）", sub:"60ml ｜ 免洗护发，留香持久", brand:"滇草源", cate:"滇草源", images:["upload/22-1.jpg","upload/22-2.jpg"]},
-  {name:"滇草源植萃香氛护发精油（黄包装款）", sub:"60ml ｜ 轻薄不油，修护分叉", brand:"滇草源", cate:"滇草源", images:["upload/23-1.jpg","upload/23-2.jpg"]},
-  {name:"云草舒植萃舒缓洗发露", sub:"750ml ｜ 植萃舒缓，温和洁净", brand:"云草舒", cate:"云草舒", images:["upload/90-1.jpg","upload/90-2.jpg"]},
-  {name:"云草舒草本控油洗发乳", sub:"750ml ｜ 草本控油，蓬松清爽", brand:"云草舒", cate:"云草舒", images:["upload/91-1.jpg","upload/91-2.jpg"]},
-  {name:"云草舒柔顺修护发膜", sub:"650ml ｜ 深层修护，柔顺亮泽", brand:"云草舒", cate:"云草舒", images:["upload/92-1.jpg","upload/92-2.jpg"]},
-  {name:"云草舒去屑止痒洗发水", sub:"500ml ｜ 去屑止痒，舒缓头皮", brand:"云草舒", cate:"云草舒", images:["upload/93-1.jpg","upload/93-2.jpg"]},
-  {name:"云草舒护发精油", sub:"60ml ｜ 免洗护发，修护分叉", brand:"云草舒", cate:"云草舒", images:["upload/94-1.jpg","upload/94-2.jpg"]},
-  {name:"云草舒植萃补水面贴", sub:"25ml × 5片 ｜ 植萃补水，舒缓修护", brand:"云草舒面贴", cate:"面贴", images:["upload/95-1.jpg","upload/95-2.jpg"]},
-  {name:"云草舒草本舒缓面贴", sub:"25ml × 5片 ｜ 草本舒缓，镇静肌肤", brand:"云草舒面贴", cate:"面贴", images:["upload/96-1.jpg","upload/96-2.jpg"]},
-  {name:"云草舒亮肤焕颜面贴", sub:"25ml × 5片 ｜ 提亮肤色，焕活美肌", brand:"云草舒面贴", cate:"面贴", images:["upload/97-1.jpg","upload/97-2.jpg"]},
-  {name:"忠哗会净澈去屑控油洗发乳", sub:"720g ｜ 净澈头皮，长效控油去屑", brand:"忠哗会", cate:"洗护", images:["upload/24-1.jpg","upload/24-2.jpg"]},
-  {name:"忠哗会焕活润养修护洗发乳", sub:"720g ｜ 润养修护，改善烫染损伤", brand:"忠哗会", cate:"洗护", images:["upload/25-1.jpg","upload/25-2.jpg"]},
-  {name:"忠哗会奢润柔顺果酸角蛋白1号", sub:"720g ｜ 角蛋白填充，抚平毛躁", brand:"忠哗会", cate:"洗护", images:["upload/26-1.jpg","upload/26-2.jpg"]},
-  {name:"魅丽源溯去屑控油洗发乳", sub:"700g ｜ 清爽控油，祛除头屑", brand:"魅丽源溯", cate:"洗护", images:["upload/27-1.jpg","upload/27-2.jpg"]},
-  {name:"魅丽源溯柔滑修护洗发乳", sub:"700g ｜ 修护干枯，发丝顺滑", brand:"魅丽源溯", cate:"洗护", images:["upload/28-1.jpg","upload/28-2.jpg"]},
-  {name:"魅丽源溯鱼子酱蛋白复活霜", sub:"鱼子酱营养，急救受损发质", brand:"魅丽源溯", cate:"洗护", images:["upload/29-1.jpg","upload/29-2.jpg"]},
-  {name:"魅丽源溯特硬干胶", sub:"360ml ｜ 强力定型，持久蓬松", brand:"魅丽源溯", cate:"洗护", images:["upload/30-1.jpg","upload/30-2.jpg"]},
-  {name:"魅丽源溯轻漾鱼感泡沫发蜡", sub:"380ml ｜ 弹力塑卷，轻盈不厚重", brand:"魅丽源溯", cate:"洗护", images:["upload/31-1.jpg","upload/31-2.jpg"]},
-  {name:"金曼丽发芯小分子蛋白乳", sub:"小分子蛋白，渗透发芯修护", brand:"金曼丽", cate:"洗护", images:["upload/32-1.jpg","upload/32-2.jpg"]},
-  {name:"金曼丽植萃去屑洗发乳", sub:"720g ｜ 植萃温和，舒缓去屑", brand:"金曼丽", cate:"洗护", images:["upload/33-1.jpg","upload/33-2.jpg"]},
-  {name:"欣洋娜水润修护洗发水", sub:"700ml ｜ 水润滋养，改善干枯毛躁", brand:"欣洋娜", cate:"洗护", images:["upload/34-1.jpg","upload/34-2.jpg"]},
-  {name:"欣洋娜控油蓬松洗发水", sub:"清爽控油，发根立体蓬松", brand:"欣洋娜", cate:"洗护", images:["upload/35-1.jpg","upload/35-2.jpg"]},
-  {name:"欣洋娜奢润蛋白护理", sub:"700ml ｜ 蛋白深层护理，提升发丝光泽", brand:"欣洋娜", cate:"洗护", images:["upload/36-1.jpg","upload/36-2.jpg"]},
-  {name:"妍美汐蓬松润泽酸性洗发水", sub:"700ml ｜ 酸性配方，闭合毛鳞片，蓬松顺滑", brand:"妍美汐", cate:"洗护", images:["upload/37-1.jpg","upload/37-2.jpg"]},
-  {name:"裕萱水光丝滑精华霜", sub:"750g ｜ 水光质感，发丝丝滑", brand:"裕萱", cate:"洗护", images:["upload/38-1.jpg","upload/38-2.jpg"]},
-  {name:"裕萱水润丝质顺滑洗发露", sub:"750g ｜ 长效顺滑，易梳理", brand:"裕萱", cate:"洗护", images:["upload/39-1.jpg","upload/39-2.jpg"]},
-  {name:"裕萱无味黑油", sub:"无味黑油，发廊专用", brand:"裕萱", cate:"洗护", images:["upload/40-1.jpg","upload/40-2.jpg"]},
-  {name:"迪洛斯去屑精华乳", sub:"300ml ｜ 头皮去屑精华，改善顽固头屑", brand:"迪洛斯", cate:"洗护", images:["upload/41-1.jpg","upload/41-2.jpg"]},
-  {name:"迪洛斯去屑精华乳", sub:"130ml ｜ 便携小瓶装，头皮护理", brand:"迪洛斯", cate:"洗护", images:["upload/42-1.jpg","upload/42-2.jpg"]},
-  {name:"荣威控油防脱洗发露", sub:"450ml ｜ 控油，稳固发根", brand:"其他", cate:"洗护", images:["upload/43-1.jpg","upload/43-2.jpg"]},
-  {name:"澳尚免洗液态护理精华乳（修复液）", sub:"260ml ｜ 免洗修护，抚平毛躁", brand:"其他", cate:"洗护", images:["upload/44-1.jpg","upload/44-2.jpg"]},
-  {name:"罗威丝发感喷雾精华素", sub:"220ml ｜ 喷雾型护发，即时顺滑", brand:"其他", cate:"洗护", images:["upload/45-1.jpg","upload/45-2.jpg"]},
-  {name:"发炫多效去屑洗发乳", sub:"500g ｜ 多效去屑，清爽头皮", brand:"其他", cate:"洗护", images:["upload/46-1.jpg","upload/46-2.jpg"]},
-  {name:"新靓琪致妍保湿玫瑰露", sub:"120ml × 2", brand:"新靓琪", cate:"护肤", images:["upload/47-1.jpg","upload/47-2.jpg"]},
-  {name:"新靓琪多肽倍润眼霜", sub:"20g", brand:"新靓琪", cate:"护肤", images:["upload/48-1.jpg","upload/48-2.jpg"]},
-  {name:"新靓琪致妍赋采精华乳", sub:"100ml", brand:"新靓琪", cate:"护肤", images:["upload/49-1.jpg","upload/49-2.jpg"]},
-  {name:"新靓琪水漾清润柔肤水", sub:"120ml", brand:"新靓琪", cate:"护肤", images:["upload/50-1.jpg","upload/50-2.jpg"]},
-  {name:"新靓琪水漾清润补水霜", sub:"50g", brand:"新靓琪", cate:"护肤", images:["upload/51-1.jpg","upload/51-2.jpg"]},
-  {name:"新靓琪水漾清润锁水乳", sub:"100ml", brand:"新靓琪", cate:"护肤", images:["upload/52-1.jpg","upload/52-2.jpg"]},
-  {name:"新靓琪水漾补水洁面霜", sub:"120g", brand:"新靓琪", cate:"护肤", images:["upload/53-1.jpg","upload/53-2.jpg"]},
-  {name:"新靓琪臻颜净透洁面泡沫", sub:"120ml", brand:"新靓琪", cate:"护肤", images:["upload/54-1.jpg","upload/54-2.jpg"]},
-  {name:"恩必思色膏", sub:"", brand:"色膏系列", cate:"染发", images:["upload/55-1.jpg","upload/55-2.jpg"]},
-  {name:"领秀色膏", sub:"", brand:"色膏系列", cate:"染发", images:["upload/56-1.jpg","upload/56-2.jpg"]},
-  {name:"美雅色膏", sub:"", brand:"色膏系列", cate:"染发", images:["upload/57-1.jpg","upload/57-2.jpg"]},
-  {name:"凡高黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/58-1.jpg","upload/58-2.jpg"]},
-  {name:"立典黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/59-1.jpg","upload/59-2.jpg"]},
-  {name:"HG黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/60-1.jpg","upload/60-2.jpg"]},
-  {name:"朵妍琦黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/61-1.jpg","upload/61-2.jpg"]},
-  {name:"佳桐黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/62-1.jpg","upload/62-2.jpg"]},
-  {name:"孜然炫彩黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/63-1.jpg","upload/63-2.jpg"]},
-  {name:"章华百草韵味冷烫液（正常发质）", sub:"120ml × 2", brand:"章华", cate:"烫发", images:["upload/64-1.jpg","upload/64-2.jpg"]},
-  {name:"章华百草韵味冷烫液（受损发质）", sub:"120ml × 2", brand:"章华", cate:"烫发", images:["upload/65-1.jpg","upload/65-2.jpg"]},
-  {name:"章华百草韵味曲直烫发霜", sub:"550ml × 2", brand:"章华", cate:"烫发", images:["upload/66-1.jpg","upload/66-2.jpg"]},
-  {name:"章华百草韵味素卷烫发乳", sub:"550ml × 2", brand:"章华", cate:"烫发", images:["upload/67-1.jpg","upload/67-2.jpg"]},
-  {name:"两方面曲直香氛烫发乳（卷发专用）", sub:"900ml × 2", brand:"两方面", cate:"烫发", images:["upload/68-1.jpg","upload/68-2.jpg"]},
-  {name:"两方面曲直香氛烫发乳（直发专用）", sub:"900ml × 2", brand:"两方面", cate:"烫发", images:["upload/69-1.jpg","upload/69-2.jpg"]},
-  {name:"两方面美感弹力烫发液（高技）", sub:"120ml × 2", brand:"两方面", cate:"烫发", images:["upload/70-1.jpg","upload/70-2.jpg"]},
-  {name:"两方面美感弹力烫发液（水剂）", sub:"120ml × 2", brand:"两方面", cate:"烫发", images:["upload/71-1.jpg","upload/71-2.jpg"]},
-  {name:"两方面美感潮流冷烫液", sub:"120ml × 2", brand:"两方面", cate:"烫发", images:["upload/72-1.jpg","upload/72-2.jpg"]},
-  {name:"水慕柔劲酷特硬喷雾干胶", sub:"450ml ｜ 强力定型，持久造型", brand:"水慕柔", cate:"造型", images:["upload/73-1.jpg","upload/73-2.jpg"]},
-  {name:"水慕柔精油造型乳", sub:"300ml ｜ 造型护发二合一", brand:"水慕柔", cate:"造型", images:["upload/74-1.jpg","upload/74-2.jpg"]},
-  {name:"丽维尔专业油头理发器（油推）", sub:"", brand:"美发电器", cate:"工具", images:["upload/75-1.jpg","upload/75-2.jpg"]},
-  {name:"圣爵士锂电池电推剪", sub:"", brand:"美发电器", cate:"工具", images:["upload/76-1.jpg","upload/76-2.jpg"]},
-  {name:"无刷高速电吹风（戴森款）", sub:"", brand:"美发电器", cate:"工具", images:["upload/77-1.jpg","upload/77-2.jpg"]},
-  {name:"护手宝舒柔型洗发水", sub:"4L", brand:"大容量洗护", cate:"大容量", images:["upload/78-1.jpg","upload/78-2.jpg"]},
-  {name:"奢香稻草发护理1号护发发膜", sub:"1L", brand:"大容量洗护", cate:"大容量", images:["upload/79-1.jpg","upload/79-2.jpg"]},
-  {name:"奢香水润柔顺洗发露", sub:"1L", brand:"大容量洗护", cate:"大容量", images:["upload/80-1.jpg","upload/80-2.jpg"]},
-  {name:"奢香去屑爽洁洗发露", sub:"1L", brand:"大容量洗护", cate:"大容量", images:["upload/81-1.jpg","upload/81-2.jpg"]},
-  {name:"圆块烫发液", sub:"1L × 2", brand:"大容量洗护", cate:"大容量", images:["upload/82-1.jpg","upload/82-2.jpg"]},
-  {name:"潮范立体塑形发蜡", sub:"100ml", brand:"大容量洗护", cate:"大容量", images:["upload/83-1.jpg","upload/83-2.jpg"]},
-  {name:"潮范立体塑形发泥", sub:"100ml", brand:"大容量洗护", cate:"大容量", images:["upload/84-1.jpg","upload/84-2.jpg"]}
+  {name:"帝辇氨基酸精华滋润修护洗发水", sub:"700g ｜ 氨基酸基底，修护干枯毛躁", brand:"帝辇", cate:"帝辇", images:["upload/01.jpg"]},
+  {name:"帝辇氨基酸去屑蓬松洗发水", sub:"700g ｜ 温和去屑，发根持久蓬松", brand:"帝辇", cate:"帝辇", images:["upload/02.jpg"]},
+  {name:"帝辇蛋白焕活霜", sub:"700ml ｜ 沙龙蛋白护理，柔顺锁水", brand:"帝辇", cate:"帝辇", images:["upload/03.jpg"]},
+  {name:"帝辇抑菌膏", sub:"30g ｜ 头皮舒缓护理", brand:"帝辇", cate:"帝辇", images:["upload/04.jpg"]},
+  {name:"帝辇中药防断健发洗发液", sub:"500g ｜ 减少断发，强韧发根", brand:"帝辇", cate:"帝辇", images:["upload/05.jpg"]},
+  {name:"帝辇草本去屑止痒洗发液", sub:"500g ｜ 草本舒缓，改善头痒头屑", brand:"帝辇", cate:"帝辇", images:["upload/06.jpg"]},
+  {name:"帝辇草本去屑控油洗发精华乳", sub:"350ml ｜ 含二硫化硒，强效控油去屑", brand:"帝辇", cate:"帝辇", images:["upload/07.jpg"]},
+  {name:"帝辇灵润飘逸护发精油", sub:"60ml ｜ 免洗配方，抚平毛躁", brand:"帝辇", cate:"帝辇", images:["upload/08.jpg"]},
+  {name:"帝辇氨基酸隐形发膜（弹力素）", sub:"300ml ｜ 卷发保湿，隐形质感不厚重", brand:"帝辇", cate:"帝辇", images:["upload/09.jpg"]},
+  {name:"帝辇水润护卷弹力素", sub:"300ml ｜ 持久护卷，造型不僵硬", brand:"帝辇", cate:"帝辇", images:["upload/10.jpg"]},
+  {name:"帝辇保湿定型啫喱膏", sub:"300ml ｜ 保湿定型，干爽不发白", brand:"帝辇", cate:"帝辇", images:["upload/11.jpg"]},
+  {name:"帝辇香氛蓬松洗发乳", sub:"4.2L ｜ 发廊大桶装，香氛蓬松", brand:"帝辇", cate:"帝辇", images:["upload/12.jpg"]},
+  {name:"帝辇香氛柔滑护发素", sub:"4.2L ｜ 发廊大桶护发，顺滑易梳", brand:"帝辇", cate:"帝辇", images:["upload/13.jpg"]},
+  {name:"帝辇绿点黑油", sub:"发廊专业染黑", brand:"帝辇", cate:"帝辇", images:["upload/14.jpg"]},
+  {name:"帝辇皂基奢舒沐浴乳", sub:"香氛沐浴，清洁清爽", brand:"帝辇", cate:"帝辇", images:["upload/15.jpg"]},
+  {name:"帝辇绿瓶香氛沐浴露", sub:"", brand:"帝辇", cate:"帝辇", images:["upload/16.jpg"]},
+  {name:"滇草源植萃精华柔顺修护洗发乳", sub:"750ml ｜ 植萃配方，修护烫染受损", brand:"滇草源", cate:"滇草源", images:["upload/17.jpg"]},
+  {name:"滇草源植萃精华去屑控油洗发水", sub:"750ml ｜ 植萃净屑，平衡头皮油脂", brand:"滇草源", cate:"滇草源", images:["upload/18.jpg"]},
+  {name:"滇草源植萃焕活果酸修复霜", sub:"700ml ｜ 果酸修护，改善干枯稻草发", brand:"滇草源", cate:"滇草源", images:["upload/19.jpg"]},
+  {name:"滇草源去屑净油止痒洗发乳", sub:"300ml ｜ 含二硫化硒，针对顽固头屑头痒", brand:"滇草源", cate:"滇草源", images:["upload/20.jpg"]},
+  {name:"滇草源植萃蛋白柔顺霜（发膜）", sub:"650ml ｜ 深层蛋白滋养，柔顺亮泽", brand:"滇草源", cate:"滇草源", images:["upload/21.jpg"]},
+  {name:"滇草源植萃香氛护发精油（经典款）", sub:"60ml ｜ 免洗护发，留香持久", brand:"滇草源", cate:"滇草源", images:["upload/22.jpg"]},
+  {name:"滇草源植萃香氛护发精油（黄包装款）", sub:"60ml ｜ 轻薄不油，修护分叉", brand:"滇草源", cate:"滇草源", images:["upload/23.jpg"]},
+  {name:"云草舒植萃舒缓洗发露", sub:"750ml ｜ 植萃舒缓，温和洁净", brand:"云草舒", cate:"云草舒", images:["upload/90.jpg"]},
+  {name:"云草舒草本控油洗发乳", sub:"750ml ｜ 草本控油，蓬松清爽", brand:"云草舒", cate:"云草舒", images:["upload/91.jpg"]},
+  {name:"云草舒柔顺修护发膜", sub:"650ml ｜ 深层修护，柔顺亮泽", brand:"云草舒", cate:"云草舒", images:["upload/92.jpg"]},
+  {name:"云草舒去屑止痒洗发水", sub:"500ml ｜ 去屑止痒，舒缓头皮", brand:"云草舒", cate:"云草舒", images:["upload/93.jpg"]},
+  {name:"云草舒护发精油", sub:"60ml ｜ 免洗护发，修护分叉", brand:"云草舒", cate:"云草舒", images:["upload/94.jpg"]},
+  {name:"云草舒植萃补水面贴", sub:"25ml × 5片 ｜ 植萃补水，舒缓修护", brand:"云草舒面贴", cate:"面贴", images:["upload/95.jpg"]},
+  {name:"云草舒草本舒缓面贴", sub:"25ml × 5片 ｜ 草本舒缓，镇静肌肤", brand:"云草舒面贴", cate:"面贴", images:["upload/96.jpg"]},
+  {name:"云草舒亮肤焕颜面贴", sub:"25ml × 5片 ｜ 提亮肤色，焕活美肌", brand:"云草舒面贴", cate:"面贴", images:["upload/97.jpg"]},
+  {name:"忠哗会净澈去屑控油洗发乳", sub:"720g ｜ 净澈头皮，长效控油去屑", brand:"忠哗会", cate:"洗护", images:["upload/24.jpg"]},
+  {name:"忠哗会焕活润养修护洗发乳", sub:"720g ｜ 润养修护，改善烫染损伤", brand:"忠哗会", cate:"洗护", images:["upload/25.jpg"]},
+  {name:"忠哗会奢润柔顺果酸角蛋白1号", sub:"720g ｜ 角蛋白填充，抚平毛躁", brand:"忠哗会", cate:"洗护", images:["upload/26.jpg"]},
+  {name:"魅丽源溯去屑控油洗发乳", sub:"700g ｜ 清爽控油，祛除头屑", brand:"魅丽源溯", cate:"洗护", images:["upload/27.jpg"]},
+  {name:"魅丽源溯柔滑修护洗发乳", sub:"700g ｜ 修护干枯，发丝顺滑", brand:"魅丽源溯", cate:"洗护", images:["upload/28.jpg"]},
+  {name:"魅丽源溯鱼子酱蛋白复活霜", sub:"鱼子酱营养，急救受损发质", brand:"魅丽源溯", cate:"洗护", images:["upload/29.jpg"]},
+  {name:"魅丽源溯特硬干胶", sub:"360ml ｜ 强力定型，持久蓬松", brand:"魅丽源溯", cate:"洗护", images:["upload/30.jpg"]},
+  {name:"魅丽源溯轻漾鱼感泡沫发蜡", sub:"380ml ｜ 弹力塑卷，轻盈不厚重", brand:"魅丽源溯", cate:"洗护", images:["upload/31.jpg"]},
+  {name:"金曼丽发芯小分子蛋白乳", sub:"小分子蛋白，渗透发芯修护", brand:"金曼丽", cate:"洗护", images:["upload/32.jpg"]},
+  {name:"金曼丽植萃去屑洗发乳", sub:"720g ｜ 植萃温和，舒缓去屑", brand:"金曼丽", cate:"洗护", images:["upload/33.jpg"]},
+  {name:"欣洋娜水润修护洗发水", sub:"700ml ｜ 水润滋养，改善干枯毛躁", brand:"欣洋娜", cate:"洗护", images:["upload/34.jpg"]},
+  {name:"欣洋娜控油蓬松洗发水", sub:"清爽控油，发根立体蓬松", brand:"欣洋娜", cate:"洗护", images:["upload/35.jpg"]},
+  {name:"欣洋娜奢润蛋白护理", sub:"700ml ｜ 蛋白深层护理，提升发丝光泽", brand:"欣洋娜", cate:"洗护", images:["upload/36.jpg"]},
+  {name:"妍美汐蓬松润泽酸性洗发水", sub:"700ml ｜ 酸性配方，闭合毛鳞片，蓬松顺滑", brand:"妍美汐", cate:"洗护", images:["upload/37.jpg"]},
+  {name:"裕萱水光丝滑精华霜", sub:"750g ｜ 水光质感，发丝丝滑", brand:"裕萱", cate:"洗护", images:["upload/38.jpg"]},
+  {name:"裕萱水润丝质顺滑洗发露", sub:"750g ｜ 长效顺滑，易梳理", brand:"裕萱", cate:"洗护", images:["upload/39.jpg"]},
+  {name:"裕萱无味黑油", sub:"无味黑油，发廊专用", brand:"裕萱", cate:"洗护", images:["upload/40.jpg"]},
+  {name:"迪洛斯去屑精华乳", sub:"300ml ｜ 头皮去屑精华，改善顽固头屑", brand:"迪洛斯", cate:"洗护", images:["upload/41.jpg"]},
+  {name:"迪洛斯去屑精华乳", sub:"130ml ｜ 便携小瓶装，头皮护理", brand:"迪洛斯", cate:"洗护", images:["upload/42.jpg"]},
+  {name:"荣威控油防脱洗发露", sub:"450ml ｜ 控油，稳固发根", brand:"其他", cate:"洗护", images:["upload/43.jpg"]},
+  {name:"澳尚免洗液态护理精华乳（修复液）", sub:"260ml ｜ 免洗修护，抚平毛躁", brand:"其他", cate:"洗护", images:["upload/44.jpg"]},
+  {name:"罗威丝发感喷雾精华素", sub:"220ml ｜ 喷雾型护发，即时顺滑", brand:"其他", cate:"洗护", images:["upload/45.jpg"]},
+  {name:"发炫多效去屑洗发乳", sub:"500g ｜ 多效去屑，清爽头皮", brand:"其他", cate:"洗护", images:["upload/46.jpg"]},
+  {name:"新靓琪致妍保湿玫瑰露", sub:"120ml × 2", brand:"新靓琪", cate:"护肤", images:["upload/47.jpg"]},
+  {name:"新靓琪多肽倍润眼霜", sub:"20g", brand:"新靓琪", cate:"护肤", images:["upload/48.jpg"]},
+  {name:"新靓琪致妍赋采精华乳", sub:"100ml", brand:"新靓琪", cate:"护肤", images:["upload/49.jpg"]},
+  {name:"新靓琪水漾清润柔肤水", sub:"120ml", brand:"新靓琪", cate:"护肤", images:["upload/50.jpg"]},
+  {name:"新靓琪水漾清润补水霜", sub:"50g", brand:"新靓琪", cate:"护肤", images:["upload/51.jpg"]},
+  {name:"新靓琪水漾清润锁水乳", sub:"100ml", brand:"新靓琪", cate:"护肤", images:["upload/52.jpg"]},
+  {name:"新靓琪水漾补水洁面霜", sub:"120g", brand:"新靓琪", cate:"护肤", images:["upload/53.jpg"]},
+  {name:"新靓琪臻颜净透洁面泡沫", sub:"120ml", brand:"新靓琪", cate:"护肤", images:["upload/54.jpg"]},
+  {name:"恩必思色膏", sub:"", brand:"色膏系列", cate:"染发", images:["upload/55.jpg"]},
+  {name:"领秀色膏", sub:"", brand:"色膏系列", cate:"染发", images:["upload/56.jpg"]},
+  {name:"美雅色膏", sub:"", brand:"色膏系列", cate:"染发", images:["upload/57.jpg"]},
+  {name:"凡高黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/58.jpg"]},
+  {name:"立典黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/59.jpg"]},
+  {name:"HG黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/60.jpg"]},
+  {name:"朵妍琦黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/61.jpg"]},
+  {name:"佳桐黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/62.jpg"]},
+  {name:"孜然炫彩黑油", sub:"", brand:"黑油系列", cate:"染发", images:["upload/63.jpg"]},
+  {name:"章华百草韵味冷烫液（正常发质）", sub:"120ml × 2", brand:"章华", cate:"烫发", images:["upload/64.jpg"]},
+  {name:"章华百草韵味冷烫液（受损发质）", sub:"120ml × 2", brand:"章华", cate:"烫发", images:["upload/65.jpg"]},
+  {name:"章华百草韵味曲直烫发霜", sub:"550ml × 2", brand:"章华", cate:"烫发", images:["upload/66.jpg"]},
+  {name:"章华百草韵味素卷烫发乳", sub:"550ml × 2", brand:"章华", cate:"烫发", images:["upload/67.jpg"]},
+  {name:"两方面曲直香氛烫发乳（卷发专用）", sub:"900ml × 2", brand:"两方面", cate:"烫发", images:["upload/68.jpg"]},
+  {name:"两方面曲直香氛烫发乳（直发专用）", sub:"900ml × 2", brand:"两方面", cate:"烫发", images:["upload/69.jpg"]},
+  {name:"两方面美感弹力烫发液（高技）", sub:"120ml × 2", brand:"两方面", cate:"烫发", images:["upload/70.jpg"]},
+  {name:"两方面美感弹力烫发液（水剂）", sub:"120ml × 2", brand:"两方面", cate:"烫发", images:["upload/71.jpg"]},
+  {name:"两方面美感潮流冷烫液", sub:"120ml × 2", brand:"两方面", cate:"烫发", images:["upload/72.jpg"]},
+  {name:"水慕柔劲酷特硬喷雾干胶", sub:"450ml ｜ 强力定型，持久造型", brand:"水慕柔", cate:"造型", images:["upload/73.jpg"]},
+  {name:"水慕柔精油造型乳", sub:"300ml ｜ 造型护发二合一", brand:"水慕柔", cate:"造型", images:["upload/74.jpg"]},
+  {name:"丽维尔专业油头理发器（油推）", sub:"", brand:"美发电器", cate:"工具", images:["upload/75.jpg"]},
+  {name:"圣爵士锂电池电推剪", sub:"", brand:"美发电器", cate:"工具", images:["upload/76.jpg"]},
+  {name:"无刷高速电吹风（戴森款）", sub:"", brand:"美发电器", cate:"工具", images:["upload/77.jpg"]},
+  {name:"护手宝舒柔型洗发水", sub:"4L", brand:"大容量洗护", cate:"大容量", images:["upload/78.jpg"]},
+  {name:"奢香稻草发护理1号护发发膜", sub:"1L", brand:"大容量洗护", cate:"大容量", images:["upload/79.jpg"]},
+  {name:"奢香水润柔顺洗发露", sub:"1L", brand:"大容量洗护", cate:"大容量", images:["upload/80.jpg"]},
+  {name:"奢香去屑爽洁洗发露", sub:"1L", brand:"大容量洗护", cate:"大容量", images:["upload/81.jpg"]},
+  {name:"圆块烫发液", sub:"1L × 2", brand:"大容量洗护", cate:"大容量", images:["upload/82.jpg"]},
+  {name:"潮范立体塑形发蜡", sub:"100ml", brand:"大容量洗护", cate:"大容量", images:["upload/83.jpg"]},
+  {name:"潮范立体塑形发泥", sub:"100ml", brand:"大容量洗护", cate:"大容量", images:["upload/84.jpg"]}
 ];
 
 const ARTICLES = [
@@ -830,6 +746,8 @@ function switchTab(tab){
   if(page) page.classList.add('active');
   if(tabEl) tabEl.classList.add('active');
   window.scrollTo({top:0, behavior:'smooth'});
+  /* 保存当前 Tab 到 localStorage */
+  try { localStorage.setItem('current_tab', tab); } catch(e){}
   if(tab === 'ai') setTimeout(initAI, 50);
   if(tab !== 'games'){
     if(typeof sStop === 'function') sStop();
@@ -853,37 +771,27 @@ function renderCate(){
   $('cateList').querySelectorAll('.cate-btn').forEach(btn => {
     btn.onclick = () => {
       currentCate = btn.dataset.cate;
-      renderCate();
-      renderProducts();
+      renderCate(); renderProducts();
     };
   });
 }
 
-function escapeAttr(s){
-  return String(s).replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
-}
+function escapeAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
 
 function cardHTML(p){
   const imgs = p.images || [];
-  const multi = imgs.length > 1;
   let imgInner = '';
   if(imgs.length === 0){
     imgInner = `<div class="ph"><i class="fas fa-image"></i>暂无图片</div>`;
   } else {
     imgInner = `<img src="${imgs[0]}" alt="${p.name}" loading="lazy"
                  onerror="this.style.display='none';this.parentNode.innerHTML='<div class=ph><i class=fas--image></i>图片加载失败</div>'">`;
-    if(multi){
-      imgInner += `
-        <button class="nav-btn prev" onclick="event.stopPropagation();cardNav(this,-1)">‹</button>
-        <button class="nav-btn next" onclick="event.stopPropagation();cardNav(this,1)">›</button>
-        <div class="dots">${imgs.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>`;
-    }
   }
-  return `<div class="product-card" data-imgs='${JSON.stringify(imgs).replace(/'/g,"&#39;")}'
-              data-idx="0" data-brand="${escapeAttr(p.brand||'')}"
+  return `<div class="product-card" data-img="${escapeAttr(imgs[0]||'')}"
+              data-brand="${escapeAttr(p.brand||'')}"
               data-name="${escapeAttr(p.name)}" data-sub="${escapeAttr(p.sub||'')}"
               onclick="openDetail(this)">
-    <div class="product-img ${multi?'multi':''}">${imgInner}</div>
+    <div class="product-img">${imgInner}</div>
     <div class="product-info">
       <div class="p-title">${p.name}</div>
       <div class="p-sub">${p.sub || '&nbsp;'}</div>
@@ -892,23 +800,10 @@ function cardHTML(p){
   </div>`;
 }
 
-function cardNav(btn, dir){
-  const card = btn.closest('.product-card');
-  const imgBox = card.querySelector('.product-img');
-  const imgs = JSON.parse(card.dataset.imgs || '[]');
-  if(imgs.length < 2) return;
-  let i = (parseInt(card.dataset.idx||'0') + dir + imgs.length) % imgs.length;
-  card.dataset.idx = i;
-  const img = imgBox.querySelector('img');
-  if(img) img.src = imgs[i];
-  imgBox.querySelectorAll('.dots span').forEach((d,k)=>d.classList.toggle('on', k===i));
-}
-
 function renderProducts(){
   let list = PRODUCTS.slice();
   if(viewingBrand) list = list.filter(p => p.brand === viewingBrand);
   else if(currentCate !== "全部") list = list.filter(p => p.cate === currentCate);
-
   if(currentKeyword){
     const kw = currentKeyword.toLowerCase();
     list = list.filter(p =>
@@ -917,23 +812,16 @@ function renderProducts(){
       (p.brand||"").toLowerCase().includes(kw)
     );
   }
-
   if(list.length === 0){
     $('content').innerHTML = '<div class="empty"><i class="fas fa-search"></i>没有找到相关产品</div>';
     return;
   }
-
   if(viewingBrand){
     $('content').innerHTML = '<div class="product-list">' + list.map(cardHTML).join('') + '</div>';
     return;
   }
-
   const groups = {};
-  list.forEach(p => {
-    const b = p.brand || "其他";
-    if(!groups[b]) groups[b] = [];
-    groups[b].push(p);
-  });
+  list.forEach(p => { const b = p.brand || "其他"; if(!groups[b]) groups[b] = []; groups[b].push(p); });
   let html = '';
   for(const brand in groups){
     html += `<div class="brand-title">${brand}</div>`;
@@ -986,8 +874,7 @@ function goHome(){
   $('homeView').style.display = '';
   $('brandPageHead').className = 'brand-page-head';
   $('culturePageHead').className = 'brand-page-head culture';
-  renderCate();
-  renderProducts();
+  renderCate(); renderProducts();
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
@@ -999,51 +886,46 @@ function jumpCate(name){
   currentCate = name;
   currentKeyword = "";
   $('search').value = "";
-  renderCate();
-  renderProducts();
+  renderCate(); renderProducts();
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-let modalImgs = [];
-let modalIdx = 0;
+/* ============================================================
+   4. 详情弹窗 + 全屏图片
+   ============================================================ */
+let modalImg = '';
 
 function openDetail(card){
-  const imgs = JSON.parse(card.dataset.imgs || '[]');
-  modalImgs = imgs;
-  modalIdx = parseInt(card.dataset.idx||'0') % Math.max(1, imgs.length);
+  const img = card.dataset.img;
+  modalImg = img;
   $('modalTitle').textContent = card.dataset.name;
   $('modalSub').textContent = (card.dataset.brand ? '【' + card.dataset.brand + '】' : '') + (card.dataset.sub ? '  ' + card.dataset.sub : '');
   $('modalPrice').innerHTML = '批发价面议 <small>实体门店专供</small>';
-  renderModal();
+
+  const main = $('modalMain');
+  if(img){
+    main.innerHTML = `<img src="${img}" onerror="this.parentNode.innerHTML='<div class=\\'ph\\'>图片加载失败</div>'">`;
+  } else {
+    main.innerHTML = '暂无图片';
+  }
   $('modal').classList.add('show');
 }
 
-function renderModal(){
-  const main = $('modalMain'), thumbs = $('modalThumbs');
-  if(modalImgs.length === 0){ main.innerHTML = '暂无图片'; thumbs.innerHTML = ''; return; }
-  main.innerHTML = `<img src="${modalImgs[modalIdx]}">
-    ${modalImgs.length > 1 ? `
-      <button class="nav-btn prev" onclick="modalPrev()">‹</button>
-      <button class="nav-btn next" onclick="modalNext()">›</button>
-    ` : ''}`;
-  if(modalImgs.length > 1){
-    thumbs.innerHTML = modalImgs.map((u,i)=>
-      `<img src="${u}" class="${i===modalIdx?'on':''}" onclick="modalIdx=${i};renderModal()">`
-    ).join('');
-  } else thumbs.innerHTML = '';
-}
-
-function modalPrev(){ modalIdx = (modalIdx - 1 + modalImgs.length) % modalImgs.length; renderModal(); }
-function modalNext(){ modalIdx = (modalIdx + 1) % modalImgs.length; renderModal(); }
 function closeModal(){ $('modal').classList.remove('show'); }
 $('modal').addEventListener('click', e => { if(e.target.id === 'modal') closeModal(); });
 
+/* 全屏图片查看 */
+function openLightbox(){
+  if(!modalImg) return;
+  $('lightboxImg').src = modalImg;
+  $('lightbox').classList.add('show');
+}
+function closeLightbox(){ $('lightbox').classList.remove('show'); }
+
 document.addEventListener('keydown', e => {
+  if($('lightbox').classList.contains('show')){ if(e.key === 'Escape') closeLightbox(); return; }
   if(!$('modal').classList.contains('show')) return;
   if(e.key === 'Escape') closeModal();
-  if(modalImgs.length < 2) return;
-  if(e.key === 'ArrowLeft') modalPrev();
-  if(e.key === 'ArrowRight') modalNext();
 });
 
 $('search').addEventListener('input', e => {
@@ -1095,7 +977,7 @@ function backToGames(){
 }
 
 /* ============================================================
-   6. 贪吃蛇（含音效 + 视觉）
+   6. 贪吃蛇
    ============================================================ */
 let snake = { running:false, raf:null };
 (function(){
@@ -1111,10 +993,7 @@ let snake = { running:false, raf:null };
     if(dx === dir.x && dy === dir.y) return;
     nextDir = { x:dx, y:dy };
   };
-  window.sStop = function(){
-    snake.running = false;
-    if(snake.raf){ cancelAnimationFrame(snake.raf); snake.raf = null; }
-  };
+  window.sStop = function(){ snake.running = false; if(snake.raf){ cancelAnimationFrame(snake.raf); snake.raf = null; } };
   window.sReset = function(){
     sStop();
     body = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
@@ -1129,9 +1008,7 @@ let snake = { running:false, raf:null };
     while(true){
       const f = { x: Math.floor(Math.random()*G), y: Math.floor(Math.random()*G) };
       let ok = true;
-      for(let i = 0; i < body.length; i++){
-        if(body[i].x === f.x && body[i].y === f.y){ ok = false; break; }
-      }
+      for(let i = 0; i < body.length; i++){ if(body[i].x === f.x && body[i].y === f.y){ ok = false; break; } }
       if(ok){ food = f; return; }
     }
   }
@@ -1143,12 +1020,10 @@ let snake = { running:false, raf:null };
       cx.beginPath(); cx.moveTo(i*CELL,0); cx.lineTo(i*CELL,400); cx.stroke();
       cx.beginPath(); cx.moveTo(0,i*CELL); cx.lineTo(400,i*CELL); cx.stroke();
     }
-    // 食物发光
     cx.shadowColor = '#f87171'; cx.shadowBlur = 12;
     cx.fillStyle = '#f87171';
     cx.beginPath(); cx.arc(food.x*CELL+CELL/2, food.y*CELL+CELL/2, CELL/2-3, 0, 6.28); cx.fill();
     cx.shadowBlur = 0;
-    // 蛇身
     for(let i = 0; i < body.length; i++){
       const s = body[i];
       cx.fillStyle = dead ? '#7f1d1d' : (i === 0 ? '#d4a96a' : '#8a9a5b');
@@ -1169,30 +1044,18 @@ let snake = { running:false, raf:null };
       const head = { x: body[0].x + dir.x, y: body[0].y + dir.y };
       let died = false;
       if(head.x < 0 || head.x >= G || head.y < 0 || head.y >= G) died = true;
-      if(!died){
-        for(let i = 0; i < body.length; i++){
-          if(body[i].x === head.x && body[i].y === head.y){ died = true; break; }
-        }
-      }
+      if(!died){ for(let i = 0; i < body.length; i++){ if(body[i].x === head.x && body[i].y === head.y){ died = true; break; } } }
       if(died){
         dead = true; snake.running = false;
-        Sound.snakeDie();
-        shakeScreen('snakeC');
-        flashScreen('snakeFlash');
-        draw();
-        if(score > best){
-          best = score;
-          try { localStorage.setItem('snake_best', String(best)); } catch(e){}
-          $('sBest').textContent = best;
-        }
+        Sound.snakeDie(); shakeScreen('snakeC'); flashScreen('snakeFlash'); draw();
+        if(score > best){ best = score; try { localStorage.setItem('snake_best', String(best)); } catch(e){} $('sBest').textContent = best; }
         snake.raf = null; return;
       }
       body.unshift(head);
       if(head.x === food.x && head.y === food.y){
         score++; $('sScore').textContent = score;
         if(tickMs > 80) tickMs -= 4;
-        Sound.snakeEat();
-        spawnFood();
+        Sound.snakeEat(); spawnFood();
       } else body.pop();
     }
     draw();
@@ -1209,10 +1072,7 @@ let snake = { running:false, raf:null };
   });
 
   let sx = 0, sy = 0;
-  cv.addEventListener('touchstart', e => {
-    if(e.touches[0]){ sx = e.touches[0].clientX; sy = e.touches[0].clientY; }
-    e.preventDefault();
-  }, {passive:false});
+  cv.addEventListener('touchstart', e => { if(e.touches[0]){ sx = e.touches[0].clientX; sy = e.touches[0].clientY; } e.preventDefault(); }, {passive:false});
   cv.addEventListener('touchmove', e => {
     if(!snake.running) return;
     if(e.touches[0]){
@@ -1228,7 +1088,7 @@ let snake = { running:false, raf:null };
 })();
 
 /* ============================================================
-   7. 打砖块（含音效 + 视觉）
+   7. 打砖块
    ============================================================ */
 let br = { running:false, raf:null };
 (function(){
@@ -1236,10 +1096,7 @@ let br = { running:false, raf:null };
   const W = cv.width, H = cv.height;
   let paddle, ball, bricks, score, lives, keys = {};
 
-  window.bStop = function(){
-    br.running = false;
-    if(br.raf){ cancelAnimationFrame(br.raf); br.raf = null; }
-  };
+  window.bStop = function(){ br.running = false; if(br.raf){ cancelAnimationFrame(br.raf); br.raf = null; } };
   window.bReset = function(){
     bStop();
     paddle = { w:100, h:14, x:W/2-50, y:H-40 };
@@ -1250,11 +1107,7 @@ let br = { running:false, raf:null };
     const colors = ['#2c5530','#8a9a5b','#d4a96a','#4e6337','#7a8f4d'];
     for(let r = 0; r < rows; r++){
       for(let c = 0; c < cols; c++){
-        bricks.push({
-          x: 20 + c*bw, y: 50 + r*(bh+gap),
-          w: bw-gap, h: bh, color: colors[r % colors.length],
-          alive: true, hp: (r === 0) ? 2 : 1
-        });
+        bricks.push({ x: 20 + c*bw, y: 50 + r*(bh+gap), w: bw-gap, h: bh, color: colors[r % colors.length], alive: true, hp: (r === 0) ? 2 : 1 });
       }
     }
     score = 0; lives = 3;
@@ -1285,16 +1138,10 @@ let br = { running:false, raf:null };
       cx.fillStyle = b.color;
       cx.fillRect(b.x, b.y, b.w, b.h);
       cx.shadowBlur = 0;
-      if(b.hp > 1){
-        cx.strokeStyle = 'rgba(255,255,255,0.6)'; cx.lineWidth = 1.5;
-        cx.strokeRect(b.x+1, b.y+1, b.w-2, b.h-2);
-      }
+      if(b.hp > 1){ cx.strokeStyle = 'rgba(255,255,255,0.6)'; cx.lineWidth = 1.5; cx.strokeRect(b.x+1, b.y+1, b.w-2, b.h-2); }
     }
-    // 挡板发光
     cx.shadowColor = '#d4a96a'; cx.shadowBlur = 14;
-    cx.fillStyle = '#d4a96a';
-    cx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
-    // 球
+    cx.fillStyle = '#d4a96a'; cx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
     cx.shadowColor = '#fbbf24'; cx.shadowBlur = 16;
     cx.fillStyle = '#fbbf24';
     cx.beginPath(); cx.arc(ball.x, ball.y, ball.r, 0, 6.28); cx.fill();
@@ -1323,8 +1170,7 @@ let br = { running:false, raf:null };
       const angle = hit * 1.05;
       let sp = Math.sqrt(ball.vx*ball.vx + ball.vy*ball.vy);
       if(sp < 6) sp = 6;
-      ball.vx = sp * Math.sin(angle);
-      ball.vy = -sp * Math.cos(angle);
+      ball.vx = sp * Math.sin(angle); ball.vy = -sp * Math.cos(angle);
       Sound.paddle();
     }
     for(const b of bricks){
@@ -1334,25 +1180,15 @@ let br = { running:false, raf:null };
         const oy = Math.min(ball.y + ball.r - b.y, b.y + b.h - (ball.y - ball.r));
         if(ox < oy) ball.vx = -ball.vx; else ball.vy = -ball.vy;
         b.hp--;
-        if(b.hp <= 0){
-          b.alive = false; score += 10; $('bScore').textContent = score;
-          Sound.brick();
-          flashScreen('brFlash');
-        }
+        if(b.hp <= 0){ b.alive = false; score += 10; $('bScore').textContent = score; Sound.brick(); flashScreen('brFlash'); }
         break;
       }
     }
     if(ball.y - ball.r > H){
       lives--; $('bLives').textContent = lives;
-      Sound.loseLife();
-      shakeScreen('brC');
+      Sound.loseLife(); shakeScreen('brC');
       if(lives <= 0){ br.running = false; }
-      else {
-        ball.x = W/2; ball.y = H-70;
-        ball.vx = (Math.random() < 0.5 ? -1 : 1) * 3;
-        ball.vy = -3;
-        paddle.x = W/2 - paddle.w/2;
-      }
+      else { ball.x = W/2; ball.y = H-70; ball.vx = (Math.random() < 0.5 ? -1 : 1) * 3; ball.vy = -3; paddle.x = W/2 - paddle.w/2; }
     }
     let any = false;
     for(const b of bricks) if(b.alive){ any = true; break; }
@@ -1368,7 +1204,7 @@ let br = { running:false, raf:null };
 })();
 
 /* ============================================================
-   8. 星际守卫（含音效 + 视觉）
+   8. 星际守卫
    ============================================================ */
 let sp = { running:false, raf:null };
 (function(){
@@ -1378,17 +1214,12 @@ let sp = { running:false, raf:null };
   let pointerActive = false, px = null, py = null;
   let score, lives, fireT, spawnT, lastT, keys = {};
 
-  window.spStop = function(){
-    sp.running = false;
-    if(sp.raf){ cancelAnimationFrame(sp.raf); sp.raf = null; }
-  };
+  window.spStop = function(){ sp.running = false; if(sp.raf){ cancelAnimationFrame(sp.raf); sp.raf = null; } };
   window.spReset = function(){
     spStop();
     player = { x:W/2, y:H-100, r:14 };
     bullets = []; enemies = []; particles = []; stars = [];
-    for(let i = 0; i < 50; i++){
-      stars.push({ x:Math.random()*W, y:Math.random()*H, z:Math.random()*2+0.5 });
-    }
+    for(let i = 0; i < 50; i++) stars.push({ x:Math.random()*W, y:Math.random()*H, z:Math.random()*2+0.5 });
     score = 0; lives = 3; fireT = 0; spawnT = 0; lastT = performance.now();
     $('spScore').textContent = '0'; $('spLives').textContent = '3';
     sp.running = true;
@@ -1411,23 +1242,14 @@ let sp = { running:false, raf:null };
 
   function spawnEnemy(){
     const r = 12 + Math.random() * 12;
-    enemies.push({
-      x: 30 + Math.random() * (W - 60), y: -30,
-      r, vy: 70 + score * 0.3 + Math.random() * 40,
-      vx: (Math.random() - 0.5) * 40, hp: r > 18 ? 2 : 1,
-      points: Math.round(r)
-    });
+    enemies.push({ x: 30 + Math.random() * (W - 60), y: -30, r, vy: 70 + score * 0.3 + Math.random() * 40, vx: (Math.random() - 0.5) * 40, hp: r > 18 ? 2 : 1, points: Math.round(r) });
   }
 
   function explode(x, y, color, n){
     for(let i = 0; i < n; i++){
       const a = Math.random() * 6.28;
       const s = 40 + Math.random() * 180;
-      particles.push({
-        x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s,
-        life: 0.5 + Math.random() * 0.4, maxLife: 0.9,
-        color, size: 2 + Math.random() * 2
-      });
+      particles.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 0.5 + Math.random() * 0.4, maxLife: 0.9, color, size: 2 + Math.random() * 2 });
     }
   }
 
@@ -1441,13 +1263,8 @@ let sp = { running:false, raf:null };
     if(keys['ArrowUp'] || keys['w']) dirY -= 1;
     if(keys['ArrowDown'] || keys['s']) dirY += 1;
 
-    if(dirX || dirY){
-      player.x += dirX * 340 * dt;
-      player.y += dirY * 340 * dt;
-    } else if(pointerActive && px !== null){
-      player.x += (px - player.x) * Math.min(1, dt * 16);
-      player.y += (py - player.y) * Math.min(1, dt * 16);
-    }
+    if(dirX || dirY){ player.x += dirX * 340 * dt; player.y += dirY * 340 * dt; }
+    else if(pointerActive && px !== null){ player.x += (px - player.x) * Math.min(1, dt * 16); player.y += (py - player.y) * Math.min(1, dt * 16); }
 
     if(player.x < player.r+4) player.x = player.r+4;
     if(player.x > W - player.r-4) player.x = W - player.r-4;
@@ -1473,15 +1290,8 @@ let sp = { running:false, raf:null };
         if(dx*dx + dy*dy < (e.r+4)*(e.r+4)){
           e.hp--; hit = true;
           explode(b.x, b.y, '#d4a96a', 4);
-          if(e.hp <= 0){
-            score += e.points; $('spScore').textContent = score;
-            explode(e.x, e.y, '#f87171', 14);
-            Sound.explode();
-            flashScreen('spFlash');
-            enemies.splice(j, 1);
-          } else {
-            Sound.hitEnemy();
-          }
+          if(e.hp <= 0){ score += e.points; $('spScore').textContent = score; explode(e.x, e.y, '#f87171', 14); Sound.explode(); flashScreen('spFlash'); enemies.splice(j, 1); }
+          else Sound.hitEnemy();
           break;
         }
       }
@@ -1497,9 +1307,7 @@ let sp = { running:false, raf:null };
       if(dx*dx + dy*dy < rr*rr){
         lives--; $('spLives').textContent = lives;
         explode(player.x, player.y, '#8b5cf6', 24);
-        Sound.playerHit();
-        shakeScreen('spC');
-        flashScreen('spFlash');
+        Sound.playerHit(); shakeScreen('spC'); flashScreen('spFlash');
         enemies.splice(i, 1);
         if(lives <= 0) sp.running = false;
       }
@@ -1514,29 +1322,15 @@ let sp = { running:false, raf:null };
     }
 
     spawnT -= dt;
-    if(spawnT <= 0){
-      spawnEnemy();
-      spawnT = Math.max(0.4, 1.0 - score * 0.001) * (0.7 + Math.random() * 0.6);
-    }
+    if(spawnT <= 0){ spawnEnemy(); spawnT = Math.max(0.4, 1.0 - score * 0.001) * (0.7 + Math.random() * 0.6); }
   }
 
   function draw(){
     cx.fillStyle = '#0a0e1a'; cx.fillRect(0, 0, W, H);
-    for(const s of stars){
-      cx.globalAlpha = 0.3 + s.z * 0.3;
-      cx.fillStyle = '#d4a96a';
-      cx.fillRect(s.x, s.y, s.z, s.z * 2);
-    }
+    for(const s of stars){ cx.globalAlpha = 0.3 + s.z * 0.3; cx.fillStyle = '#d4a96a'; cx.fillRect(s.x, s.y, s.z, s.z * 2); }
     cx.globalAlpha = 1;
-
-    for(const p of particles){
-      cx.globalAlpha = Math.max(0, p.life / p.maxLife);
-      cx.fillStyle = p.color;
-      cx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
-    }
+    for(const p of particles){ cx.globalAlpha = Math.max(0, p.life / p.maxLife); cx.fillStyle = p.color; cx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size); }
     cx.globalAlpha = 1;
-
-    // 敌人发光
     for(const e of enemies){
       cx.shadowColor = '#f87171'; cx.shadowBlur = 10;
       cx.fillStyle = '#f87171';
@@ -1545,13 +1339,9 @@ let sp = { running:false, raf:null };
       cx.fillStyle = '#fecaca';
       cx.beginPath(); cx.arc(e.x, e.y, e.r * 0.4, 0, 6.28); cx.fill();
     }
-
-    // 子弹发光
     cx.shadowColor = '#d4a96a'; cx.shadowBlur = 8;
     cx.fillStyle = '#d4a96a';
-    for(const b of bullets){
-      cx.beginPath(); cx.arc(b.x, b.y, 3.5, 0, 6.28); cx.fill();
-    }
+    for(const b of bullets){ cx.beginPath(); cx.arc(b.x, b.y, 3.5, 0, 6.28); cx.fill(); }
     cx.shadowBlur = 0;
 
     if(sp.running){
@@ -1597,28 +1387,17 @@ let aiRAF = null;
 
 function randMatrix(rows, cols, scale){
   const m = [];
-  for(let i = 0; i < rows; i++){
-    const row = [];
-    for(let j = 0; j < cols; j++) row.push((Math.random() * 2 - 1) * scale);
-    m.push(row);
-  }
+  for(let i = 0; i < rows; i++){ const row = []; for(let j = 0; j < cols; j++) row.push((Math.random() * 2 - 1) * scale); m.push(row); }
   return m;
 }
 function zeros(n){ const a = []; for(let i = 0; i < n; i++) a.push(0); return a; }
 function sigmoid(x){ return 1 / (1 + Math.exp(-Math.max(-30, Math.min(30, x)))); }
 function dsigmoid(y){ return y * (1 - y); }
-
-function createNN(){
-  return { W1: randMatrix(2, 4, 1.2), b1: zeros(4), W2: randMatrix(4, 1, 1.2), b2: zeros(1) };
-}
+function createNN(){ return { W1: randMatrix(2, 4, 1.2), b1: zeros(4), W2: randMatrix(4, 1, 1.2), b2: zeros(1) }; }
 
 function forward(net, x){
   const h = [];
-  for(let i = 0; i < 4; i++){
-    let z = net.b1[i];
-    for(let j = 0; j < 2; j++) z += x[j] * net.W1[j][i];
-    h.push(sigmoid(z));
-  }
+  for(let i = 0; i < 4; i++){ let z = net.b1[i]; for(let j = 0; j < 2; j++) z += x[j] * net.W1[j][i]; h.push(sigmoid(z)); }
   let o = net.b2[0];
   for(let i = 0; i < 4; i++) o += h[i] * net.W2[i][0];
   o = sigmoid(o);
@@ -1638,12 +1417,7 @@ function trainStep(net, x, y, lr){
   return (o - y) ** 2 / 2;
 }
 
-const XOR_DATA = [
-  { x: [0, 0], y: 0 },
-  { x: [0, 1], y: 1 },
-  { x: [1, 0], y: 1 },
-  { x: [1, 1], y: 0 }
-];
+const XOR_DATA = [ { x: [0, 0], y: 0 }, { x: [0, 1], y: 1 }, { x: [1, 0], y: 1 }, { x: [1, 1], y: 0 } ];
 
 function initAI(){
   if(aiInitialized) return;
@@ -1651,10 +1425,7 @@ function initAI(){
   nn = createNN();
   aiEpoch = 0;
   aiLossHistory = [];
-  drawNN();
-  drawLossChart();
-  updateAIStats(0, 0);
-  updateXorTable();
+  drawNN(); drawLossChart(); updateAIStats(0, 0); updateXorTable();
   const slider = $('lrSlider');
   if(slider) slider.oninput = () => { $('lrVal').textContent = (slider.value / 100).toFixed(2); };
 }
@@ -1662,18 +1433,14 @@ function initAI(){
 function getLR(){ const s = $('lrSlider'); return s ? s.value / 100 : 0.2; }
 
 function drawNN(){
-  const cv = $('nnViz');
-  if(!cv || !nn) return;
+  const cv = $('nnViz'); if(!cv || !nn) return;
   const cx = cv.getContext('2d');
   const W = cv.width, H = cv.height;
   cx.fillStyle = '#0f172a'; cx.fillRect(0, 0, W, H);
   const layerX = [W * 0.18, W * 0.5, W * 0.82];
   const ys = [[H * 0.35, H * 0.65], [H * 0.2, H * 0.4, H * 0.6, H * 0.8], [H * 0.5]];
-  for(let i = 0; i < 2; i++)
-    for(let j = 0; j < 4; j++)
-      drawConn(cx, layerX[0], ys[0][i], layerX[1], ys[1][j], nn.W1[i][j]);
-  for(let j = 0; j < 4; j++)
-    drawConn(cx, layerX[1], ys[1][j], layerX[2], ys[2][0], nn.W2[j][0]);
+  for(let i = 0; i < 2; i++) for(let j = 0; j < 4; j++) drawConn(cx, layerX[0], ys[0][i], layerX[1], ys[1][j], nn.W1[i][j]);
+  for(let j = 0; j < 4; j++) drawConn(cx, layerX[1], ys[1][j], layerX[2], ys[2][0], nn.W2[j][0]);
   const labels = [['A','B'], ['h₁','h₂','h₃','h₄'], ['out']];
   const colors = ['#d4a96a', '#8a9a5b', '#2c5530'];
   for(let l = 0; l < 3; l++){
@@ -1701,8 +1468,7 @@ function drawConn(cx, x1, y1, x2, y2, w){
 }
 
 function drawLossChart(){
-  const cv = $('lossChart');
-  if(!cv) return;
+  const cv = $('lossChart'); if(!cv) return;
   const cx = cv.getContext('2d');
   const W = cv.width, H = cv.height;
   cx.fillStyle = '#0f172a'; cx.fillRect(0, 0, W, H);
@@ -1733,21 +1499,14 @@ function updateAIStats(epoch, loss){
 }
 
 function updateXorTable(){
-  const tbody = $('xorTable');
-  if(!tbody || !nn) return;
+  const tbody = $('xorTable'); if(!tbody || !nn) return;
   tbody.innerHTML = XOR_DATA.map(({x, y}) => {
     const { o } = forward(nn, x);
     const pred = o >= 0.5 ? 1 : 0;
     const ok = pred === y;
-    return `<tr>
-      <td>${x[0]}</td><td>${x[1]}</td><td>${y}</td>
-      <td class="mono ${ok ? 'good' : 'bad'}">${pred} (${o.toFixed(3)})</td>
-    </tr>`;
+    return `<tr><td>${x[0]}</td><td>${x[1]}</td><td>${y}</td><td class="mono ${ok ? 'good' : 'bad'}">${pred} (${o.toFixed(3)})</td></tr>`;
   }).join('');
-  const correct = XOR_DATA.filter(({x, y}) => {
-    const { o } = forward(nn, x);
-    return (o >= 0.5 ? 1 : 0) === y;
-  }).length;
+  const correct = XOR_DATA.filter(({x, y}) => { const { o } = forward(nn, x); return (o >= 0.5 ? 1 : 0) === y; }).length;
   if($('aiAcc')) $('aiAcc').textContent = Math.round(correct / 4 * 100) + '%';
 }
 
@@ -1768,25 +1527,14 @@ function trainEpochs(n){
 function aiLoop(){
   if(!aiTraining) return;
   const loss = trainEpochs(10);
-  if(aiEpoch % 10 === 0){
-    drawNN(); drawLossChart();
-    updateAIStats(aiEpoch, loss);
-    updateXorTable();
-  }
+  if(aiEpoch % 10 === 0){ drawNN(); drawLossChart(); updateAIStats(aiEpoch, loss); updateXorTable(); }
   aiRAF = requestAnimationFrame(aiLoop);
 }
 
 function toggleTraining(){
   if(!nn) initAI();
-  if(aiTraining){
-    aiTraining = false;
-    if(aiRAF) cancelAnimationFrame(aiRAF);
-    $('aiTrainBtn').textContent = '▶ 继续训练';
-  } else {
-    aiTraining = true;
-    $('aiTrainBtn').textContent = '⏸ 暂停训练';
-    aiLoop();
-  }
+  if(aiTraining){ aiTraining = false; if(aiRAF) cancelAnimationFrame(aiRAF); $('aiTrainBtn').textContent = '▶ 继续训练'; }
+  else { aiTraining = true; $('aiTrainBtn').textContent = '⏸ 暂停训练'; aiLoop(); }
 }
 
 function resetNN(){
@@ -1796,12 +1544,11 @@ function resetNN(){
   aiEpoch = 0;
   aiLossHistory = [];
   $('aiTrainBtn').textContent = '▶ 开始训练';
-  drawNN(); drawLossChart();
-  updateAIStats(0, 0); updateXorTable();
+  drawNN(); drawLossChart(); updateAIStats(0, 0); updateXorTable();
 }
 
 /* ============================================================
-   10. 初始化
+   10. 初始化 —— 恢复上次的 Tab
    ============================================================ */
 function initApp(){
   renderCate();
@@ -1809,13 +1556,23 @@ function initApp(){
   renderGameList();
   updateStats();
   initSoundUI();
+
+  /* 恢复上次停留的 Tab */
+  let savedTab = 'home';
+  try { savedTab = localStorage.getItem('current_tab') || 'home'; } catch(e){}
+  if(savedTab !== 'home' && document.getElementById('page-' + savedTab)){
+    switchTab(savedTab);
+  } else {
+    /* 确保首页高亮 */
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-home').classList.add('active');
+    document.querySelector('.main-tab[data-tab="home"]').classList.add('active');
+  }
 }
 
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
-}
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+else initApp();
 </script>
 </body>
 </html>
