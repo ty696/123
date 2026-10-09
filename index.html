@@ -612,7 +612,12 @@ var RAW=[
 "奢香去屑爽洁洗发露|1L|大容量洗护|大容量|upload/81.jpg",
 "圆块烫发液|1L × 2|大容量洗护|大容量|upload/82.jpg",
 "潮范立体塑形发蜡|100ml|大容量洗护|大容量|upload/83.jpg",
-"潮范立体塑形发泥|100ml|大容量洗护|大容量|upload/84.jpg"
+"潮范立体塑形发泥|100ml|大容量洗护|大容量|upload/84.jpg"，
+  "帝辇888吹风2400w|2400W大功率 ｜ 发廊专业电吹风|美发电器|工具|upload/85.jpg",
+"帝辇8889吹风|专业发廊电吹风 ｜ 速干护发|美发电器|工具|upload/86.jpg",
+"利威尔电剪|专业理发器 ｜ 静音强劲|美发电器|工具|upload/87.jpg",
+"美扬夹板黑色|直卷两用 ｜ 恒温护发|美发电器|工具|upload/88.jpg",
+"美扬夹板石墨烯版面|石墨烯涂层 ｜ 均匀发热不伤发|美发电器|工具|upload/89.jpg"
 ];
 var PRODUCTS=RAW.map(function(s){var a=s.split("|");return {name:a[0],sub:a[1]||"",brand:a[2],cate:a[3],images:[a[4]]};});
 try{var cp=JSON.parse(localStorage.getItem('custom_products')||'[]');if(Array.isArray(cp))cp.forEach(function(p){if(p&&p.name)PRODUCTS.push(Object.assign({},p,{custom:true}));});}catch(e){}
