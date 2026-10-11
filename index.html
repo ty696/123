@@ -483,13 +483,11 @@ footer{background:var(--p);color:#fff;padding:54px 22px 26px;margin-top:50px}
         crossorigin="anonymous" async></script>
 
 <script>
-/* ============ 基础配置 ============ */
 var PHONE="135-7742-0308";
 document.getElementById('phoneText').textContent=PHONE;
 document.getElementById('footerPhone').textContent=PHONE;
 document.getElementById('phoneBtn').href='tel:'+PHONE.replace(/[^0-9+]/g,'');
 
-/* ============ 音效 ============ */
 var Sound=(function(){
   var ctx=null,on=true;
   try{var v=localStorage.getItem('game_sound_on');if(v!==null)on=v==='1';}catch(e){}
@@ -505,7 +503,6 @@ document.addEventListener('touchstart',initAudio);
 document.addEventListener('mousedown',initAudio);
 document.addEventListener('click',initAudio);
 
-/* ============ 商品数据 ============ */
 var CATEGORIES=["全部","帝辇","滇草源","忠哗会","魅丽源溯","新靓琪","云草舒","洗护","护肤","面贴","染发","烫发","造型","工具","大容量"];
 var RAW=[
 "帝辇氨基酸精华滋润修护洗发水|700g ｜ 氨基酸基底，修护干枯毛躁|帝辇|帝辇|upload/01.jpg",
@@ -660,19 +657,16 @@ function renderCate(){
   $('cateList').innerHTML=CATEGORIES.map(function(c){return '<button class="cate-btn '+(c===currentCate?'active':'')+'" data-cate="'+c+'">'+c+'</button>';}).join('');
   $('cateList').querySelectorAll('.cate-btn').forEach(function(b){b.onclick=function(){currentCate=b.dataset.cate;renderCate();renderProducts();};});
 }
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');}
-function imgFail(img){
-  img.onerror=null;
-  var d=document.createElement('div');
-  d.className='ph';
-  d.innerHTML='<i class="fas fa-image"></i>暂无图片';
-  if(img.parentNode)img.parentNode.replaceChild(d,img);
-}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function cardHTML(p){
-  var imgs=p.images||[],inner;
-  if(!imgs.length){inner='<div class="ph"><i class="fas fa-image"></i>暂无图片</div>';}
-  else{inner='<img src="'+esc(imgs[0])+'" alt="'+esc(p.name)+'" loading="lazy" onerror="imgFail(this)">';}
-  return '<div class="product-card" data-img="'+esc(imgs[0]||'')+'" data-brand="'+esc(p.brand||'')+'" data-name="'+esc(p.name)+'" data-sub="'+esc(p.sub||'')+'" onclick="openDetail(this)"><div class="product-img">'+inner+'</div><div class="product-info"><div class="p-title">'+p.name+'</div><div class="p-sub">'+(p.sub||'&nbsp;')+'</div><div class="p-price">批发价面议</div></div></div>';
+  var imgs=p.images||[];
+  var imgHTML;
+  if(!imgs.length){
+    imgHTML='<div class="ph"><i class="fas fa-image"></i>暂无图片</div>';
+  }else{
+    imgHTML='<div class="ph"><i class="fas fa-image"></i>暂无图片</div><img src="'+esc(imgs[0])+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\'none\'">';
+  }
+  return '<div class="product-card" data-img="'+esc(imgs[0]||'')+'" data-brand="'+esc(p.brand||'')+'" data-name="'+esc(p.name)+'" data-sub="'+esc(p.sub||'')+'" onclick="openDetail(this)"><div class="product-img">'+imgHTML+'</div><div class="product-info"><div class="p-title">'+esc(p.name)+'</div><div class="p-sub">'+(p.sub?esc(p.sub):'&nbsp;')+'</div><div class="p-price">批发价面议</div></div></div>';
 }
 function renderProducts(){
   var list=PRODUCTS.slice();
@@ -685,7 +679,7 @@ function renderProducts(){
   if(!list.length){$('content').innerHTML='<div class="empty"><i class="fas fa-search"></i>没有找到相关产品</div>';return;}
   if(viewingBrand){$('content').innerHTML='<div class="product-list">'+list.map(cardHTML).join('')+'</div>';return;}
   var g={};list.forEach(function(p){var b=p.brand||"其他";if(!g[b])g[b]=[];g[b].push(p);});
-  var h='';for(var b in g){h+='<div class="brand-title">'+b+'</div><div class="product-list">';g[b].forEach(function(p){h+=cardHTML(p);});h+='</div>';}
+  var h='';for(var b in g){h+='<div class="brand-title">'+esc(b)+'</div><div class="product-list">';g[b].forEach(function(p){h+=cardHTML(p);});h+='</div>';}
   $('content').innerHTML=h;
 }
 function enterBrand(brand){
@@ -703,7 +697,7 @@ function enterCulture(){
   $('brandHead').className='brand-head';
   $('cultureHead').className='brand-head culture show';
   $('cultureCount').textContent='共 '+ARTICLES.length+' 篇';
-  $('content').innerHTML='<div class="article-list">'+ARTICLES.map(function(a){return '<a class="article-card" href="'+a.url+'" target="_blank" rel="noopener"><div class="article-icon"><i class="fab fa-weixin"></i></div><div><div class="article-title">'+a.title+'</div><div class="article-meta"><i class="fas fa-bookmark"></i> 微信公众号文章</div></div><i class="fas fa-chevron-right article-go"></i></a>';}).join('')+'</div>';
+  $('content').innerHTML='<div class="article-list">'+ARTICLES.map(function(a){return '<a class="article-card" href="'+a.url+'" target="_blank" rel="noopener"><div class="article-icon"><i class="fab fa-weixin"></i></div><div><div class="article-title">'+esc(a.title)+'</div><div class="article-meta"><i class="fas fa-bookmark"></i> 微信公众号文章</div></div><i class="fas fa-chevron-right article-go"></i></a>';}).join('')+'</div>';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome(){
@@ -722,8 +716,14 @@ function openDetail(card){
   $('modalSub').textContent=(card.dataset.brand?'【'+card.dataset.brand+'】':'')+(card.dataset.sub?'  '+card.dataset.sub:'');
   $('modalPrice').innerHTML='批发价面议 <small>实体门店专供</small>';
   var m=$('modalMain');
-  if(img)m.innerHTML='<img src="'+img+'" onerror="this.parentNode.innerHTML=\'暂无图片\'">';
-  else m.innerHTML='暂无图片';
+  m.innerHTML='';
+  if(img){
+    var i=document.createElement('img');
+    i.src=img;
+    i.alt='';
+    i.onerror=function(){m.innerHTML='暂无图片';};
+    m.appendChild(i);
+  }else{m.innerHTML='暂无图片';}
   $('modal').classList.add('show');
 }
 function closeModal(){$('modal').classList.remove('show');}
@@ -738,7 +738,6 @@ document.addEventListener('keydown',function(e){
 });
 $('search').addEventListener('input',function(e){currentKeyword=e.target.value.trim();renderProducts();});
 
-/* ============ 游戏 ============ */
 var GAMES=[
 {id:'snake',name:'贪吃蛇',desc:'滑动屏幕或点方向键控制，撞墙或撞自己结束。',icon:'fa-staff-snake'},
 {id:'breakout',name:'打砖块',desc:'手指拖动底部挡板，把球弹回去打光砖块。',icon:'fa-table-cells'},
@@ -793,7 +792,6 @@ function backToGames(){
   $('gameListView').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* ============ 贪吃蛇 ============ */
 var snake={running:false,raf:null};
 (function(){
   var cv=$('snakeC');if(!cv)return;var cx=cv.getContext('2d');
@@ -848,7 +846,6 @@ var snake={running:false,raf:null};
   },{passive:false});
 })();
 
-/* ============ 打砖块 ============ */
 var br={running:false,raf:null};
 (function(){
   var cv=$('brC');if(!cv)return;var cx=cv.getContext('2d');
@@ -917,7 +914,6 @@ var br={running:false,raf:null};
   }
 })();
 
-/* ============ 星际守卫 ============ */
 var sp={running:false,raf:null};
 (function(){
   var cv=$('spC');if(!cv)return;var cx=cv.getContext('2d');
@@ -1017,7 +1013,6 @@ var sp={running:false,raf:null};
   }
 })();
 
-/* ============ AI 实验室 ============ */
 var nn=null,aiTraining=false,aiEpoch=0,aiLossHistory=[],aiInit=false,aiRAF=null;
 function randM(r,c,s){var m=[];for(var i=0;i<r;i++){var row=[];for(var j=0;j<c;j++)row.push((Math.random()*2-1)*s);m.push(row);}return m;}
 function zeros(n){var a=[];for(var i=0;i<n;i++)a.push(0);return a;}
@@ -1057,7 +1052,7 @@ function drawNN(){
   var lx=[W*.18,W*.5,W*.82],ys=[[H*.35,H*.65],[H*.2,H*.4,H*.6,H*.8],[H*.5]];
   for(var i=0;i<2;i++)for(var j=0;j<4;j++)conn(cx,lx[0],ys[0][i],lx[1],ys[1][j],nn.W1[i][j]);
   for(var k=0;k<4;k++)conn(cx,lx[1],ys[1][k],lx[2],ys[2][0],nn.W2[k][0]);
-  var labels=[['A','B'],['h₁','h₂','h₃','h₄'],['out']],colors=['#d4a96a','#8a9a5b','#2c5530'];
+  var labels=[['A','B'],['h1','h2','h3','h4'],['out']],colors=['#d4a96a','#8a9a5b','#2c5530'];
   for(var l=0;l<3;l++){
     var c=[2,4,1][l];
     for(var m=0;m<c;m++){
@@ -1135,6 +1130,94 @@ function resetNN(){
   drawNN();drawLoss();updAIStats(0,0);updateXor();
 }
 
-/* ============ 管理员 ============ */
 var ADMIN_PWD='123456',adminLogged=false;
-function getCustom(){
+function getCustom(){try{return JSON.parse(localStorage.getItem('custom_products')||'[]');}catch(e){return[];}}
+function saveCustom(a){localStorage.setItem('custom_products',JSON.stringify(a));}
+function openAdmin(){
+  $('adminModal').classList.add('show');
+  if(adminLogged){$('adminLoginView').style.display='none';$('adminPanelView').style.display='block';initAdminCate();renderAdminList();refreshAdminStats();}
+  else{$('adminLoginView').style.display='block';$('adminPanelView').style.display='none';$('adminPwd').value='';setTimeout(function(){var p=$('adminPwd');if(p)p.focus();},100);}
+}
+function closeAdmin(){$('adminModal').classList.remove('show');}
+function doAdminLogin(){
+  if($('adminPwd').value===ADMIN_PWD){adminLogged=true;$('adminLoginView').style.display='none';$('adminPanelView').style.display='block';initAdminCate();renderAdminList();refreshAdminStats();}
+  else alert('密码错误！');
+}
+function adminTab(name,btn){
+  document.querySelectorAll('.admin-tab').forEach(function(b){b.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  ['product','code','sys'].forEach(function(n){var el=$('adminPane-'+n);if(el)el.style.display=n===name?'block':'none';});
+}
+function initAdminCate(){
+  var s=$('apCate');if(!s||s.options.length>0)return;
+  s.innerHTML=CATEGORIES.filter(function(c){return c!=='全部';}).map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('');
+}
+function adminAddProduct(){
+  var name=$('apName').value.trim(),sub=$('apSub').value.trim(),brand=$('apBrand').value.trim()||'其他',cate=$('apCate').value||'洗护',img=$('apImg').value.trim();
+  if(!name){alert('请填写商品名称');return;}
+  var np={name:name,sub:sub,brand:brand,cate:cate,images:img?[img]:[]};
+  var arr=getCustom();arr.push(np);saveCustom(arr);
+  PRODUCTS.push(Object.assign({},np,{custom:true}));
+  $('apName').value='';$('apSub').value='';$('apBrand').value='';$('apImg').value='';
+  renderAdminList();refreshAdminStats();renderProducts();renderCate();updateStats();
+  alert('已添加：'+name);
+}
+function renderAdminList(){
+  var el=$('adminProductList');if(!el)return;
+  var arr=getCustom();
+  if(!arr.length){el.innerHTML='<p style="font-size:12.5px;color:#8a94a6">暂无自定义商品</p>';return;}
+  el.innerHTML=arr.map(function(p,i){return '<div class="admin-prod-item"><span>'+(p.brand?'【'+esc(p.brand)+'】':'')+esc(p.name)+(p.sub?' - '+esc(p.sub):'')+'</span><button onclick="adminDel('+i+')">删除</button></div>';}).join('');
+}
+function adminDel(i){
+  if(!confirm('确定删除这个商品吗？'))return;
+  var arr=getCustom(),removed=arr.splice(i,1)[0];saveCustom(arr);
+  if(removed)for(var j=PRODUCTS.length-1;j>=0;j--){if(PRODUCTS[j].custom&&PRODUCTS[j].name===removed.name){PRODUCTS.splice(j,1);break;}}
+  renderAdminList();refreshAdminStats();renderProducts();updateStats();
+}
+function refreshAdminStats(){
+  var arr=getCustom();
+  if($('sysProdCount'))$('sysProdCount').textContent=PRODUCTS.length;
+  if($('sysCustomCount'))$('sysCustomCount').textContent=arr.length;
+  if($('sysGameCount'))$('sysGameCount').textContent=GAMES.length;
+  if($('sysCustomGameCount'))$('sysCustomGameCount').textContent=CUSTOM_GAMES.length;
+}
+function adminExportData(){
+  var blob=new Blob([JSON.stringify(getCustom(),null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='custom_products.json';a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+}
+function adminClearCustom(){
+  if(!confirm('确定清空所有自定义商品吗？不可恢复！'))return;
+  localStorage.removeItem('custom_products');
+  for(var i=PRODUCTS.length-1;i>=0;i--)if(PRODUCTS[i].custom)PRODUCTS.splice(i,1);
+  renderAdminList();refreshAdminStats();renderProducts();updateStats();
+}
+function adminLoadSource(){
+  var ta=$('adminCode');
+  fetch(window.location.href).then(function(r){return r.text();}).then(function(txt){ta.value=txt;alert('已载入当前页面源码，可编辑后下载。');})
+  .catch(function(){ta.value='<!DOCTYPE html>\n<!-- 本地 file:// 打开时无法自动载入源码，请手动粘贴。 -->';alert('无法自动载入（本地文件受限）。');});
+}
+function adminCopyCode(){
+  var ta=$('adminCode');
+  if(!ta.value){alert('请先载入或粘贴代码');return;}
+  ta.select();document.execCommand('copy');alert('已复制到剪贴板');
+}
+function adminDownloadCode(){
+  var ta=$('adminCode');
+  if(!ta.value){alert('请先载入或粘贴代码');return;}
+  var blob=new Blob([ta.value],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='index.html';a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+}
+function adminLogout(){adminLogged=false;closeAdmin();alert('已退出登录');}
+
+function initApp(){
+  renderCate();renderProducts();renderGameList();updateStats();initSoundUI();
+  var saved='home';
+  try{saved=localStorage.getItem('current_tab')||'home';}catch(e){}
+  if(saved!=='home'&&$('page-'+saved))switchTab(saved);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initApp);else initApp();
+</script>
+</body>
+</html>
